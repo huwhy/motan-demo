@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:motan="http://api.weibo.com/schema/motan"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+   http://api.weibo.com/schema/motan http://api.weibo.com/schema/motan.xsd">
+
+    <!--<motan:registry regProtocol="zookeeper" name="registry" address="127.0.0.1:2181"/>-->
+    <motan:protocol default="true" name="motan" haStrategy="failover"
+                    loadbalance="roundrobin" maxClientConnection="10" minClientConnection="2"/>
+
+    <!-- reference to the remote service -->
+    <motan:referer id="userService" interface="com.nachepin.api.service.IUserService" directUrl="127.0.0.1:8001"/>
+    <motan:referer id="customerService" interface="com.nachepin.api.service.ICustomerService"
+                   directUrl="127.0.0.1:8001"/>
+</beans>
