@@ -5,12 +5,26 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
    http://api.weibo.com/schema/motan http://api.weibo.com/schema/motan.xsd">
 
+    <!-- 注册中心配置 -->
+    <motan:registry regProtocol="local" name="motanDemo" />
+
     <!--<motan:registry regProtocol="zookeeper" name="registry" address="127.0.0.1:2181"/>-->
     <motan:protocol default="true" name="motan" haStrategy="failover"
-                    loadbalance="roundrobin" maxClientConnection="10" minClientConnection="2"/>
-
+                    loadbalance="activeWeight" maxClientConnection="10" minClientConnection="2"/>
+    <!-- 通用referer基础配置 -->
+    <motan:basicReferer requestTimeout="200" accessLog="false"
+                        retries="2" group="motan-demo-rpc" module="motan-demo-rpc"
+                        application="myMotanDemo" protocol="motan" registry="motanDemo"
+                        id="motantestClientBasicConfig" throwException="false" check="true" />
     <!-- reference to the remote service -->
-    <motan:referer id="userService" interface="com.nachepin.api.service.IUserService" directUrl="127.0.0.1:8001"/>
-    <motan:referer id="customerService" interface="com.nachepin.api.service.ICustomerService"
-                   directUrl="127.0.0.1:8001"/>
+
+    <!-- 具体referer配置。使用方通过beanid使用服务接口类 -->
+    <motan:referer id="userService"
+                   directUrl="localhost:8002"
+                   interface="com.nachepin.api.service.IUserService"
+                   connectTimeout="300" requestTimeout="300" basicReferer="motantestClientBasicConfig" />
+    <motan:referer id="customerService"
+                   directUrl="localhost:8002"
+                   interface="com.nachepin.api.service.ICustomerService"
+                   connectTimeout="300" requestTimeout="300" basicReferer="motantestClientBasicConfig" />
 </beans>

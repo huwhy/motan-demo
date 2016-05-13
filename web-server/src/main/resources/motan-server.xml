@@ -5,15 +5,27 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
    http://api.weibo.com/schema/motan http://api.weibo.com/schema/motan.xsd">
 
+    <bean id="userServiceImpl" class="com.nachepin.service.UserServiceImpl"/>
+    <bean id="customerServiceImpl" class="com.nachepin.service.CustomerServiceImpl" />
+
+    <!-- 注册中心配置 使用不同注册中心需要依赖对应的jar包。如果不使用注册中心，可以把check属性改为false，忽略注册失败。-->
+    <motan:registry regProtocol="local" name="registry" />
     <!--<motan:registry regProtocol="zookeeper" name="registry" address="127.0.0.1:2181"/>-->
-    <motan:protocol id="motan" default="true" name="motan"
+
+    <!-- 协议配置。为防止多个业务配置冲突，推荐使用id表示具体协议。-->
+    <motan:protocol id="demoMotan" default="true" name="motan"
                     requestTimeout="220" maxServerConnection="80000" maxContentLength="1048576"
                     maxWorkerThread="800" minWorkerThread="20"/>
 
-    <!-- service implemention bean -->
-    <bean id="userServiceImpl" class="com.nachepin.service.UserServiceImpl"/>
-    <bean id="customerServiceImpl" class="com.nachepin.service.CustomerServiceImpl" />
-    <!-- exporting service by motan -->
-    <motan:service interface="com.nachepin.api.service.IUserService" ref="userServiceImpl" export="motan:8001"/>
-    <motan:service interface="com.nachepin.api.service.ICustomerService" ref="customerServiceImpl" export="motan:8001"/>
+    <!-- 通用配置，多个rpc服务使用相同的基础配置. group和module定义具体的服务池。export格式为“protocol id:提供服务的端口”-->
+    <motan:basicService requestTimeout="220" export="demoMotan:8002"
+                        group="motan-demo-rpc" accessLog="false" shareChannel="true" module="motan-demo-rpc"
+                        application="myMotanDemo" registry="registry" id="serviceBasicConfig"/>
+
+    <motan:service interface="com.nachepin.api.service.IUserService" ref="userServiceImpl"
+                   requestTimeout="200"
+                   basicService="serviceBasicConfig"/>
+    <motan:service interface="com.nachepin.api.service.ICustomerService" ref="customerServiceImpl"
+                   requestTimeout="200"
+                   basicService="serviceBasicConfig"/>
 </beans>
