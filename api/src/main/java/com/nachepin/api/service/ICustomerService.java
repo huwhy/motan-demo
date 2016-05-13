@@ -10,5 +10,7 @@ public interface ICustomerService {
 
     Customer getCustomerByCode(String code);
 
+    Customer getCustomerByUsername(String username);
+
     Customer getCustomerByPhone(String phone);
 }

@@ -21,4 +21,9 @@ public class CustomerDao extends BaseDao<Customer, Integer> {
         List<Customer> list =  jdbcTemplate.query("select * from customer where phone = ?", rowMapper, phone);
         return list.isEmpty() ? null : list.get(0);
     }
+
+    public Customer getByUsername(String username) {
+        List<Customer> list =  jdbcTemplate.query("select * from customer where username = ?", rowMapper, username);
+        return list.isEmpty() ? null : list.get(0);
+    }
 }

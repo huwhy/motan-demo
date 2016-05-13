@@ -1,7 +1,9 @@
 
 package com.nachepin.web.controller;
 
+import com.nachepin.api.dto.Json;
 import com.nachepin.api.model.Customer;
+import com.nachepin.api.model.enums.CustomerState;
 import com.nachepin.api.service.ICustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,5 +31,24 @@ public class IndexController {
         }
     }
 
+    @RequestMapping("/login")
+    @ResponseBody
+    public Json login(String code, String password) {
+        Customer c = customerService.getCustomerByCode(code);
+        if (c == null) {
+            c = customerService.getCustomerByPhone(code);
+        }
+        if (c == null) {
+            c = customerService.getCustomerByUsername(code);
+        }
+
+        if (c == null) {
+            return Json.error("用户名或手机号有误!");
+        }
+        if (c.getState().equals(CustomerState.stop)) {
+            return Json.error("帐号已停用");
+        }
+        return Json.success2(c);
+    }
 
 }
