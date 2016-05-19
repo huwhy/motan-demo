@@ -1,0 +1,100 @@
+<%layout("../layout/header_layout.html"){%>
+<title>尾货处理详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "尾货处理详情";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span2" style="margin-left: 0;">
+                    <div class="input-prepend">
+                        <span class="add-on">联系人</span>
+                        <span class="add-text h18">${tails.contacts!}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2" style="margin-left: 0;">
+                    <div class="input-prepend">
+                        <span class="add-on">联系电话</span>
+                        <span class="add-text h18">${tails.phone!}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品名称</span>
+                        <span class="add-text h18">
+                            ${tails.goodsName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品材质</span>
+                        <span class="add-text h18">
+                            ${tails.material!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品总价</span>
+                        <span class="add-text h18">
+                            ${tails.money!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品数量</span>
+                        <span class="add-text h18">
+                            ${tails.quantity!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">提货方式</span>
+                        <span class="add-text h18">
+                            ${tails.getMethod!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品详情说明</span>
+                        <span class="add-text h18">
+                            ${tails.comment!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <img src="${img_url.getS(tails.imgUrl!)}" width="200px" height="200px" class="img-thumbnail" alt="商品图片">
+            </div>
+        </div>
+
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

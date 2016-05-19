@@ -1,0 +1,62 @@
+<div class="ncnum_L">
+    <p class="ncnum_lTitle${decode(actionKey,'/member/index.html','02','/member/follow.html','02','/member/supplier.html','02','/member/purchase.html','02','/member/purchaseResult.html','02','/member/supplierResult.html','02','01')}">用户信息</p>
+    <ul>
+        <li class="ncnum_zi${decode(actionKey,'/member/index.html','02','')}"><a href="/member/index.html" title="用户信息">用户信息</a> </li>
+        <li class="ncnum_zi${decode(actionKey,'/member/follow.html','02','')}"><a href="/member/follow.html" title="关注列表">关注列表</a> </li>
+        <%if(session.curCustomer.type.val < 1){%>
+            <%if(session.curCustomer.purchaseState.val < 1){%>
+            <li class="ncnum_zi${decode(actionKey,'/member/purchase.html','02','')}"><a href="/member/purchase.html" title="申请进货商认证">申请进货商认证</a></li>
+            <%}%>
+            <%if(session.curCustomer.purchaseState.val == 2){%>
+            <li class="ncnum_zi${decode(actionKey,'/member/purchaseResult.html','02','')}"><a href="/member/purchaseResult.html" title="进货商认证结果">进货商认证结果</a></li>
+            <%}%>
+        <%}%>
+        <%if(session.curCustomer.type.val < 2){%>
+            <%if(session.curCustomer.supplierState.val < 1){%>
+            <li class="ncnum_zi${decode(actionKey,'/member/supplier.html','02','')}"><a href="/member/supplier.html" title="申请供货商认证">申请供货商认证</a></li>
+            <%}%>
+            <%if(session.curCustomer.supplierState.val == 2){%>
+            <li class="ncnum_zi${decode(actionKey,'/member/supplierResult.html','02','')}"><a href="/member/supplierResult.html" title="供货商认证结果">供货商认证结果</a></li>
+            <%}%>
+        <%}%>
+    </ul>
+    <%if(session.curCustomer.type.val == 2){%>
+    <%if(strutil.startWith(actionKey, "/member/sellOrder") || strutil.startWith(actionKey, "/member/online") || strutil.startWith(actionKey, "/member/offline")
+    || strutil.startWith(actionKey, "/member/waitCheck") || strutil.startWith(actionKey, "/member/backGoods") || strutil.startWith(actionKey, "/member/newGoods")
+    || strutil.startWith(actionKey, "/member/settlement.html") || strutil.startWith(actionKey, "/member/tailGoods/") ){%>
+    <p class="ncnum_lTitle04">供货商中心</p>
+    <%}else{%>
+    <p class="ncnum_lTitle03">供货商中心</p>
+    <%}%>
+    <ul style="background: #f2f2f2;">
+        <li class="ncnum_zi${strutil.startWith(actionKey, '/member/sellOrder')?'02':''}"><a href="/member/sellOrder/list.html" title="订单管理">订单管理</a> </li>
+        <li class="ncnum_zi">
+            <div class="subNavBox">
+                <div class="subNav currentDd currentDt" title="商品管理">商品管理</div>
+                <ul class="navContent" style="display:block">
+                    <li style="padding:0;" class="shangjia_a"><a href="/member/online/list.html" class="sjsp${strutil.startWith(actionKey, '/member/online')?'02':'01'}" title="上架商品">已上架商品</a></li>
+                    <li style="padding:0;"><a href="/member/offline/list.html" class="sjsp${strutil.startWith(actionKey, '/member/offline')?'02':'01'}" title="下架商品">已下架商品</a></li>
+                    <li style="padding:0;"><a href="/member/waitCheck/list.html" class="sjsp${strutil.startWith(actionKey, '/member/waitCheck')?'02':'01'}" title="待审核商品">待审核商品</a></li>
+                    <li style="padding:0;"><a href="/member/backGoods/list.html" class="sjsp${strutil.startWith(actionKey, '/member/backGoods')?'02':'01'}" title="退回商品">退回商品</a></li>
+                    <li style="padding:0;"><a href="/member/newGoods/add.html" class="sjsp${strutil.startWith(actionKey, '/member/newGoods')?'02':'01'}" title="新增商品">新增商品</a></li>
+                </ul>
+            </div>
+        </li>
+        <div class="ty_gyClear"></div>
+       <!-- <li class="ncnum_zi${strutil.startWith(actionKey, '/member/settlement.html')?'02':''}"><a href="/member/settlement.html" title="资金结算">资金结算</a></li>-->
+        <li class="ncnum_zi${strutil.startWith(actionKey, '/member/tailGoods')?'02':''}"><a href="/member/tailGoods/list.html" title="尾货处理申请">尾货处理申请</a> </li>
+    </ul>
+    <%}%>
+    <%if(session.curCustomer.type.val > 0){%>
+    <%if(strutil.startWith(actionKey, "/member/buyOrder") || strutil.startWith(actionKey, "/member/seek")  || strutil.startWith(actionKey, "/member/coupon")){%>
+    <p class="ncnum_lTitle06">进货商中心</p>
+    <%}else{%>
+    <p class="ncnum_lTitle05">进货商中心</p>
+    <%}%>
+    <ul>
+        <li class="ncnum_bor ncnum_zi${strutil.startWith(actionKey,'/member/buyOrder')?'02':''}"><a href="/member/buyOrder/list.html" title="我的订单">我的订单</a></li>
+        <li class="ncnum_zi${strutil.startWith(actionKey, '/member/seek')?'02':''}"><a href="/member/seek/list.html" title="我要定制">我要定制</a></li>
+        <li class="ncnum_zi${strutil.startWith(actionKey, '/member/coupon')?'02':''}"><a href="/member/coupon/list.html" title="我的优惠券">我的优惠券</a></li>
+    </ul>
+    <%}%>
+</div>

@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>购物车页</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <script type="text/javascript">
+        function calcTotal() {
+            var totalPrice = 0;
+            $("input[name=chkSon]:checked").each(function () {
+                totalPrice += parseFloat($(this).attr("data-price")) * parseFloat($(this).attr("data-num"));
+            });
+            $(".totalPrice").text("￥" + (totalPrice / 100.00).toFixed(2));
+        }
+        $(function () {
+            $("input[name=chkSon]").unbind("change").bind("change", function () {
+                calcTotal();
+            });
+            $(".btn-order").unbind("click").bind("click", function () {
+                if ($("input[name=chkSon]:checked").length == 0) {
+                    Msg.warning("请选中要结算的商品");
+                    return;
+                }
+                var ids = "";
+                $("input[name=chkSon]:checked").each(function () {
+                    ids += "," + $(this).val();
+                });
+                Common.post("/trade/sendCartItems", {data: ids}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Common.go("/trade/confirmOrder.html");
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+            $(".btn-follow").unbind("click").bind("click", function () {
+                var goodsCode = $(this).attr("data-code");
+                Common.post("/buy/follow", {goodsCode: goodsCode}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, top);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+            $(".btn-del").unbind("click").bind("click", function () {
+                var id = $(this).attr("data-code");
+                Common.post("/cart/del", {id: id}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message, top);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+
+            /*购物车*/
+            $(".addgwcar").click(function () {
+                var t = $(this).parent().find('input[class*=text_box]');
+                t.val(parseInt(t.val()) + 1)
+                chgNum($(this).siblings("input[name=quantity]"));
+            })
+            $(".mingwcar").click(function () {
+                var t = $(this).parent().find('input[class*=text_box]');
+                t.val(parseInt(t.val()) - 1)
+                if (parseInt(t.val()) <= 0) {
+                    t.val(1);
+                }
+                chgNum($(this).siblings("input[name=quantity]"));
+            })
+            $("input[name=quantity]").unbind("change").bind("change", function(){
+                chgNum($(this));
+            });
+        });
+
+        function chgNum($this) {
+            var id = $this.attr("data-id");
+            var num = $this.val();
+            var price = $this.attr("data-price");
+            Common.post2({
+                url: "/cart/chgNum",
+                param: {
+                    id: id,
+                    num: num
+                },
+                success: function(json){
+                    $this.parents("td").siblings(".price").text((parseFloat(num) * parseFloat(price) / 100.00).toFixed(2));
+                    $("input[name=chkSon][value=" + id + "]").attr("data-num", num);
+                    calcTotal();
+                },
+                error: function (json) {
+                    if (json.data) {
+                        $this.val(json.data);
+                    }
+                    if (json.message) {
+                        MsgBox.danger($this, json.message);
+                    }
+                }
+            });
+        }
+        ;
+    </script>
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<form name="form1" method="post" action="">
+    <div class="ncpgwc_Con">
+        <div class="ncp_gouwucarKong" style="display: ${isEmpty(shoppingCarts)?'block':'none'}">
+            <p>您的购物车还是空的，赶紧行动吧！</p>
+        </div>
+        <div style="display: ${isEmpty(shoppingCarts)?'none':'block'}">
+            <p class="ncpgwc_ConP">全部商品</p>
+
+            <div class="ncpgwc_Main">
+                <p class="margin:20px 0;"><input name="chkAll" id="chkAll" title="全选"
+                                                 onClick="ChkAllClick('chkSon','chkAll')"
+                                                 type="checkbox"/>&nbsp;&nbsp;<label for="chkAll">全选</label></p>
+                <%for(goods in shoppingCarts!){%>
+                <!--第1个 start-->
+                <div class="ncpgwc_MainL">
+                    <input name="chkSon" type="checkbox" data-size="${goods.size}" data-color="${goods.color}"
+                           data-price="${goods.price}" data-num="${goods.quantity}" value='${goods.id}'
+                           onclick="ChkSonClick('chkSon','chkAll')"/>
+                </div>
+                <div class="ncpgwc_MainR">
+                    <table class="sui-table table-bordered" id="gouwu_carYss" >
+                        <thead>
+                        <tr>
+                            <th width="66">商品编号</th>
+                            <th width="120">商品</th>
+                            <th width="66">规格</th>
+                            <th width="66">商品货号</th>
+                            <th width="80">颜色</th>
+                            <th width="60">尺寸</th>
+                            <th width="74">是否特殊商品</th>
+                            <th width="64">单价(元)</th>
+                            <th width="80">数量</th>
+                            <th width="80">总价(元)</th>
+                            <th width="130">操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>${goods.goodsCode}</td>
+                            <td>${goods.goodsName}</td>
+                            <td>${goods.specPropValue!}</td>
+                            <td>${goods.goodsItemNo}</td>
+                            <td>${goods.color}</td>
+                            <td>${goods.size}</td>
+                            <td>${goods.isSpecial?'是':'否'}</td>
+                            <td>${goods.price/100,"#0.00"}</td>
+                            <!-- <td>${goods.quantity}</td>-->
+                            <td width="80">
+                                <div class="ncp_gwcNumJia">
+                                    <input class="mingwcar" name="" type="button" value="-"/>
+                                    <input class="text_box" name="quantity" data-price="${goods.price}" data-id="${goods.id}" type="text"
+                                           value="${goods.quantity}" style="width: 42px;"/>
+                                    <input class="addgwcar" name="" type="button" value="+"/>
+                                </div>
+                            </td>
+                            <td class="price">${goods.money/100,"#0.00"}</td>
+                            <td>
+                            <span class="chakan_Btn" style="display: ${goods.followed?'block':'none'}">
+                                <a href="javascript:void(0);" style="width: 40px;" title="已关注">已关注</a>
+                            </span>
+                            <span class="chakan_Btn03" style="display: ${goods.followed?'none':'block'}">
+                                <a href="javascript:void(0);" data-code="${goods.goodsCode}" class="btn-follow"
+                                   title="关注">关注</a>
+                            </span>
+                            <span class="chakan_Btn02">
+                                <a href="javascript:void(0);" data-code="${goods.id}" class="btn-del" title="删除">删除</a>
+                            </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!--第1个 end-->
+                <%}%>
+            </div>
+            <p class="ncpgwc_all">
+                <span><input id="jiesuan" type="button" value="去结算" class="ncp_jiesuanBtn btn-order"
+                             title="去结算"/></span>
+                <span class="ncp_jiesuanP totalPrice">￥00.00</span>
+                <span class="ncp_jiesuanT">订单金额：</span>
+            </p>
+        </div>
+    </div>
+</form>
+<%include("/web/common/foot.html"){}%>
+</body>
+</html>

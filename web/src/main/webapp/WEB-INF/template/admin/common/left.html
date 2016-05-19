@@ -1,0 +1,9 @@
+<div class="sidebar">
+	<%if(!isEmpty(session.curTopMenu)){%>
+	<div class="lab_title">${session.curTopMenu.name!}</div>
+	<%}%>
+	<ul class="sui-nav nav-list" style="height: 1000px;">
+		<%for(menu in session.leftMenus!){%>
+		<li class="${(menuURI!'') == menu.url?'active':''}"><a href="${menu.url!}">${menu.name!}</a></li> <%}%>
+	</ul>
+</div>

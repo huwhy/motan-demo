@@ -1,0 +1,1147 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>纳车品供销服务平台--货源商城</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".ttshop_guanzhu").unbind("click").bind("click", function () {
+                var btn = this;
+                var FlagL = ($(btn).attr("src") == "/static/images/web/tt_guanzhu01.png");
+                if (FlagL) {
+                    if (${isEmpty(session.curCustomer)}) {
+                        Common.go("/login.html");
+                    }
+                    var goodsCode = $(btn).siblings(".goodsCode").val();
+                    Common.post("/buy/follow", {goodsCode: goodsCode}, function (json) {
+                        if (json.code == Common.SUCC) {
+                            $(btn).attr("src", "/static/images/web/tt_guanzhu02.png");
+                        } else {
+                            Msg.danger(json.message, top);
+                        }
+                    });
+                } else {
+                    if (${isEmpty(session.curCustomer)}) {
+                        Common.go("/login.html");
+                    }
+                    var goodsCode = $(btn).siblings(".goodsCode").val();
+                    Common.post("/buy/delFollow", {goodsCode: goodsCode}, function (json) {
+                        if (json.code == Common.SUCC) {
+                            $(btn).attr("src", "/static/images/web/tt_guanzhu01.png");
+                        } else {
+                            Msg.danger(json.message, top);
+                        }
+                    });
+                }
+            });
+            $(".search_form input").unbind("blur").bind("blur", function () {
+                $(this).addClass('ttshop_input');
+                $(this).removeClass('ttshop_input02');
+            }).unbind("focus").bind("focus", function () {
+                $(this).addClass('ttshop_input02');
+                $(this).removeClass('ttshop_input');
+            });
+
+            $(".sorts").unbind("click").bind("click", function () {
+                var imgObj = $(this).find(".paixuSImg img");
+                var desc = (imgObj.attr("src") == "/static/images/web/zdxq_orderD.jpg")
+                var _form = $(this).parents("div[name=f]").find("form.search_form");
+                _form.find("input[name=sorts]").val($(this).attr("data-name") + "_" + (desc ? 'asc' : 'desc'));
+                _form.submit();
+            });
+
+            Web_Pagination.init();
+        });
+    </script>
+    <!--商城选项卡 start -->
+    <style type="text/css">
+        .ttshop_page ul, .ttshop_page div {
+            display: inline-flex;
+        }
+
+        .pagination-small div > span {
+            padding-top: 5px;
+        }
+
+        .TabTitle {
+            width: 1190px;
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        #myTab0 {
+            width: 1190px;
+            height: 42px;
+            border-bottom: 1px solid #ddd;
+            font-size: 15px;
+        }
+
+        #myTab0 li {
+            color: #4c4c4c;
+            height: 42px;
+            text-align: center;
+            width: 120px;
+            float: left;
+            line-height: 42px;
+            cursor: pointer;
+        }
+
+        #myTab0 .active {
+            background: #fd7009;
+            color: #fff;
+        }
+
+        .none {
+            display: none;
+        }
+    </style>
+    <script type="text/javascript">
+        function nTabs(thisObj, Num) {
+            if (thisObj.className == "active")return;
+            var tabObj = thisObj.parentNode.id;
+            var tabList = document.getElementById(tabObj).getElementsByTagName("li");
+            for (i = 0; i < tabList.length; i++) {
+                if (i == Num) {
+                    thisObj.className = "active";
+                    document.getElementById(tabObj + "_Content" + i).style.display = "block";
+                } else {
+                    tabList[i].className = "normal";
+                    document.getElementById(tabObj + "_Content" + i).style.display = "none";
+                }
+            }
+        }
+    </script>
+    <!--商城选项卡 end -->
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<div class="tt_pic">
+    <div class="tt_picCon">
+        <img src="/static/images/web/ttshop_lc.png"/>
+    </div>
+</div>
+<!--商城选项卡 start-->
+<div class="zw_width">
+    <div class="banxin_width zd-dingweiyin">
+        <div class="TabTitle">
+            <ul id="myTab0">
+                <li class="${'all' == (parameter.tab!'all') ? 'active' :  'normal'}" onclick="nTabs(this,0);"
+                    title="全部商品">全部商品
+                </li>
+                <li class="${'cushion' == parameter.tab ? 'active' :  'normal'}" onclick="nTabs(this,1);" title="汽车坐垫">
+                    汽车坐垫
+                </li>
+                <li class="${'floorMat' == parameter.tab ? 'active' :  'normal'}" onclick="nTabs(this,2);" title="汽车脚垫">
+                    汽车脚垫
+                </li>
+                <li class="${'wheelCover' == parameter.tab ? 'active' :  'normal'}" onclick="nTabs(this,3);"
+                    title="方向盘套">方向盘套
+                </li>
+                <li class="${'carTrim' == parameter.tab ? 'active' :  'normal'}" onclick="nTabs(this,4);" title="汽车内饰">
+                    汽车内饰
+                </li>
+                <li class="${'other' == parameter.tab ? 'active' :  'normal'}" onclick="nTabs(this,5);" title="其他">其他
+                </li>
+            </ul>
+            <table border="0" cellpadding="0" cellspacing="0" class="ww2">
+                <tr>
+                    <td height="60" align="center">
+                        <div id="butong_net1">
+                            <div id="myTab0_Content0" class="${'all' != (parameter.tab!'all') ? 'none'}">
+                                <!-- 全品类 start -->
+                                <div name="f">
+                                    <div class="float_l ind_rzlcar">
+                                        <div class="ttshop_mL">
+                                            <p class="ttshop_srhTop">搜索：${all.page.totalNum!}个结果</p>
+                                        </div>
+                                        <div class="ty_gyClear"></div>
+                                        <div class="ttshop_mLMa">
+                                            <form class="search_form" action="/goods/list.html">
+                                                <input type="hidden" name="tab" value="all"/>
+                                                <%
+                                                var allParams = session.allParams;
+                                                if(isNotEmpty(allParams.params)){%>
+                                                <input type="hidden" name="sorts" value="${allParams.sorts!}"/>
+
+                                                <p>
+                                                    <span class="float_l ttshop_srh_tiaoJians">本次查找条件：</span>
+                                                    <%for(entry in allParams.params!){%>
+                                                    <%if(isNotEmpty(entry.value.name)){%>
+                                                    <%if(entry.value.key == 'price'){%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=all&news=true', allParams, 'minPrice', 'maxPrice')}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}else{%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=all&news=true', allParams, entry.key)}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <a class="ttshop_srh_close float_r"
+                                                       href="/goods/list.html?tab=all&news=true"
+                                                       title="清除全部条件">清除全部条件</a>
+                                                </p>
+                                                <%}%>
+                                                <p class="ty_gyClear">
+                                                    <span class="float_l ttshop_srh_tiaoJians">选择查找条件：</span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">品牌</span>
+                                            <span class="float_l"><input type="text" name="brand"
+                                                                         value="${allParams.params.brand.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">商品名</span>
+                                            <span class="float_l"><input type="text" name="goodsName"
+                                                                         value="${allParams.params.goodsName.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">货号</span>
+                                            <span class="float_l"><input type="text" name="itemNo"
+                                                                         value="${allParams.params.itemNo.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">颜色</span>
+                                            <span class="float_l"><input type="text" name="color"
+                                                                         value="${allParams.params.color.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">尺寸</span>
+                                            <span class="float_l"><input type="text" name="size"
+                                                                         value="${allParams.params.size.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">价格</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="minPrice"
+                                                   value="${allParams.params.minPrice.paramValue!}"/>
+                                        </span>
+                                                    <span class="ttshop_jiange float_l">~</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="maxPrice"
+                                                   value="${allParams.params.maxPrice.paramValue!}"/>
+                                        </span>
+                                                </p>
+                                                <input type="submit" value="搜索" class="ttshop_sreachBtn"
+                                                       style="border: 0;margin-top:20px;"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <ul class="float_r ind_rzrcar02" style="padding-top:11px;">
+                                        <div class="ncp_paixuCon">
+                                                <span class="zdwcm_zdlicheng sorts" data-name="time">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(allParams.orders.time)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == allParams.orders.time ? 'U':'D'}.jpg"
+                                                             id="licheng_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">时间</span>
+                                                </span>
+                                                <span class="zdwcm_zdlicheng sorts" data-name="price">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(allParams.orders.price)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == allParams.orders.price ? 'U':'D'}.jpg"
+                                                             id="time_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">价格</span>
+                                                </span>
+                                                <span class="zdwcm_zdPrice sorts" data-name="saleNum">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(allParams.orders.saleNum)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == allParams.orders.saleNum ? 'U':'D'}.jpg"
+                                                             id="paixu_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">销量</span>
+                                                </span>
+                                        </div>
+                                        <%for(goods in all.data) {%>
+                                        <li class="ty_rerelative">
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <img src="${img_url.getS(goods.headImgUrl1)}" width="206" height="198"/>
+                                            </a>
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <p class="tt_listTitle">${goods.name}</p>
+                                            </a>
+                                            <%if(isEmpty(session.curCustomer)){%>
+                                            <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a>
+                                            </p>
+                                            <%}else{%>
+                                            <p class="tt_listPrice">￥${(goods.wholesalePrice / 100), "#0.00"}</p>
+                                            <%}%>
+                                            <p class="tt_zhizaochang"><span class="float_l">${goods.brand}</span></p>
+                                            <img class="ttshop_guanzhu"
+                                                 src="/static/images/web/tt_guanzhu${goods.followed?'02':'01'}.png"
+                                                 width="66"/>
+                                            <input type="hidden" class="goodsCode" value="${goods.code}">
+                                        </li>
+                                        <%}elsefor{%>
+                                        <div class="ncp_xiangQingMain">
+                                            <p>暂无商品</p>
+                                        </div>
+                                        <%}%>
+                                    </ul>
+                                    <div class="ty_gyClear"></div>
+                                    <div class="ttshop_page">
+                                        <div class="zdwcm_page">
+                                            <#webPage2 url="/goods/list.html" val='${all.page}' size='small' params = '${allParams.parameters!}' showNum = 'show' />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 全品类 end -->
+                            </div>
+                            <div id="myTab0_Content1" class="${'cushion' != parameter.tab ? 'none'}">
+                                <!-- 汽车坐垫 start -->
+                                <div name="f">
+                                    <div class="float_l ind_rzlcar">
+                                        <div class="ttshop_mL">
+                                            <p class="ttshop_srhTop">汽车坐垫搜索：${cushion.page.totalNum!}个结果</p>
+                                        </div>
+                                        <div class="ty_gyClear"></div>
+                                        <div class="ttshop_mLMa">
+                                            <form class="search_form" action="/goods/list.html">
+                                                <input type="hidden" name="tab" value="cushion"/>
+                                                <%
+                                                var cushionParams = session.cushionParams;
+                                                if(isNotEmpty(cushionParams.params)){%>
+                                                <input type="hidden" name="sorts" value="${cushionParams.sorts!}"/>
+
+                                                <p>
+                                                    <span class="float_l ttshop_srh_tiaoJians">本次查找条件：</span>
+                                                    <%for(entry in cushionParams.params!){%>
+                                                    <%if(isNotEmpty(entry.value.name)){%>
+                                                    <%if(entry.value.key == 'price'){%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=cushion&news=true', cushionParams, 'minPrice', 'maxPrice')}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}else{%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=cushion&news=true', cushionParams, entry.key)}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <a class="ttshop_srh_close float_r"
+                                                       href="/goods/list.html?tab=cushion&news=true" title="清除全部条件">清除全部条件</a>
+                                                </p>
+                                                <%}%>
+                                                <p class="ty_gyClear">
+                                                    <span class="float_l ttshop_srh_tiaoJians">选择查找条件：</span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">品牌</span>
+                                            <span class="float_l"><input type="text" name="brand"
+                                                                         value="${cushionParams.params.brand.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">商品名</span>
+                                            <span class="float_l"><input type="text" name="goodsName"
+                                                                         value="${cushionParams.params.goodsName.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">货号</span>
+                                            <span class="float_l"><input type="text" name="itemNo"
+                                                                         value="${cushionParams.params.itemNo.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">颜色</span>
+                                            <span class="float_l"><input type="text" name="color"
+                                                                         value="${cushionParams.params.color.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">尺寸</span>
+                                            <span class="float_l"><input type="text" name="size"
+                                                                         value="${cushionParams.params.size.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">价格</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="minPrice"
+                                                   value="${cushionParams.params.minPrice.paramValue!}"/>
+                                        </span>
+                                                    <span class="ttshop_jiange float_l">~</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="maxPrice"
+                                                   value="${cushionParams.params.maxPrice.paramValue!}"/>
+                                        </span>
+                                                </p>
+                                                <input type="submit" value="搜索" class="ttshop_sreachBtn"
+                                                       style="border: 0;margin-top:20px;"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <ul class="float_r ind_rzrcar02" style="padding-top:11px;">
+                                        <div class="ncp_paixuCon">
+                                                <span class="zdwcm_zdlicheng sorts" data-name="time">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(cushionParams.orders.time)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == cushionParams.orders.time ? 'U':'D'}.jpg"
+                                                             id="licheng_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">时间</span>
+                                                </span>
+                                                <span class="zdwcm_zdlicheng sorts" data-name="price">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(cushionParams.orders.price)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == cushionParams.orders.price ? 'U':'D'}.jpg"
+                                                             id="time_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">价格</span>
+                                                </span>
+                                                <span class="zdwcm_zdPrice sorts" data-name="saleNum">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(cushionParams.orders.saleNum)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == cushionParams.orders.saleNum ? 'U':'D'}.jpg"
+                                                             id="paixu_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">销量</span>
+                                                </span>
+                                        </div>
+                                        <%for(goods in cushion.data) {%>
+                                        <li class="ty_rerelative">
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <img src="${img_url.getS(goods.headImgUrl1)}" width="206" height="198"/>
+                                            </a>
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <p class="tt_listTitle">${goods.name}</p>
+                                            </a>
+                                            <%if(isEmpty(session.curCustomer)){%>
+                                            <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a>
+                                            </p>
+                                            <%}else{%>
+                                            <p class="tt_listPrice">￥${(goods.wholesalePrice / 100), "#0.00"}</p>
+                                            <%}%>
+                                            <p class="tt_zhizaochang"><span class="float_l">${goods.brand}</span></p>
+                                            <img class="ttshop_guanzhu"
+                                                 src="/static/images/web/tt_guanzhu${goods.followed?'02':'01'}.png"
+                                                 width="66"/>
+                                            <input type="hidden" class="goodsCode" value="${goods.code}">
+                                        </li>
+                                        <%}elsefor{%>
+                                        <div class="ncp_xiangQingMain">
+                                            <p>暂无商品</p>
+                                        </div>
+                                        <%}%>
+                                    </ul>
+                                    <div class="ty_gyClear"></div>
+                                    <div class="ttshop_page">
+                                        <div class="zdwcm_page">
+                                            <#webPage2 url="/goods/list.html" val='${cushion.page}' size='small' params = '${cushionParams.parameters!}' showNum = 'show' />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 汽车坐垫 end -->
+                            </div>
+                            <div id="myTab0_Content2" class="${'floorMat' != parameter.tab ? 'none'}">
+                                <!-- 汽车脚垫 start -->
+                                <div name="f">
+                                    <div class="float_l ind_rzlcar">
+                                        <div class="ttshop_mL">
+                                            <p class="ttshop_srhTop">汽车脚垫搜索：${floorMat.page.totalNum!}个结果</p>
+                                        </div>
+                                        <div class="ty_gyClear"></div>
+                                        <div class="ttshop_mLMa">
+                                            <form class="search_form" action="/goods/list.html">
+                                                <input type="hidden" name="tab" value="floorMat"/>
+                                                <%
+                                                var floorMatParams = session.floorMatParams;
+                                                if(isNotEmpty(floorMatParams.params)){%>
+                                                <input type="hidden" name="sorts" value="${floorMatParams.sorts!}"/>
+
+                                                <p>
+                                                    <span class="float_l ttshop_srh_tiaoJians">本次查找条件：</span>
+                                                    <%for(entry in floorMatParams.params!){%>
+                                                    <%if(isNotEmpty(entry.value.name)){%>
+                                                    <%if(entry.value.key == 'price'){%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=floorMat&news=true', floorMatParams, 'minPrice', 'maxPrice')}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}else{%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=floorMat&news=true', floorMatParams, entry.key)}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <a class="ttshop_srh_close float_r"
+                                                       href="/goods/list.html?tab=floorMat&news=true" title="清除全部条件">清除全部条件</a>
+                                                </p>
+                                                <%}%>
+                                                <p class="ty_gyClear">
+                                                    <span class="float_l ttshop_srh_tiaoJians">选择查找条件：</span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">品牌</span>
+                                            <span class="float_l"><input type="text" name="brand"
+                                                                         value="${floorMatParams.params.brand.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">商品名</span>
+                                            <span class="float_l"><input type="text" name="goodsName"
+                                                                         value="${floorMatParams.params.goodsName.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">货号</span>
+                                            <span class="float_l"><input type="text" name="itemNo"
+                                                                         value="${floorMatParams.params.itemNo.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">颜色</span>
+                                            <span class="float_l"><input type="text" name="color"
+                                                                         value="${floorMatParams.params.color.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">尺寸</span>
+                                            <span class="float_l"><input type="text" name="size"
+                                                                         value="${floorMatParams.params.size.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">价格</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="minPrice"
+                                                   value="${floorMatParams.params.minPrice.paramValue!}"/>
+                                        </span>
+                                                    <span class="ttshop_jiange float_l">~</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="maxPrice"
+                                                   value="${floorMatParams.params.maxPrice.paramValue!}"/>
+                                        </span>
+                                                </p>
+                                                <input type="submit" value="搜索" class="ttshop_sreachBtn"
+                                                       style="border: 0;margin-top:20px;"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <ul class="float_r ind_rzrcar02" style="padding-top:11px;">
+                                        <div class="ncp_paixuCon">
+                                                <span class="zdwcm_zdlicheng sorts" data-name="time">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(floorMatParams.orders.time)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == floorMatParams.orders.time ? 'U':'D'}.jpg"
+                                                             id="licheng_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">时间</span>
+                                                </span>
+                                                <span class="zdwcm_zdlicheng sorts" data-name="price">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(floorMatParams.orders.price)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == floorMatParams.orders.price ? 'U':'D'}.jpg"
+                                                             id="time_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">价格</span>
+                                                </span>
+                                                <span class="zdwcm_zdPrice sorts" data-name="saleNum">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(floorMatParams.orders.saleNum)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == floorMatParams.orders.saleNum ? 'U':'D'}.jpg"
+                                                             id="paixu_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">销量</span>
+                                                </span>
+                                        </div>
+                                        <%for(goods in floorMat.data) {%>
+                                        <li class="ty_rerelative">
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <img src="${img_url.getS(goods.headImgUrl1)}" width="206" height="198"/>
+                                            </a>
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <p class="tt_listTitle">${goods.name}</p>
+                                            </a>
+                                            <%if(isEmpty(session.curCustomer)){%>
+                                            <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a>
+                                            </p>
+                                            <%}else{%>
+                                            <p class="tt_listPrice">￥${(goods.wholesalePrice / 100), "#0.00"}</p>
+                                            <%}%>
+                                            <p class="tt_zhizaochang"><span class="float_l">${goods.brand!}</span></p>
+                                            <img class="ttshop_guanzhu"
+                                                 src="/static/images/web/tt_guanzhu${goods.followed?'02':'01'}.png"
+                                                 width="66"/>
+                                            <input type="hidden" class="goodsCode" value="${goods.code}">
+                                        </li>
+                                        <%}elsefor{%>
+                                        <div class="ncp_xiangQingMain">
+                                            <p>暂无商品</p>
+                                        </div>
+                                        <%}%>
+                                    </ul>
+                                    <div class="ty_gyClear"></div>
+                                    <div class="ttshop_page">
+                                        <div class="zdwcm_page">
+                                            <#webPage2 url="/goods/list.html"  val='${floorMat.page}' size='small' params = '${floorMatParams.parameters!}' showNum = 'show' />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 汽车脚垫 end -->
+                            </div>
+                            <div id="myTab0_Content3" class="${'wheelCover' != parameter.tab ? 'none'}">
+                                <!-- 方向盘套 start -->
+                                <div name="f">
+                                    <div class="float_l ind_rzlcar">
+                                        <div class="ttshop_mL">
+                                            <p class="ttshop_srhTop">方向盘套搜索：${wheelCover.page.totalNum!}个结果</p>
+                                        </div>
+                                        <div class="ty_gyClear"></div>
+                                        <div class="ttshop_mLMa">
+                                            <form class="search_form" action="/goods/list.html">
+                                                <input type="hidden" name="tab" value="wheelCover"/>
+                                                <%
+                                                var wheelCoverParams = session.wheelCoverParams;
+                                                if(isNotEmpty(wheelCoverParams.params)){%>
+                                                <input type="hidden" name="sorts" value="${wheelCoverParams.sorts!}"/>
+
+                                                <p>
+                                                    <span class="float_l ttshop_srh_tiaoJians">本次查找条件：</span>
+                                                    <%for(entry in wheelCoverParams.params!){%>
+                                                    <%if(isNotEmpty(entry.value.name)){%>
+                                                    <%if(entry.value.key == 'price'){%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=wheelCover&news=true', wheelCoverParams, 'minPrice', 'maxPrice')}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}else{%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=wheelCover&news=true', wheelCoverParams, entry.key)}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <a class="ttshop_srh_close float_r"
+                                                       href="/goods/list.html?tab=wheelCover&news=true" title="清除全部条件">清除全部条件</a>
+                                                </p>
+                                                <%}%>
+                                                <p class="ty_gyClear">
+                                                    <span class="float_l ttshop_srh_tiaoJians">选择查找条件：</span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">品牌</span>
+                                            <span class="float_l"><input type="text" name="brand"
+                                                                         value="${wheelCoverParams.params.brand.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">商品名</span>
+                                            <span class="float_l"><input type="text" name="goodsName"
+                                                                         value="${wheelCoverParams.params.goodsName.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">货号</span>
+                                            <span class="float_l"><input type="text" name="itemNo"
+                                                                         value="${wheelCoverParams.params.itemNo.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">颜色</span>
+                                            <span class="float_l"><input type="text" name="color"
+                                                                         value="${wheelCoverParams.params.color.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">尺寸</span>
+                                            <span class="float_l"><input type="text" name="size"
+                                                                         value="${wheelCoverParams.params.size.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">价格</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="minPrice"
+                                                   value="${wheelCoverParams.params.minPrice.paramValue!}"/>
+                                        </span>
+                                                    <span class="ttshop_jiange float_l">~</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="maxPrice"
+                                                   value="${wheelCoverParams.params.maxPrice.paramValue!}"/>
+                                        </span>
+                                                </p>
+                                                <input type="submit" value="搜索" class="ttshop_sreachBtn"
+                                                       style="border: 0;margin-top:20px;"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <ul class="float_r ind_rzrcar02" style="padding-top:11px;">
+                                        <div class="ncp_paixuCon">
+                                                <span class="zdwcm_zdlicheng sorts" data-name="time">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(wheelCoverParams.orders.time)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == wheelCoverParams.orders.time ? 'U':'D'}.jpg"
+                                                             id="licheng_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">时间</span>
+                                                </span>
+                                                <span class="zdwcm_zdlicheng sorts" data-name="price">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(wheelCoverParams.orders.price)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == wheelCoverParams.orders.price ? 'U':'D'}.jpg"
+                                                             id="time_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">价格</span>
+                                                </span>
+                                                <span class="zdwcm_zdPrice sorts" data-name="saleNum">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(wheelCoverParams.orders.saleNum)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == wheelCoverParams.orders.saleNum ? 'U':'D'}.jpg"
+                                                             id="paixu_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">销量</span>
+                                                </span>
+                                        </div>
+                                        <%for(goods in wheelCover.data) {%>
+                                        <li class="ty_rerelative">
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <img src="${img_url.getS(goods.headImgUrl1)}" width="206" height="198"/>
+                                            </a>
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <p class="tt_listTitle">${goods.name}</p>
+                                            </a>
+                                            <%if(isEmpty(session.curCustomer)){%>
+                                            <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a>
+                                            </p>
+                                            <%}else{%>
+                                            <p class="tt_listPrice">￥${(goods.wholesalePrice / 100), "#0.00"}</p>
+                                            <%}%>
+                                            <p class="tt_zhizaochang"><span class="float_l">${goods.brand}</span></p>
+                                            <img class="ttshop_guanzhu"
+                                                 src="/static/images/web/tt_guanzhu${goods.followed?'02':'01'}.png"
+                                                 width="66"/>
+                                            <input type="hidden" class="goodsCode" value="${goods.code}">
+                                        </li>
+                                        <%}elsefor{%>
+                                        <div class="ncp_xiangQingMain">
+                                            <p>暂无商品</p>
+                                        </div>
+                                        <%}%>
+                                    </ul>
+                                    <div class="ty_gyClear"></div>
+                                    <div class="ttshop_page">
+                                        <div class="zdwcm_page">
+                                            <#webPage2 url="/goods/list.html" val='${wheelCover.page}' size='small' params = '${wheelCoverParams.parameters!}' showNum = 'show' />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 方向盘套 end -->
+                            </div>
+                            <div id="myTab0_Content4" class="${'carTrim' != parameter.tab ? 'none'}">
+                                <!-- 汽车内饰 start -->
+                                <div name="f">
+                                    <div class="float_l ind_rzlcar">
+                                        <div class="ttshop_mL">
+                                            <p class="ttshop_srhTop">汽车内饰搜索：${carTrim.page.totalNum!}个结果</p>
+                                        </div>
+                                        <div class="ty_gyClear"></div>
+                                        <div class="ttshop_mLMa">
+                                            <form class="search_form" action="/goods/list.html">
+                                                <input type="hidden" name="tab" value="carTrim"/>
+                                                <%
+                                                var carTrimParams = session.carTrimParams;
+                                                if(isNotEmpty(carTrimParams.params)){%>
+                                                <input type="hidden" name="sorts" value="${carTrimParams.sorts!}"/>
+
+                                                <p>
+                                                    <span class="float_l ttshop_srh_tiaoJians">本次查找条件：</span>
+                                                    <%for(entry in carTrimParams.params!){%>
+                                                    <%if(isNotEmpty(entry.value.name)){%>
+                                                    <%if(entry.value.key == 'price'){%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=carTrim&news=true', carTrimParams, 'minPrice', 'maxPrice')}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}else{%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=carTrim&news=true', carTrimParams, entry.key)}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <a class="ttshop_srh_close float_r"
+                                                       href="/goods/list.html?tab=carTrim&news=true" title="清除全部条件">清除全部条件</a>
+                                                </p>
+                                                <%}%>
+                                                <p class="ty_gyClear">
+                                                    <span class="float_l ttshop_srh_tiaoJians">选择查找条件：</span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">品牌</span>
+                                            <span class="float_l"><input type="text" name="brand"
+                                                                         value="${carTrimParams.params.brand.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">商品名</span>
+                                            <span class="float_l"><input type="text" name="goodsName"
+                                                                         value="${carTrimParams.params.goodsName.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">货号</span>
+                                            <span class="float_l"><input type="text" name="itemNo"
+                                                                         value="${carTrimParams.params.itemNo.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">颜色</span>
+                                            <span class="float_l"><input type="text" name="color"
+                                                                         value="${carTrimParams.params.color.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">尺寸</span>
+                                            <span class="float_l"><input type="text" name="size"
+                                                                         value="${carTrimParams.params.size.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">价格</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="minPrice"
+                                                   value="${carTrimParams.params.minPrice.paramValue!}"/>
+                                        </span>
+                                                    <span class="ttshop_jiange float_l">~</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="maxPrice"
+                                                   value="${carTrimParams.params.maxPrice.paramValue!}"/>
+                                        </span>
+                                                </p>
+                                                <input type="submit" value="搜索" class="ttshop_sreachBtn"
+                                                       style="border: 0;margin-top:20px;"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <ul class="float_r ind_rzrcar02" style="padding-top:11px;">
+                                        <div class="ncp_paixuCon">
+                                                <span class="zdwcm_zdlicheng sorts" data-name="time">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(carTrimParams.orders.time)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == carTrimParams.orders.time ? 'U':'D'}.jpg"
+                                                             id="licheng_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">时间</span>
+                                                </span>
+                                                <span class="zdwcm_zdlicheng sorts" data-name="price">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(carTrimParams.orders.price)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == carTrimParams.orders.price ? 'U':'D'}.jpg"
+                                                             id="time_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">价格</span>
+                                                </span>
+                                                <span class="zdwcm_zdPrice sorts" data-name="saleNum">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(carTrimParams.orders.saleNum)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == carTrimParams.orders.saleNum ? 'U':'D'}.jpg"
+                                                             id="paixu_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">销量</span>
+                                                </span>
+                                        </div>
+                                        <%for(goods in carTrim.data) {%>
+                                        <li class="ty_rerelative">
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <img src="${img_url.getS(goods.headImgUrl1)}" width="206" height="198"/>
+                                            </a>
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <p class="tt_listTitle">${goods.name}</p>
+                                            </a>
+                                            <%if(isEmpty(session.curCustomer)){%>
+                                            <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a>
+                                            </p>
+                                            <%}else{%>
+                                            <p class="tt_listPrice">￥${(goods.wholesalePrice / 100), "#0.00"}</p>
+                                            <%}%>
+                                            <p class="tt_zhizaochang"><span class="float_l">${goods.brand}</span></p>
+                                            <img class="ttshop_guanzhu"
+                                                 src="/static/images/web/tt_guanzhu${goods.followed?'02':'01'}.png"
+                                                 width="66"/>
+                                            <input type="hidden" class="goodsCode" value="${goods.code}">
+                                        </li>
+                                        <%}elsefor{%>
+                                        <div class="ncp_xiangQingMain">
+                                            <p>暂无商品</p>
+                                        </div>
+                                        <%}%>
+                                    </ul>
+                                    <div class="ty_gyClear"></div>
+                                    <div class="ttshop_page">
+                                        <div class="zdwcm_page">
+                                            <#webPage2 url="/goods/list.html" val='${carTrim.page}' size='small' params = '${carTrimParams.parameters!}' showNum = 'show' />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 汽车内饰 end -->
+                            </div>
+                            <div id="myTab0_Content5" class="${'other' != parameter.tab ? 'none'}">
+                                <!-- 其他 start -->
+                                <div name="f">
+                                    <div class="float_l ind_rzlcar">
+                                        <div class="ttshop_mL">
+                                            <p class="ttshop_srhTop">其他搜索：${other.page.totalNum!}个结果</p>
+                                        </div>
+                                        <div class="ty_gyClear"></div>
+                                        <div class="ttshop_mLMa">
+                                            <form class="search_form" action="/goods/list.html">
+                                                <input type="hidden" name="tab" value="other"/>
+                                                <%
+                                                var otherParams = session.otherParams;
+                                                if(isNotEmpty(otherParams.params)){%>
+                                                <input type="hidden" name="sorts" value="${otherParams.sorts!}"/>
+
+                                                <p>
+                                                    <span class="float_l ttshop_srh_tiaoJians">本次查找条件：</span>
+                                                    <%for(entry in otherParams.params!){%>
+                                                    <%if(isNotEmpty(entry.value.name)){%>
+                                                    <%if(entry.value.key == 'price'){%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=other&news=true', otherParams, 'minPrice', 'maxPrice')}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}else{%>
+                                                    <a class="ttshop_srh_close where_close"
+                                                       href="${urls.searchUrl('/goods/list.html', 'tab=other&news=true', otherParams, entry.key)}"
+                                                       title="strutil.decoding(entry.value.name!'')">
+                                                        ${strutil.decoding(entry.value.name!'')}
+                                                    </a>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <%}%>
+                                                    <a class="ttshop_srh_close float_r"
+                                                       href="/goods/list.html?tab=other&news=true"
+                                                       title="清除全部条件">清除全部条件</a>
+                                                </p>
+                                                <%}%>
+                                                <p class="ty_gyClear">
+                                                    <span class="float_l ttshop_srh_tiaoJians">选择查找条件：</span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">品牌</span>
+                                            <span class="float_l"><input type="text" name="brand"
+                                                                         value="${otherParams.params.brand.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">商品名</span>
+                                            <span class="float_l"><input type="text" name="goodsName"
+                                                                         value="${otherParams.params.goodsName.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">货号</span>
+                                            <span class="float_l"><input type="text" name="itemNo"
+                                                                         value="${otherParams.params.itemNo.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">颜色</span>
+                                            <span class="float_l"><input type="text" name="color"
+                                                                         value="${otherParams.params.color.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">尺寸</span>
+                                            <span class="float_l"><input type="text" name="size"
+                                                                         value="${otherParams.params.size.paramValue!}"
+                                                                         class="ttshop_input"/></span>
+                                                </p>
+
+                                                <p class="ttshop_topP">
+                                                    <span class="ttshop_sTitle">价格</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="minPrice"
+                                                   value="${otherParams.params.minPrice.paramValue!}"/>
+                                        </span>
+                                                    <span class="ttshop_jiange float_l">~</span>
+                                        <span class="float_l">
+                                            <input type="text" class="ttshop_input03" name="maxPrice"
+                                                   value="${otherParams.params.maxPrice.paramValue!}"/>
+                                        </span>
+                                                </p>
+                                                <input type="submit" value="搜索" class="ttshop_sreachBtn"
+                                                       style="border: 0;margin-top:20px;"/>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <ul class="float_r ind_rzrcar02" style="padding-top:11px;">
+                                        <div class="ncp_paixuCon">
+                                                <span class="zdwcm_zdlicheng sorts" data-name="time">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(otherParams.orders.time)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == otherParams.orders.time ? 'U':'D'}.jpg"
+                                                             id="licheng_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">时间</span>
+                                                </span>
+                                                <span class="zdwcm_zdlicheng sorts" data-name="price">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(otherParams.orders.price)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == otherParams.orders.price ? 'U':'D'}.jpg"
+                                                             id="time_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">价格</span>
+                                                </span>
+                                                <span class="zdwcm_zdPrice sorts" data-name="saleNum">
+                                                    <span class="paixuSImg">
+                                                        <%if(isNotEmpty(otherParams.orders.saleNum)){%>
+                                                        <img src="/static/images/web/zdxq_order${'asc' == otherParams.orders.saleNum ? 'U':'D'}.jpg"
+                                                             id="paixu_pic">
+                                                        <%}%>
+                                                    </span>
+                                                    <span class="paixuS">销量</span>
+                                                </span>
+                                        </div>
+                                        <%for(goods in other.data) {%>
+                                        <li class="ty_rerelative">
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <img src="${img_url.getS(goods.headImgUrl1)}" width="206" height="198"/>
+                                            </a>
+                                            <a href="/goods/${goods.code}.html" target="_blank"
+                                               title="${goods.name}">
+                                                <p class="tt_listTitle">${goods.name}</p>
+                                            </a>
+                                            <%if(isEmpty(session.curCustomer)){%>
+                                            <p class="tt_listPrice03"><a href="/login.html" title="登录后查看价格">登录后查看价格</a>
+                                            </p>
+                                            <%}else{%>
+                                            <p class="tt_listPrice">￥${(goods.wholesalePrice / 100), "#0.00"}</p>
+                                            <%}%>
+                                            <p class="tt_zhizaochang"><span class="float_l">${goods.brand}</span></p>
+                                            <img class="ttshop_guanzhu"
+                                                 src="/static/images/web/tt_guanzhu${goods.followed?'02':'01'}.png"
+                                                 width="66"/>
+                                            <input type="hidden" class="goodsCode" value="${goods.code}">
+                                        </li>
+                                        <%}elsefor{%>
+                                        <div class="ncp_xiangQingMain">
+                                            <p>暂无商品</p>
+                                        </div>
+                                        <%}%>
+                                    </ul>
+                                    <div class="ttshop_page">
+                                        <div class="zdwcm_page">
+                                            <#webPage2 url="/goods/list.html" val='${other.page}' size='small' params = '${otherParams.parameters!}' showNum = 'show' />
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 其他 end -->
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<!--商城选项卡 end-->
+<%include("/web/common/foot.html"){}%>
+</body>
+</html>

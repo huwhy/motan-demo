@@ -1,0 +1,158 @@
+
+<%layout("../layout/header_layout.html"){%>
+<title>编辑优惠券</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.go("/admin/coupon/manage");
+        });
+        $(".btn-ok").unbind("click").bind("click", function () {
+            $("form.save-form").submit();
+        });
+        Common.ajaxForm($("form.save-form"), "/admin/coupon/manage", null);
+    });
+
+</script>
+<style>
+    .baseInfo:after {
+        content: "创建优惠单";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form save-form sui-validate" novalidate="novalidate" method="POST"
+          action="/admin/coupon/manage/save">
+
+        <input type="hidden" name="id" value="${template.id}">
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">优惠券名称</span>
+                        <input type="text" name="couponName" class="input-fat" data-rules="required" maxlength="10" value="${template.name}" />
+
+                    </div>
+                </div>
+            </div>
+            <div class="control-group input-append">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">优惠券面值</span>
+                        <input type="text" name="money" class="input-fat" readonly data-rules="required|digits" value="${template.money /100}" />
+                        <span class="add-on">元</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend input-inner">
+                        <span class="add-on">有效期</span>
+                        <input type="text" class="input-date h22" name="startTime" data-toggle="datepicker" data-rules="required" value="${template.startTime}" />
+                        <span class="add-on">-&nbsp;&nbsp;</span>
+                        <input type="text" class="input-date h22" name="endTime" data-toggle="datepicker" data-rules="required" value="${template.endTime}" />
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend input-append">
+                        <span class="add-on">总发行量</span>
+                        <input type="text" name="num" class="input-fat" data-rules="required|digits" value="${template.num}" />
+                        <span class="add-on">张</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">使用条件</span>
+                    </div>
+                    单笔订单金额满
+                    <input type="text" name="condition" class="input-fat" data-rules="required|number" value="${nums.yuan(template.condition)}" />
+                    元使用&nbsp;&nbsp;&nbsp;(填"0"表示没有限制)
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on">使用方法</span>
+                        </div>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.useType == 'POST_FEE' ?'checked':''}">
+                            <input type="radio" name="useType" value="POST_FEE" ${template.useType == 'POST_FEE' ?'checked':''}><span>抵运费</span>
+                        </label>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.useType == 'PAYMENT' ?'checked':''}">
+                            <input type="radio" name="useType" value="PAYMENT" ${template.useType == 'PAYMENT' ?'checked':''}><span>抵货款</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on">状态</span>
+                        </div>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.status == 'NORMAL' ?'checked':''}">
+                            <input type="radio" name="status" value="NORMAL" ${template.status == 'NORMAL' ?'checked':''}><span>正常</span>
+                        </label>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.status == 'DISABLE' ?'checked':''}">
+                            <input type="radio" name="status" value="DISABLE" ${template.status == 'DISABLE' ?'checked':''}><span>停用</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group hidden">
+                <div class="span3">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on">发放方式</span>
+                        </div>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.sendType == 'AUTO' ?'checked':''}">
+                            <input type="radio" name="sendType" value="AUTO" ${template.sendType == 'AUTO' ?'checked':''}><span>自主领取</span>
+                        </label>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.sendType == 'MANU' ?'checked':''}">
+                            <input type="radio" name="sendType" value="MANU" ${template.sendType == 'MANU' ?'checked':''}><span>定向发放</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group hidden">
+                <div class="span3">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on">展示方式</span>
+                        </div>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.display?'checked':''}">
+                            <input type="radio" name="display" value="1" ${template.display?'checked':''}><span>展示到会员专区</span>
+                        </label>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.display?'':'checked'}">
+                            <input type="radio" name="display" value="0" ${template.display?'':'checked'}><span>不展示到会员专区</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group hidden">
+                <div class="span3">
+                    <div class="controls">
+                        <div class="input-prepend">
+                            <span class="add-on">允许转赠</span>
+                        </div>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.donation?'checked':''}">
+                            <input type="radio" name="donation" value="1" ${template.donation?'checked':''}><span>允许</span>
+                        </label>
+                        <label data-toggle="radio" class="radio-pretty inline ${template.donation?'':'checked'}">
+                            <input type="radio" name="donation" value="0" ${template.donation?'':'checked'}><span>不允许</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <input type="button" class="sui-btn btn-primary btn-ok" value="保存"/>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

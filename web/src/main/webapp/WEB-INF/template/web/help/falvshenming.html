@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>法律声明</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+</head>
+<body>
+<!-- 直通车 start -->
+<div class="tt_topCon">
+    <div class="tt_topConent">
+        <ul class="tttop_01">
+            <li class="tttop_indhome"><a href="/index.html" title="首页" class="tttop_left">首页</a><span>|</span></li>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li><a href="/register.html" title="免费注册">注册</a></li>
+            <%}%>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li class="ty_rerelative" style="width: 55px;text-align:center;">
+                <span style="position: absolute;top:0;left: -5px;">|</span><a href="/login.html" title="请登录">请登录</a>
+            </li>
+            <%}%>
+        </ul>
+        <ul class="tttop_02">
+            <li class="tttop_indhome02"><div class="tttop_left02">0576-81300105</div></li>
+            <%if(!isEmpty(session.curCustomer)){%>
+            <li class="float_r"><a href="/member/follow.html" title="我的关注">我的关注</a><span>|</span></li>
+            <li class="float_r ty_rerelative">
+                <a href="${decode(session.curCustomer.type.val,0,'/member/index.html',1,'/member/buyOrder/list.html','/member/sellOrder/list.html')}" title="我的订单" class="ttTop_myDiDa">我的订单</a>
+                <span class="ttTop_dingdan"><img src="/static/images/web/tt_hot01.gif" /></span>
+                <span>|</span>
+            </li>
+            <li class="float_r">
+                <a href="/member/index.html" title="${session.curCustomer.name}的个人中心">${session.curCustomer.name}的个人中心</a>&nbsp;&nbsp;&nbsp;
+                <a href="/logout" title="注销">注销</a>
+                <span>|</span>
+            </li>
+            <%}%>
+        </ul>
+    </div>
+</div>
+<!-- 直通车 end -->
+<!-- menu start -->
+<div class="tt_menuCon">
+    <div class="tt_menuConter">
+        <a href="/index.html"><img src="/static/images/web/tt_logo.png" class="tt_menuCtImg" width="160" /></a>
+        <span class="nc_pageTitle">关于纳车品</span>
+        <ul class="float_r ty_rerelative">
+            <li><a href="/index.html" title="首页">首页</a></li>
+            <span class="ncmum_jg01">|</span>
+            <li class="${strutil.startWith(actionKey,'/goods')?'tt_indxZ':''}" ><a href="/goods/list.html" target="_blank" title="货源商城">货源商城</a></li>
+            <span class="ncmum_jg02">|</span>
+            <li class="${strutil.startWith(actionKey,'/brand')?'tt_indxZ':''}"><a href="/brand/list.html" title="品牌专区">帮助中心</a></li>
+        </ul>
+    </div>
+</div>
+<!-- menu end -->
+<div class="ncnum_main">
+    <div class="ncpHelp_conter">
+        <!-- 左侧 start -->
+        <div class="ncnHelp_L">
+            <p class="ncnum_lTitle02">关于纳车品</p>
+            <ul>
+                <li class="ncnum_zi"><a href="/companyProfile.html" title="公司简介">公司简介</a> </li>
+                <li class="ncnum_zi"><a href="contactUs.html" title="联系我们">联系我们</a></li>
+                <li class="ncnum_zi"><a href="http://www.2788.com/" target="_blank" title="友情链接">友情链接</a></li>
+            </ul>
+            <p class="help_fwzxTilBg">服务保障</p>
+            <ul style="background: #f2f2f2;">
+                <li class="ncnum_zi"><a href="/brand/list.html" title="实体工厂货源">实体工厂货源</a></li>
+                <li class="ncnum_zi"><a href="returnGoods.html" title="8天无理由放心退货">8天无理由放心退货</a></li>
+            </ul>
+            <p class="help_xinshouzhiNam01">新手指南</p>
+            <ul>
+                <li class="ncnum_bor ncnum_zi"><a href="registeredAccount.html" title="账户注册">账户注册</a></li>
+                <li class="ncnum_bor ncnum_zi"><a href="gouwuliucheng.html" title="购物流程">购物流程</a></li>
+                <li class="ncnum_bor ncnum_zi"><a href="peisongfanwei.html" title="配送范围及时间">配送范围及时间</a></li>
+            </ul>
+            <p class="ncnum_lTitle05">售后服务</p>
+            <ul style="background: #f2f2f2;">
+                <li class="ncnum_zi"><a href="zhengce.html" title="退换货政策">退换货政策</a> </li>
+                <li class="ncnum_zi"><a href="banliliucheng.html" title="退换货办理流程">退换货办理流程</a></li>
+                <li class="ncnum_zi"><a href="tuikuanshuoM.html" title="退款说明">退款说明</a></li>
+            </ul>
+            <p class="ncnum_lTitle06">帮助中心</p>
+            <ul>
+                <li class="ncnum_bor ncnum_zi"><a href="zaixiankefu.html" title="在线客服">在线客服</a></li>
+                <li class="ncnum_bor ncnum_zi"><a href="forgetPwd.html" title="找回密码">找回密码</a></li>
+                <li class="ncnum_bor ncnum_zi02"><a href="falvshenming.html" title="法律申明">法律申明</a></li>
+            </ul>
+        </div>
+        <!-- 左侧 end -->
+        <!--主体 start-->
+        <div class="ncpHelp_R">
+            <p class="ncnHelp_numberT">法律声明</p>
+            <div class="ncpHelp_gsMain02">
+                <p class="ncpHelp_jsTitle">法律声明</p>
+                <p class="ncpHelp_tilZWen">提示条款：</p>
+                <p class="ncpHelp_tilZText">纳车品提醒您：本部分涉及到法律责任的具体条款，在使用纳车品平台各项服务前，请您务必仔细阅读并透彻理解本声明。如对本声明内容有任何疑问，您可向纳车品平台客服咨询。阅读本声明的过程中，如果您不同意本声明或其中任何内容，您应立即停止使用纳车品平台服务。如果您使用纳车品平台服务的，您的使用行为将被视为对本声明以及平台所涉及的全部规则的认可。</p>
+                <p class="ncpHelp_tilZWen">一、知识产权条款：</p>
+                <p class="ncpHelp_tilZText">除非纳车品另行声明，纳车品平台内的所有产品、技术、软件、程序、数据及其他信息（包括但不限于文字、图像、图片、照片、音频、视频、图表、色彩、版面设计、电子文档）的所有知识产权（包括但不限于版权、商标权、专利权、商业秘密等）及相关权利，均归纳车品或其关联公司所有。未经纳车品许可，任何人不得擅自使用（包括但不限于复制、传播、展示、镜像、上载、下载）。
+                    纳车品平台的Logo、“纳车品”等文字、图形及其组合，以及纳车品平台的其他标识、徵记、产品和服务名称均为纳车品及其关联公司在国内和国外的商标，未经纳车品书面授权，任何人不得以任何方式展示、使用或作其他处理，也不得向他人表明您有权展示、使用或作其他处理。</p>
+                <p class="ncpHelp_tilZWen">二、责任条款：</p>
+                <p class="ncpHelp_tilZText">1.您如果违反纳车品平台服务使用规范，产生任何法律后果的，您应以自己的名义独立承担所有的法律责任，纳车品免于因此产生任何损失或增加费用。</p>
+                <p class="ncpHelp_tilZText">2.基于维护纳车品平台交易秩序及交易安全的需要，纳车品有权在发生恶意诋毁商业信誉、恶意购买、恶意退货等扰乱市场正常交易秩序的情形下，执行关闭相应交易订单等操作并且不承担任何责任。</p>
+                <p class="ncpHelp_tilZText">3.经国家行政或司法机关的生效法律文书确认您存在违法或侵权行为，或者纳车品根据自身的判断，认为您的行为涉嫌违反法律法规的规定或涉嫌违反本协议或规则的条款的，则纳车品有权在纳车品平台上公示您的该涉嫌违法或违约行为及纳车品已对您采取的措施并且不承担任何责任。</p>
+                <p class="ncpHelp_tilZText">4.对于您在纳车品平台上发布的涉嫌违法、涉嫌侵犯他人合法权利或违反本协议和或规则的信息，纳车品有权不经通知您即予以删除，且不承担法律责任。</p>
+                <p class="ncpHelp_tilZText">5.对于您违反本协议项下承诺，或您在纳车品平台上实施的行为，包括您未在纳车品平台上实施但已经对纳车品平台及其用户产生影响的行为，纳车品有权单方认定您行为的性质及是否构成对本协议或规则的违反，并根据单方认定结果适用规则予以处理或终止向您提供服务，且无须征得您的同意或提前通知予您并且不承担法律责任，您应自行保存与您行为有关的全部证据，并应对无法提供充分证据而承担的不利后果。</p>
+                <p class="ncpHelp_tilZText">6.纳车品负责按“现状”和“将来的状态”向您提供纳车品平台服务。但纳车品对纳车品平台服务不作任何明示或暗示的保证，包括但不限于纳车品平台服务的适用性、没有错误或疏漏、持续性、准确性、可靠性、适用于某一特定用途。您应自行谨慎判断确定相关商品或信息的真实性、合法性和有效性，并自行承担因此产生的责任与损失。</p>
+                <p class="ncpHelp_tilZText">7.您了解纳车品平台上的信息系用户自行发布，且可能存在风险和瑕疵。纳车品平台仅作为交易地点。纳车品平台仅作为您获取物品或服务信息、物色交易对象、就物品和或服务的交易进行协商及开展交易的场所，但纳车品只做形式上的审查，无法控制交易所涉及的物品的质量、安全或合法性，商贸信息的真实性或准确性，以及交易各方履行其在贸易协议中各项义务的能力。</p>
+                <p class="ncpHelp_tilZText">8.除非法律法规明确要求，或出现以下情况，否则，纳车品没有义务对所有用户的信息数据、商品和服务信息、交易行为以及与交易有关的其它事项进行事先审查：</p>
+                <p class="ncpHelp_tilZTextZz">（a）纳车品有合理的理由认为特定会员及具体交易事项可能存在重大违法或违约情形。</p>
+                <p class="ncpHelp_tilZTextZz">（b）纳车品有合理的理由认为用户在纳车品平台的行为涉嫌违法或不当。</p>
+                <p class="ncpHelp_tilZText">9.纳车品或纳车品授权的第三方或您与纳车品一致同意的第三方有权基于您不可撤销的授权受理您与其他会员因交易产生的争议，并有权单方判断与该争议相关的事实及应适用的规则，进而作出处理决定，包括但不限于调整相关订单的交易状态，指令支付平台将争议货款的全部或部分支付给交易一方或双方。该处理决定对您有约束力。如您未在限期内执行处理决定的，则纳车品有权利（但无义务）直接拒绝支付给您的未结算货款或者已支付的价款。不足以补偿的您应及时弥补纳车品及其关联公司的损失，否则纳车品及其关联公司有权直接抵减您在其它合同项下的权益，并有权继续追偿。</p>
+                <p class="ncpHelp_tilZText">10.您理解并同意，纳车品或纳车品授权的第三方或您与纳车品一致同意的第三方并非司法机构，仅能以普通人的身份对证据进行鉴别，纳车品或纳车品授权的第三方或您与纳车品一致同意的第三方对争议的调处完全是基于您不可撤销的授权，其无法保证争议处理结果符合您的期望，也不对争议调处结论承担任何责任。如您因此遭受损失，您同意自行向受益人索偿。</p>
+                <p class="ncpHelp_tilZText">11.您了解并同意，纳车品不对因下述任一情况而导致您的任何损害赔偿承担责任，包括但不限于利润、商誉、使用、数据等方面的损失或其它无形损失的损害赔偿 (无论纳车品是否已被告知该等损害赔偿的可能性) ：</p>
+                <p class="ncpHelp_tilZTextZz">（a）使用或未能使用纳车品平台服务。</p>
+                <p class="ncpHelp_tilZTextZz">（b )第三方未经批准地使用您的账户或更改您的数据。</p>
+                <p class="ncpHelp_tilZTextZz">（c )通过纳车品平台服务购买或获取任何商品、样品、数据、信息或进行交易等行为或替代行为产生的费用及损失。</p>
+                <p class="ncpHelp_tilZTextZz">（d )您对纳车品平台服务的误解。</p>
+                <p class="ncpHelp_tilZTextZz">（e )任何非因纳车品的原因而引起的与纳车品平台服务有关的其它损失。
+                    不论在何种情况下，纳车品不对因不可抗力原因造成的不能服务或延迟服务承担责任。不可抗力包括但不限于：信息网络正常的设备维护，信息网络连接故障，电脑、通讯或其他系统的故障，电力故障，罢工，劳动争议，暴乱，起义，骚乱，生产力或生产资料不足，火灾，洪水，风暴，爆炸，战争，政府行为，司法行政机关的命令或第三方的不作为等原因。
+                </p>
+                <p class="ncpHelp_tilZText">12.如果您涉嫌违反有关法律或者本协议之规定，使纳车品遭受任何损失，或受到任何第三方的索赔，或受到任何行政管理部门的处罚，您应当赔偿纳车品因此造成的损失和发生的费用，包括但不限于律师费用等。</p>
+                <p class="ncpHelp_tilZText">13.根据合同自愿的原则，纳车品有权自行决定以任何理由不经事先通知地中止、终止向您提供部分或全部纳车品平台服务，有合理地理由出现时纳车品有权暂时冻结或永久冻结（注销）您的账户在纳车品平台的权限，且无须为此向您或任何第三方承担任何责任。</p>
+                <p class="ncpHelp_tilZText">14.对于已经标明的次品、特价品、订制品以及依法不适用8天内无理由退货等特殊的商品，纳车品无义务受理退换货的申请。</p>
+                <p class="ncpHelp_tilZText">15.您有权在纳车品平台提供的评价系统中对与您达成交易的其他用户商品或服务进行评价，但应当合法真实。您应当理解，您在纳车平台的评价信息是公开的，如您不愿意在评价信息中向公众披露您的身份信息，您有权选择通过匿名形式发表评价内容。</p>
+                <p class="ncpHelp_tilZText">16.您的所有评价行为应遵守纳车品平台规则的相关规定，评价内容应当客观真实，不应包含任何恶意诋毁、故意攻击、污言秽语、色情低俗、广告信息及法律法规与本协议列明的其他禁止性信息；您不应以不正当方式帮助他人提升信用或利用评价权利对其他用户实施威胁、敲诈勒索。纳车品可按照纳车品平台规则的相关规定对您实施上述行为所产生的评价信息进行删除或屏蔽，因恶意诋毁评价造成纳车品或第三人损失的，权利人保留追究的权利。</p>
+                <p class="ncpHelp_tilZText">17.账户因您主动泄露或遭受他人攻击、诈骗等行为导致的损失及后果，均由您自行承担。除纳车品存在过错外，您应对您账户项下的所有行为结果（包括但不限于在线签署各类协议、发布信息、购买商品及服务及披露信息等）负责。如发现任何未经授权使用您账户登录纳车品平台或其他可能导致您账户遭窃、遗失的情况，建议您立即通知纳车品，并授权纳车品将该信息同步给支付和技术平台。您理解纳车品对您的任何请求采取行动均需要合理时间，除纳车品存在过错外，纳车品对在采取行动前已经产生的后果不承担任何责任。</p>
+                <p class="ncpHelp_tilZText">18.如您的行为使纳车品或其关联公司遭受损失（包括自身的直接经济损失、商誉损失及对外支付的赔偿金、和解款、律师费、诉讼费等间接经济损失），您应赔偿纳车品或其关联公司的上述全部损失。
+                    如您的行为使纳车品或其关联公司遭受第三人主张权利，纳车品或其关联公司可在对第三人承担金钱给付等义务后就全部损失向您追偿。
+                </p>
+                <p class="ncpHelp_tilZText">19.如因您的行为使得第三人遭受损失或您怠于履行调处决定、纳车品或纳车品关联公司出于社会公共利益保护或消费者权益保护目的，可指示支付平台自您的支付宝账户中划扣相应款项进行支付。如您的未结算货款或者已支付价款余额不足以支付相应款项的，您同意委托纳车品使用自有资金代您支付上述款项，您应当返还该部分费用并赔偿因此造成纳车品的全部损失。如您账户中的款项不足以支付上述赔偿款项的，纳车品或关联公司可直接抵减您在纳车品或其关联公司其它协议项下的权益，并可继续追偿。</p>
+                <p class="ncpHelp_tilZText">20.纳车品平台上的店铺、商品信息（包括但不限于商品质量和价格、店铺名称、公司名称、 联系人及联络信息、产品的描述和说明、相关图片、视频等）均由会员自行提供并上传，由会员对其提供并上传的所有信息承担相应法律责任。</p>
+                <p class="ncpHelp_tilZText">21.其他。</p>
+                <p class="ncpHelp_tilZWen">三、信息保护条款：</p>
+                <p class="ncpHelp_tilZText">纳车品（下称“我们”）非常尊重用户信息的保护，无论是供货商会员还是进货商会员，在您使用纳车品平台提供的服务时，我们将按照本隐私权政策收集、使用及共享您的个人信息。本隐私权政策包含了我们收集、存储、使用、共享和保护您的个人信息的条款，我们希望通过本隐私权政策向您清晰地介绍我们对您个人信息的处理方式，因此我们建议您完整地阅读本隐私权政策，以帮助您了解维护自己隐私权的方式。如您对本隐私权政策有任何疑问，您可以通过纳车品平台公布的联系方式与我们联系。如果您不同意本隐私权政策任何内容，您应立即停止使用纳车品平台服务。当您使用纳车品平台提供的任一服务时，即表示您已同意我们按照本隐私权政策来合法使用和保护您的个人信息。
+                    为保障您的信息安全，我们努力采取各种合理的物理、电子和管理方面的安全措施来保护您的信息，使您的信息不会被泄漏、毁损或者丢失，包括但不限于信息加密存储、数据中心的访问控制等。我们对可能接触到您的信息的员工或外包人员也采取了严格管理，包括但不限于根据岗位的不同采取不同的权限控制，与他们签署保密协议，监控他们的操作情况等措施。纳车品会按现有技术提供相应的安全措施来保护您的信息，提供合理的安全保障，纳车品将尽力做到使您的信息不被泄漏、毁损或丢失。
+                    您的账户均有安全保护功能，请妥善保管您的账户及密码信息。纳车品将通过向其它服务器备份、对用户密码进行加密等安全措施确保您的信息不丢失，不被滥用和变造。尽管有前述安全措施，但同时也请您理解在信息网络上不存在“完善的安全措施”。请您妥善保护自己的个人信息，仅在必要的情形下向他人提供。如您发现自己的个人信息泄密，尤其是你的账户及密码发生泄露，请您立即联络纳车品客服，以便纳车品采取相应措施。
+                </p>
+                <p>&nbsp;</p><p>&nbsp;</p>
+            </div>
+        </div>
+    </div>
+    <!--主体 end-->
+    <div class="ty_gyClear"></div>
+    <%include("/web/common/foot.html"){}%>

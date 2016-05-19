@@ -1,0 +1,99 @@
+<%layout("../layout/header_layout.html"){%>
+<title>小批量定制详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "小批量定制详情";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span2" style="margin-left: 0;">
+                    <div class="input-prepend">
+                        <span class="add-on">联系人</span>
+                        <span class="add-text h18">${seeks.contacts!}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2" style="margin-left: 0;">
+                    <div class="input-prepend">
+                        <span class="add-on">联系电话</span>
+                        <span class="add-text h18">${seeks.phone!}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品名称</span>
+                        <span class="add-text h18">
+                            ${seeks.goodsName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品材质</span>
+                        <span class="add-text h18">
+                            ${seeks.material!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品报价</span>
+                        <span class="add-text h18">
+                            ${seeks.price!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">需求数量</span>
+                        <span class="add-text h18">
+                            ${seeks.quantity!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">要货时间</span>
+                        <span class="add-text h18">
+                            ${seeks.needTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品详情说明</span>
+                        <span class="add-text h18">
+                            ${seeks.remark!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <img src="${img_url.getS(seeks.imgUrl!)}" width="200px" height="200px" class="img-thumbnail" alt="商品图片">
+            </div>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

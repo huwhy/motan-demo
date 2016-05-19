@@ -1,0 +1,24 @@
+<div class="sui-navbar" style="margin-bottom: 0px; min-width: 1500px;">
+    <div class="navbar-inner">
+        <a href="/admin" class="sui-brand">
+            <img src="/static/images/web/ncp_logo.ico" width="26"/> 纳车品管理后台
+        </a>
+        <ul class="sui-nav">
+            <%for(menu in session.topMenus!){%>
+            <%if(isNotEmpty(menu.children)){%>
+            <li class="sui-dropdown">
+                <a href="javascript:Admin.menuClick(${menu.id});">${menu.name!}</a>
+            </li>
+            <%}%>
+            <%}%>
+        </ul>
+        <ul class="sui-nav pull-right">
+            <li><a href="#">欢迎 ${session.curUser.name!}</a></li>
+            <li><a href="#" data-toggle="modal"
+                   data-width="small"
+                   data-target="#J_chgpwd_modal">修改密码</a></li>
+            <!--<li><a href="#">消息</a></li>-->
+            <li><a href="/admin/logout">退出</a></li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,158 @@
+<%layout("../layout/header_layout.html"){%>
+<link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+<link rel="stylesheet" type="text/css" href="/static/css/web/jindutiao.css?v=${v}">
+<title>会员设置</title>
+<script type="text/javascript">
+    $(function(){
+        $(".m_saveBtn").unbind("click").bind("click", function () {
+
+            var mCount = $("input[name='totalMoney']").length;
+            var mArray = $("input[name='totalMoney']");
+            var tArray = $("input[name='totalQuantity']");
+            mArray.css("border","1px solid #eee")
+            tArray.css("border","1px solid #eee")
+
+            for(var i = 0; i < mCount; i++) {
+                if (mArray.eq(i).val() == undefined || mArray.eq(i).val() == null || mArray.eq(i).val().trim() == "") {
+                    alert("请填写采购金额！");
+                    mArray.eq(i).css("border", "1px solid red");
+                    mArray.eq(i).focus();
+                    return;
+                }
+                if (tArray.eq(i).val() == undefined || tArray.eq(i).val() == null || tArray.eq(i).val().trim() == "") {
+                    alert("请填写采购单数！");
+                    tArray.eq(i).css("border", "1px solid red");
+                    tArray.eq(i).focus();
+                    return;
+                }
+                if (i > 0) {
+                    /*升级采购金额相邻不足*/
+                    if (parseFloat(mArray.eq(i - 1).val()) > parseFloat(mArray.eq(i).val())) {
+                        alert("升级会员采购金额(" + parseFloat(mArray.eq(i).val()) + ")低于升级标准 ,请重新填写！");
+                        mArray.eq(i).css("border", "1px solid red");
+                        mArray.eq(i).focus();
+                        return;
+                    }
+                    if (parseFloat(mArray.eq(i - 1).val()) == parseFloat(mArray.eq(i).val()) && parseInt(tArray.eq(i - 1).val()) == parseInt(tArray.eq(i).val())) {
+                        alert("升级会员采购金额(" + parseFloat(mArray.eq(i).val()) + ")低于升级标准 ,请重新填写！");
+                        mArray.eq(i).css("border", "1px solid red");
+                        mArray.eq(i).focus();
+                        return;
+                    }
+                    /*采购单数相邻不足*/
+                    if (parseInt(tArray.eq(i - 1).val()) > parseInt(tArray.eq(i).val())) {
+                        alert("升级会员采购单数(" + parseInt(tArray.eq(i).val()) + ")低于升级标准，请重新填写");
+                        tArray.eq(i).css("border", "1px solid red");
+                        tArray.eq(i).focus();
+                        return;
+                    }
+                }
+            }
+            submitForm();
+        });
+        Common.ajaxForm($("form.form-save"), null, function(json){
+            if(json.code == Common.SUCC){
+                Common.go("/admin/member/level");
+            }else{
+                $("#gundongtiao").hide();
+                Msg.danger(json.message);
+                $(".m_saveBtn").bind("click", function () {
+                    submitForm()
+                });
+            }
+        });
+    });
+    function submitForm() {
+        /*问询*/
+        if(!confirm("确认要保存会员的设置信息吗？")){
+            return;
+        }
+        $("#gundongtiao").show();
+        $(".m_saveBtn").unbind("click");
+        $("form.form-save").submit();
+    }
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="huanyingBg">
+    <p>
+        <span class="pingtai_title">平台当前进货商数:&nbsp;${buyerCount}位</span>
+        <span class="pintai_mess"><a href="/admin/member/manage" target="_blank">管理查看</a></span>
+    </p>
+</div>
+<div class="ncpTable_Con">
+    <p>
+        <span class="huiyuan_jiegu">当前会员结构</span>
+        <span class="huiyuan_quanyi sui-btn btn-primary" id="add">新增会员等级</span>
+    </p>
+</div>
+<script type="text/javascript">
+    $("#add").click(function(){
+        var maxLevel = $("#member_table tr:last input[name='level']").val();
+        if(maxLevel == undefined){
+            maxLevel = 0;
+        }
+        var curLevel = parseInt(maxLevel) + 1;
+        var newRow='<tr><td width="100">V'+maxLevel+'<input type="hidden" name="level" value="'+ curLevel +'" /></td>';
+        newRow += '<td><span>采购总额</span><input type="text" name="totalMoney" value="" onkeyup="if(isNaN(value))execCommand(\'undo\')" onafterpaste="if(isNaN(value))execCommand(\'undo\')" /><span>元</span>';
+        newRow += '&nbsp;<label class="la">'+ ($("#andOr2").val() == 1?"且":"或") +'</label>&nbsp;';
+        newRow += '<span>采购单数</span><input type="text" name="totalQuantity" value="" onkeyup="this.value=this.value.replace(/\\D/g,\'\')" onafterpaste="this.value=this.value.replace(/\\D/g,\'\')" /><span>个</span></td></tr>';
+        $("#member_table tr:last").after(newRow);
+
+    });
+</script>
+<form class="form-save" action="save" method="post">
+    <table id="member_table" style="margin-bottom: 0;" class="sui-table table-bordered member_t">
+        <thead>
+            <tr>
+                <th width="100">会员等级</th>
+                <th>
+                    <span>根据规则设置会员等级</span>
+                    <span><input type="checkbox" id="setAll" name="setAll"><label for="setAll">设置</label></span>
+                    <span>
+                        <select name="andOr" id="andOr2">
+                            <option value="1" ${item.andOr!true ? 'selected' : ''}>且</option>
+                            <option value="0" ${item.andOr!true ? '' : 'selected'}>或</option>
+                        </select>
+                    </span>
+                </th>
+         <!--       <th>对应权益</th>-->
+                <script>
+                    $("#andOr2").click(function(){
+                        if($(this).val() == 1){
+                            $(".la").html("且");
+                        }else{
+                            $(".la").html("或");
+                        }
+                    })
+                </script>
+            </tr>
+        </thead>
+        <tbody>
+            <%for(item in memberLevels!){%>
+            <tr>
+                <td width="100">
+                    ${item.name}
+                    <input type="hidden" name="level" value="${item.level}" />
+                </td>
+                <td>
+                    <span>采购总额</span><input type="text" name="totalMoney" value="${nums.yuan(item.totalMoney)}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"/><span>元</span>
+                    &nbsp;
+                   <label class="la">且</label>
+                    <span>采购单数</span><input type="text" name="totalQuantity" value="${item.totalQuantity}" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" /><span>个</span>
+                </td>
+            </tr>
+            <%}%>
+        </tbody>
+    </table>
+    <div class="member_tFoot">
+        <span class="m_saveBtn" title="保存">保存</span>
+        <!--<input type="submit" class="m_saveBtn" value="保存" >-->
+    </div>
+    <!--进度条 start -->
+    <div class="ncp_addPageMban" id="gundongtiao">
+        <div class="warning001"><p>文件较大，请耐心等待……</p></div>
+    </div>
+    <!--进度条 end -->
+</form>
+<%}%>

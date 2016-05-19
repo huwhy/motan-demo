@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>进货商申请----结果页00</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+            Common.ajaxForm($("form.form-add"), null, function(json){
+                if(json.code == Common.SUCC){
+                    $("#ok").click();
+                }else{
+                    Msg.danger(json.message);
+                }
+            });
+            $("input[name=province]").change(function () {
+                var id = $(this).val();
+                Common.post2({
+                    url: '/cities',
+                    param: {id: id},
+                    success: function(json){
+                        $(".cities").html(json.data);
+                    }
+                });
+                $("input[name=city]").val("");
+                $("input[name=city]").siblings("span").text("请选择市");
+                $("input[name=county]").val("");
+                $("input[name=county]").siblings("span").text("请选择区");
+                $(".counties").html("");
+
+            });
+            $("input[name=city]").change(function(){
+                var id = $(this).val();
+                Common.post2({
+                    url: '/counties',
+                    param: {id: id},
+                    success: function(json){
+                        $(".counties").html(json.data);
+                    }
+                });
+                $("input[name=county]").val("");
+                $("input[name=county]").siblings("span").text("请选择区");
+            });
+        });
+
+    </script>
+</head>
+
+<%layout("../layout/body_layout.html"){%>
+<!--主体 start-->
+<form action="addPurchase" class="sui-form form-horizontal form-add sui-validate" method="post">
+    <div class="ncnum_R">
+        <p class="ncjhs_numberT">
+            <span class="ncs01">进货商认证结果</span>
+            <span class="ncs03">审核反馈</span>
+            <span class="ncs02">></span>
+            <span class="ncs02">认证审核</span>
+            <span class="ncs02">></span>
+            <span class="ncs04">提交申请</span>
+        </p>
+        <div class="ncnum_userMain02">
+            <div class="ncpsh_title" style="margin-bottom: 20px;">
+                <span class="ncpsh_title_z01">审核结果：</span>
+                <span class="ncpsh_title_z02">不通过</span>
+                <span class="ncpsh_title_z03">原因：</span>
+                <span class="ncpsh_title_z02">${check.comment}</span>
+            </div>
+            <p class="ncjhs_p001" style="margin-top:39px;">
+                <span class="ncnum_span101">进货淘宝店网址：</span>
+                <span>
+                    <input type="text" value="${check.shopUrl}" name="shopUrl" data-rules="required" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                </span>
+            </p>
+            <p class="ncjhs_p001">
+                <span class="ncnum_span101">旺旺ID：</span>
+                <span>
+                    <input type="text" value="${check.wangwang}" name="wangwang" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                </span>
+            </p>
+            <p class="ncjhs_p001">
+                <span class="ncnum_span101">常用QQ：</span>
+                <span>
+                    <input type="text" value="${check.qq}" name="qq" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                </span>
+            </p>
+            <p>
+            <div class="ty_gyClear"></div>
+            <style>
+                .sui-dropup .caret::before, .sui-dropdown .caret::before{ content: "";}
+            </style>
+
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ncjhs_p001">
+                <span class="ncnum_span101">进货商品类别：</span>
+                <span>
+                    <input type="checkbox" name="type" id="carZd" value="cushion" ${check.inCushionState?'checked':''}><label for="carZd" class="ncp_fuxuanG" > 汽车坐垫</label>
+                </span>
+                <span>
+                    <input type="checkbox" name="type" id="carJd" value="floorMat" ${check.inFloorMatState?'checked':''}><label for="carJd" class="ncp_fuxuanG" > 汽车脚垫</label>
+                </span>
+                <span>
+                    <input type="checkbox" name="type" id="carPt" value="wheelCover" ${check.inWheelCoverState?'checked':''}><label for="carPt" class="ncp_fuxuanG" > 方向盘套</label>
+                </span>
+                <span>
+                    <input type="checkbox" name="type" id="carMs" value="carTrim" ${check.inCarTrimState?'checked':''}><label for="carMs" class="ncp_fuxuanG" > 汽车内饰</label>
+                </span>
+                <span>
+                    <input type="checkbox" name="type" id="carQt" value="other" ${check.inOtherState?'checked':''}><label for="carQt" class="ncp_fuxuanG" > 其他</label>
+                </span>
+            </p>
+            <p class="ncjhs_p001">
+                <span class="ncnum_span101">进货支付宝帐号：</span>
+                <span>
+                    <input type="text" value="${check.alipayCode}" name="alipayCode" maxlength="40" data-rules="required" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                </span>
+            </p>
+            <p class="ncjhs_p001">
+                <span class="ncnum_span101">进货支付宝真实姓名：</span>
+                    <span>
+                        <input type="text" value="${check.alipayName!}" name="alipayName" maxlength="20" data-rules="required" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                    </span>
+            </p>
+            <p class="ncjhs_p001">
+                <span class="ncnum_span101">进货财付通账号：</span>
+                    <span>
+                        <input type="text" value="${check.tenpayCode!}" name="tenpayCode" maxlength="40" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                    </span>
+            </p>
+            <p class="ncjhs_p001">
+                <span class="ncnum_span101">进货微信号：</span>
+                    <span>
+                        <input type="text" value="${check.weiXin!}" name="weiXin" maxlength="50" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                    </span>
+            </p>
+            <!-- update start -->
+            <div class="ty_gyClear"></div>
+            <span class="ncnum_span101 float_l cityPSpan">所在地区：</span>
+                <span class="sui-dropdown dropdown-bordered select float_l" style="margin:5px 5px;">
+                    <span class="dropdown-inner xzCityspan">
+                        <a id="dropD" role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                            <input name="province" value="${province.id!}" type="hidden"><i class="caret"></i>
+                            <span>${province.name!'请选择省'}</span>
+                        </a>
+                        <ul id="menuD" role="menu" aria-labelledby="dropD" class="sui-dropdown-menu" style="height: 187px;">
+                            <%var pinyin = "";%>
+                            <%for(p in provinces!){%>
+                            <%if(pinyin != p.pinyin){%>
+                            <li role="presentation" class="group-title" style="padding:0px 10px;text-align: left;">${p.pinyin}</li>
+                            <%pinyin = p.pinyin;%>
+                            <%}%>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${p.id}">${p.name}</a>
+                            </li>
+                            <%}%>
+                        </ul>
+                    </span>
+                </span>
+                <span class="sui-dropdown dropdown-bordered select float_l" style="margin:5px 5px;">
+                    <span class="dropdown-inner xzCityspan">
+                        <a id="dropC" role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                            <input name="city" value="${county.cityId!}" type="hidden"><i class="caret"></i>
+                            <span>${county.cityName!'请选择城市'}</span>
+                        </a>
+                        <ul id="menuC" role="menu" aria-labelledby="dropC" class="sui-dropdown-menu cities" style="height: 187px;">
+                            <%for(c in cities!){%>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${c.id}">${c.name}</a>
+                            </li>
+                            <%}%>
+                        </ul>
+                    </span>
+                </span>
+                <span class="sui-dropdown dropdown-bordered select float_l" style="margin:5px 0px;">
+                    <span class="dropdown-inner xzCityspan">
+                        <a id="dropT" role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                            <input name="county" value="${county.id!}" type="hidden"><i class="caret"></i>
+                            <span>${county.name!'请选择区县'}</span>
+                        </a>
+                        <ul id="menuT" role="menu" aria-labelledby="dropT" class="sui-dropdown-menu counties" style="height: 187px;">
+                            <%for(c in counties!){%>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${c.id}">${c.name}</a>
+                            </li>
+                            <%}%>
+                        </ul>
+                    </span>
+                </span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <!-- update end -->
+           <!-- <p class="ncjhs_p001">
+                <span class="ncnum_span101">所在地区：</span>
+                <span>
+                    &lt;!&ndash;city start&ndash;&gt;
+                    <input name="city" id="start1" autocomplete="off" type="text" readonly value="${check.cityArea}" data-rules="required" style="height: 20px;line-height: 20px;" class="userCity_inp inputFocus proCityQueryAll proCitySelAll" placeholder="请选择/输入城市名称">
+                    &lt;!&ndash;弹出省省市&ndash;&gt;
+                    <div class="provinceCityAll topAndLeftFak">
+                        <div class="tabs clearfix">
+                            <ul class="">
+                                <li><a href="javascript:" class="current" tb="hotCityAll">热门城市</a></li>
+                                <li><a href="javascript:" tb="provinceAll">省份</a></li>
+                                <li><a href="javascript:" tb="cityAll" id="cityAll">城市</a></li>
+                                <li><a href="javascript:" tb="countyAll" id="countyAll">区县</a></li>
+                            </ul>
+                        </div>
+                        <div class="con">
+                            <div class="hotCityAll invis">
+                                <div class="pre"><a></a></div>
+                                <div class="list">
+                                    <ul></ul>
+                                </div>
+                                <div class="next"><a class="can"></a></div>
+                            </div>
+                            <div class="provinceAll invis">
+                                <div class="pre"><a></a></div>
+                                <div class="list">
+                                    <ul></ul>
+                                </div>
+                                <div class="next"><a class="can"></a></div>
+                            </div>
+                            <div class="cityAll invis">
+                                <div class="pre"><a></a></div>
+                                <div class="list">
+                                    <ul></ul>
+                                </div>
+                                <div class="next"><a class="can"></a></div>
+                            </div>
+                            <div class="countyAll invis">
+                                <div class="pre"><a></a></div>
+                                <div class="list">
+                                    <ul>
+                                    </ul>
+                                </div>
+                                <div class="next"><a class="can"></a></div>
+                            </div>
+                        </div>
+                    </div>
+                    &lt;!&ndash;city end&ndash;&gt;
+                </span>
+            </p>-->
+            <p class="ncjhs_p001" id="xiangxiAdr02">
+                <span class="ncnum_span101">详细地址：</span>
+                <span><textarea rows="2" name="address" maxlenth="240" onchange="this.value=this.value.substring(0, 240)" onkeydown="this.value=this.value.substring(0, 240)" onkeyup="this.value=this.value.substring(0, 240)"  placeholder="建议您如实填写详细收货地址，例如街道名称，门牌号码，楼层和房间号等信息">${check.address!}</textarea></span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ncjhs_p001 ncp_juTopyss">
+                <span class="ncnum_span101">邮政编码：</span>
+                <span>
+                    <input type="text" value="${check.postCode}" name="postCode" data-rules="required" placeholder="如不清楚邮递区号，请填写000000" maxlength="6" onfocus="javascript:this.className='ncjhs_inputxZ'" onblur="javascript:this.className=''" />
+                </span>
+            </p>
+            <div class="ty_gyClear"></div>
+
+            <p class="ncjhs_p001" style="margin-bottom: 80px;margin-top:10px;">
+                <span class="ncnum_span101"></span>
+                <span>
+                    <input type="submit" class="ncp_tijiaoShenHe" value="申请认证" title="申请认证"/>
+                    <input id="ok" type="button" class="hidden" value="申请认证" title="申请认证"
+                           data-toggle="modal" data-target="#shenqingRz" data-keyboard="false" />
+                </span>
+            </p>
+        </div>
+    </div>
+    <div id="shenqingRz" tabindex="-1" role="dialog" style="width: 500px;height: 290px;" data-hasfoot="false" data-backdrop="static" class="sui-modCity hide fade">
+        <div class="zdCity_Con">
+            <!--<button type="button" data-dismiss="modal" aria-hidden="true" class="sui-close">×</button>-->
+            <form>
+                <p class="ncp_ganxieshenQing">感谢您的申请</p>
+                <p style="margin-top:70px;">
+                    <span class="heiseziti">您的资格认证会在</span>
+                    <span class="heiseziti03">3·7个工作日</span>
+                    <span class="heiseziti02">内完成审核，请耐心等待！</span>
+                </p>
+                <p class="ty_gyClear">
+                    <span class="shenQingTcBtn" onclick="javascript:Common.refresh();" title="确定" >确定</span>
+                </p>
+            </form>
+        </div>
+    </div>
+</form>
+<!--主体 end-->
+<!--city start-->
+<!--<script src="/static/js/web/city/queryCities.js?v=${v}"></script>
+<script src="/static/js/web/city/queryAllAreas.js?v=${v}"></script>
+<script src="/static/js/web/city/queryAllProvinces.js?v=${v}"></script>
+<script src="/static/js/web/city/city.js?v=${v}"></script>-->
+<!--city end-->
+<%}%>
+</html>

@@ -1,0 +1,206 @@
+<%layout("../layout/header_layout.html"){%>
+<title>结算详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        Common.ajaxForm($("form.save-form"), "", function(json){
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function () {
+                    Common.go("/admin/settlement/history");
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+        $(".btn-ok").unbind("click").bind("click", function () {
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '确认已结算',
+                content: "确认已结算",
+                callback: function (win) {
+                    $("form.save-form").submit();
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST"
+          action="/admin/settlement/history/deal">
+        <input type="hidden" name="sellerId" value="${bill.sellerId!}">
+        <input type="hidden" name="month" value="${bill.month!}">
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on"><b style="color: #f00;">*</b>客户编号</span>
+                        <span class="add-text h18">${seller.code!}</span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司名</span>
+                        <span class="add-text h18">
+                            ${seller.supplierCompany!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">统计开始时间</span>
+                        <span class="add-text h18">
+                            ${bill.startDay!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">统计结束时间</span>
+                        <span class="add-text h18">
+                            ${bill.endDay!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商支付宝姓名</span>
+                        <span class="add-text h18">
+                            ${seller.alipayName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商支付宝帐号</span>
+                        <span class="add-text h18">
+                            ${seller.alipayCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商财付通帐号</span>
+                        <span class="add-text h18">
+                            ${seller.tenpayCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">总订单数</span>
+                        <span class="add-text h18">
+                            ${bill.totalNum}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">总金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${bill.totalPayment!}' />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取消订单数</span>
+                        <span class="add-text h18">
+                            ${bill.cancelNum!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取消金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${bill.cancelPayment!}' />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退款订单数</span>
+                        <span class="add-text h18">
+                            ${bill.refundNum!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退款金额</span>
+                        <span class="add-text h18">
+                        <#yuan value='${bill.refundPayment!}' />
+                            </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退货订单数</span>
+                        <span class="add-text h18">
+                            ${bill.refundGoodsNum!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退货金额</span>
+                        <span class="add-text h18">
+                        <#yuan value='${bill.refundGoodsPayment!}' />
+                            </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">结算金额</span>
+                        <span class="add-text h18">
+                        <#yuan value='${bill.finishPayment!}' />
+                            </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">备注</span>
+                        <input type="text" class="input h22" name="remark"
+                               value=""/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+        <%if(!bill.paid){%>
+        <input type="button" class="sui-btn btn-primary btn-ok" value="确认结算"/>
+        <%}%>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

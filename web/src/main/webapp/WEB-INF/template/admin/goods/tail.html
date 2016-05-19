@@ -1,0 +1,133 @@
+<%layout("../layout/header_layout.html"){%>
+<title>尾货处理管理</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        $(".btn-delete").unbind("click").bind("click", function () {
+            var $this = $(this);
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '确认删除？',
+                callback: function (win) {
+                    Common.post("/admin/goods/tail/delete",
+                        {code: $this.attr("data-id")}, function (json) {
+                            if (json.code == Common.SUCC) {
+                                win.remove();
+                                $('.dialog-mask').remove();
+                                Common.refresh();
+                                return true;
+                            } else {
+                                Dialog.show({
+                                    id: '#dialog-tip',
+                                    mask: '0',
+                                    width: '20%',
+                                    title: 'fail!',
+                                    content: json.message,
+                                    callback: function () {
+                                    }
+                                });
+                                return false;
+                            }
+                        });
+                }
+            });
+        });
+
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        查询条件
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select" style="margin-top: -4px;">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.fieldName!}" name="fieldName" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.fieldName, 'code', '尾货处理编号', 'goodsName', '商品名称',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="code">尾货处理编号</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="goodsName">商品名称</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                    <span class="add-on2">=</span>
+                    <input type="text" class="input h22" name="value" value="${parameter.value!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th width="80">尾货处理编号</th>
+        <th width="88">商品名称</th>
+        <th width="50">材质</th>
+        <th width="48">商品数量</th>
+        <th width="69">商品总价(元)</th>
+        <th width="62">提货方式</th>
+        <th>商品详情说明</th>
+        <th>申请时间</th>
+        <th width="80">尾货状态</th>
+        <th width="150">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data){%>
+    <tr>
+        <td>${item.code}</td>
+        <td>${item.goodsName}</td>
+        <td>${item.material}</td>
+        <td>${item.quantity}</td>
+        <td>${item.money}</td>
+        <td>${item.getMethod}</td>
+        <td>${item.comment}</td>
+        <td>${item.created, "yyyy-MM-dd"}</td>
+        <td>${item.status.val == 1?'处理中':'完成'}</td>
+        <td >
+            <a href="/admin/goods/tail/Taildetail?code=${item.code}">查看</a>
+            <a data-id="${item.code}" class="sui-btn btn-small btn-delete">删除</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../common/dialog.html"){};%>
+<%}%>

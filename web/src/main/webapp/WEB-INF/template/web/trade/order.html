@@ -1,0 +1,367 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>下单页</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <style>
+        .dropdown-inner {
+            background: rgba(0, 0, 0, 0) url("/static/images/web/xialabg.png") no-repeat scroll 90% 50%;
+        }
+    </style>
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $("input[name=province]").change(function () {
+                calcPostFee();
+                var id = $(this).val();
+                Common.post2({
+                    url: '/cities',
+                    param: {id: id, display: true},
+                    success: function(json){
+                        $(".cities").html(json.data);
+                    }
+                });
+                $("input[name=city]").val("");
+                $("input[name=city]").siblings("span").text("请选择市");
+                $("input[name=county]").val("");
+                $("input[name=county]").siblings("span").text("请选择区");
+                $(".counties").html("");
+
+            });
+            $("input[name=city]").change(function(){
+                var id = $(this).val();
+                Common.post2({
+                    url: '/counties',
+                    param: {id: id, display: true},
+                    success: function(json){
+                        $(".counties").html(json.data);
+                    }
+                });
+                $("input[name=county]").val("");
+                $("input[name=county]").siblings("span").text("请选择区");
+                calcPostFee();
+            });
+            $("#menu12 li").click(function(){
+                var money = $(this).attr("data-money");
+                var type = $(this).attr("data-type");
+                if (money == '0') {
+                    $("input[name=couponMoney]").val(0);
+                } else {
+                    $("input[name=couponMoney]").val(money);
+                    $("input[name=couponMoney]").attr("data-type", type);
+                }
+                calcTotalFee();
+            });
+            function calcPostFee(){
+                var provinceId = $("input[name=province]").val();
+                var areaId = $("input[name=city]").val();
+                var weight = $("input[name=province]").attr("data-weight");
+
+                Common.post2({
+                    url: "/trade/calcPostFee",
+                    param: {
+                        provinceId: provinceId,
+                        areaId: areaId,
+                        weight: weight
+                    },
+                    success: function (json) {
+                        $(".post-fee").text(json.data);
+                        $("input[name=postFee]").val(json.data);
+                        calcTotalFee();
+                    }
+                });
+            };
+            function calcTotalFee() {
+                var couponMoney = parseFloat($("input[name=couponMoney]").val());
+                var type = $("input[name=couponMoney]").attr("data-type");
+                var postFee = parseFloat($("input[name=postFee]").val());
+                var totalPayment = parseFloat($("input[name=totalPayment]").val());
+                var moneyText = "￥" + totalPayment;
+                var postFeeText = "" + postFee;
+                if (type == "POST_FEE") {
+                    postFee = postFee - couponMoney;
+                    if ( postFee < 0 ) {
+                        postFee = 0;
+                    }
+                } else {
+                    totalPayment = totalPayment - couponMoney;
+                    if ( totalPayment < 0 ) {
+                        totalPayment = 0;
+                    }
+                }
+                if (couponMoney > 0) {
+                    if (type == "POST_FEE") {
+                        postFeeText = postFeeText + "-" + couponMoney + "=" + postFee.toFixed(2);
+                    } else {
+                        moneyText = moneyText + "-" + couponMoney + "=" + totalPayment.toFixed(2);
+                    }
+                }
+                moneyText = moneyText + "元";
+                postFeeText = postFeeText + "元";
+                var elem = totalPayment + postFee;
+                $(".post-fee").text(postFeeText);
+                $(".money").text(moneyText);
+                $(".totalFee").text(elem.toFixed(2));
+            };
+
+            $("#confirmOrderForm").submit(function(){
+                var btn = $(".ncp_quzhifuBtn");
+                if($("textarea[name=buyerMessage]").val().length > 200) {
+                    MsgBox.warning(btn, "留言请小于200字符");
+                    return false;
+                }
+                if(!$("input[name=receiveName]").val()) {
+                    MsgBox.warning(btn, "请填写收货人姓名");
+                    return false;
+                }
+                var phone = $("input[name=receivePhone]").val();
+                if(!phone || phone.length > 20) {
+                    MsgBox.warning(btn, "请填写正确收货人电话");
+                    return false;
+                }
+                var provinceId = $("input[name=province]").val();
+                var cityId = $("input[name=city]").val();
+                var countyId = $("input[name=county]").val();
+                if(!provinceId || provinceId == "0" || !cityId || cityId == "0" || !countyId || countyId == "0") {
+                    MsgBox.warning(btn, "请选择省市区");
+                    return false;
+                }
+                if(!$("input[name=receiveAddress]").val()) {
+                    MsgBox.warning(btn, "请填明细地址");
+                    return false;
+                }
+                var postCode = $("input[name=postCode]").val();
+                if(postCode.length != 6) {
+                    MsgBox.warning(btn, "请填正确的邮编");
+                    return false;
+                }
+                return true;
+            });
+        });
+    </script>
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<div class="ncpXD_pic">
+    <img src="/static/images/web/ncpXD_liucpic.jpg"/>
+    <form id="confirmOrderForm" action="/trade/order" method="post">
+    <div class="ncpqr_textCon">
+        <p class="ncpXD_xiaoTit">确认订单信息：</p>
+        <p>
+        <table class="sui-table table-bordered" style="width:100%;margin:6px auto 0 auto;">
+            <thead>
+            <tr>
+                <th>商品编号</th>
+                <th>商品名称</th>
+                <th>属性</th>
+                <th>商品货号</th>
+                <!--<th>颜色</th>-->
+                <!--<th>尺寸</th>-->
+                <!--<th>适合车型</th>-->
+                <th>是否特殊商品</th>
+                <th>商品重量(KG)</th>
+                <th>单价(元)</th>
+                <th>数量</th>
+                <th>总价(元)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(item in items!){%>
+            <tr>
+                <td>${item.goodsCode!}</td>
+                <td>${item.goodsName!}</td>
+                <td>${strutil.replace(item.specPropValue,';','&nbsp;&nbsp;&nbsp;')}</td>
+                <td>${item.goodsItemNo!}</td>
+                <!--<td>${item.color!}</td>-->
+                <!--<td>${item.size!}</td>-->
+                <!--<td>${item.fitCar!}</td>-->
+                <td>${item.isSpecial?'是':'否'}</td>
+                <td>${item.weight / 1000.00, "#0.0"}</td>
+                <td>
+                    <%if(item.offline){%>
+                    <span style='color:red;'>商品已下架</span>
+                    <%}else{%>
+                    <#yuan value='${item.price}' />
+                    <%}%>
+                </td>
+                <td>${item.stock >= item.quantity? item.quantity : "<span style='color:red;'>库存不足</span>"}</td>
+                <td>
+                    <%if(item.offline){%>
+                    <span style='color:red;'>商品已下架</span>
+                    <%}else{%>
+                    <#yuan value='${item.money}'/>
+                    <%}%>
+                </td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        </p>
+        <div class="ty_gyClear">&nbsp;</div>
+        <p class="ncp_jushanjju">
+            <span>买家留言：</span>
+            <span><textarea name="buyerMessage" class="ncpqr_textarea" onfocus="javascript:this.className='ncpqr_textarea02'"
+                            onblur="javascript:this.className='ncpqr_textarea'"></textarea></span>
+        </p>
+
+        <p class="ncpqr_jiner">
+            <span>订单金额：</span>
+            <span class="money" style="color: #fd7009;font-size: 18px;font-weight: bold;">￥<#yuan value='${tradeTotalPrice}' /></span>
+        </p>
+    </div>
+    <div class="ty_gyClear"></div>
+    <div class="ncpqr_textCon">
+        <p class="ncpXD_xiaoTit">买家收货地址：</p>
+
+        <p class="ncpqr_shouhuored">
+            <span class="ncpqr_shouhuored02">收货人姓名：</span>
+            <span><input class="ncpqr_input" name="receiveName" type="text" maxlength="" onfocus="javascript:this.className='ncpqr_input02'"
+                         onblur="javascript:this.className='ncpqr_input'"/> </span>
+        </p>
+
+        <p class="ncpqr_shouhuored">
+            <span class="ncpqr_shouhuored02">电话：</span>
+            <span><input class="ncpqr_input" name="receivePhone" type="text" maxlength="20" onfocus="javascript:this.className='ncpqr_input02'"
+                         onblur="javascript:this.className='ncpqr_input'"/> </span>
+        </p>
+
+        <p class="ty_gyClear ncpqr_shouhuored">
+            <span class="ncpqr_shouhuored02" style="display: block;padding-top:10px;">省份：</span>
+            <span style="float:left;">
+                <h3 style="float:left;">&nbsp;</h3>
+                <span class="sui-dropdown dropdown-bordered select"
+                      style="float:left;margin: 5px 0 10px 0;">
+                    <span class="dropdown-inner">
+                        <a id="select" role="button" href="javascript:void(0);" data-toggle="dropdown" style="padding:4px 10px 4px 10px;text-align: left;" class="dropdown-toggle">
+                            <input value="0" data-weight="${totalWeight}" name="province" type="text" class="hidden" />
+                            <i class="caret"></i><span>请选择省份&nbsp;&nbsp;</span>
+                        </a>
+                        <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu" style="height: 220px;">
+                            <%var pinyin = "";%>
+                            <%for(p in provinces!){%>
+                            <%if(pinyin != p.pinyin){%>
+                            <li role="presentation" class="group-title" style="padding:0px 10px;text-align: left;">${p.pinyin}</li>
+                            <%pinyin = p.pinyin;%>
+                            <%}%>
+                            <li role="presentation">
+                                <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${p.id}">${p.name}</a>
+                            </li>
+                            <%}%>
+                        </ul>
+                    </span>
+                </span>
+            </span>
+            <span style="float:left;">
+                <h3 style="float:left;">&nbsp;</h3>
+                <span class="sui-dropdown dropdown-bordered select" style="float:left;margin: 5px 0 10px 0;">
+                    <span class="dropdown-inner">
+                        <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                           style="padding:4px 10px 4px 10px;text-align: left;" class="dropdown-toggle">
+                            <input value="0" name="city" type="text" class="hidden" />
+                            <i class="caret"></i><span>请选择市</span>
+                        </a>
+                        <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu cities">
+
+                        </ul>
+                    </span>
+                </span>
+            </span>
+            <span style="float:left;">
+                <h3 style="float:left;">&nbsp;</h3>
+                <span class="sui-dropdown dropdown-bordered select" style="float:left;margin: 5px 0 10px 0;">
+                    <span class="dropdown-inner">
+                        <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                           style="padding:4px 10px 4px 10px;text-align: left;" class="dropdown-toggle">
+                            <input value="0" name="county" type="text" class="hidden" />
+                            <i class="caret"></i><span>请选择区</span>
+                        </a>
+                        <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu counties">
+                        </ul>
+                    </span>
+                </span>
+            </span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ty_gyClear ncpqr_shouhuored">
+            <span class="ncpqr_shouhuored02">地址：</span>
+            <span><input class="ncpqr_input" name="receiveAddress" type="text" onfocus="javascript:this.className='ncpqr_input02'"
+                         onblur="javascript:this.className='ncpqr_input'"/> </span>
+        </p>
+
+        <p class="ncpqr_shouhuored">
+            <span class="ncpqr_shouhuored02">邮编：</span>
+            <span><input class="ncpqr_input" name="postCode" type="text" maxlength="6" onfocus="javascript:this.className='ncpqr_input02'"
+                         onblur="javascript:this.className='ncpqr_input'"/> </span>
+        </p>
+    </div>
+    <div class="ty_gyClear"></div>
+    <!-- zdj add start -->
+    <div class="xiaDan_yhjuan">
+        <p>
+        <div class="ty_gyClear"></div>
+        <span class="shiyong_youHuiJuan">使用优惠券：</span>
+        <input name="couponMoney" value="0" data-type="" type="hidden">
+        <span class="sui-dropdown dropdown-bordered select float_l">
+            <span class="dropdown-inner xzCityspan" style="width: auto;">
+                <a id="drop12" role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                    <input name="couponId" value="0" type="hidden">
+                    <i class="caret"></i>
+                    <span>不使用优惠券</span>
+                </a>
+                <ul id="menu12" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu" style="max-height: 80px;">
+                    <li role="presentation" data-money='0'>
+                        <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="0" title="不使用优惠券">不使用优惠券</a>
+                    </li>
+                    <%for(coupon in coupons!){%>
+                    <li role="presentation" data-type="${coupon.couponTemplate.useType!}" data-money="${nums.yuan(coupon.couponTemplate.money!)}">
+                        <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${coupon.id}">
+                            满${nums.yuan(coupon.couponTemplate.condition!)}元 ${coupon.couponTemplate.useType.value!}${nums.yuan(coupon.couponTemplate.money!)}元
+                        </a>
+                    </li>
+                    <%}%>
+                </ul>
+            </span>
+        </span>
+        </p>
+        <div class="ty_gyClear"></div>
+    </div>
+        <!-- zdj add end -->
+    <div class="ncpqr_textCon" style="height: 180px;">
+        <p class="ncpXD_xiaoTit">合计总费用：</p>
+
+        <p class="ncp_kuaidi">
+            快递费：￥<span class="post-fee">0.00</span>
+            <input type="hidden" name="postFee" value="0.00" />
+            <input type="hidden" name="totalPayment" value="<#yuan value='${tradeTotalPrice}' />" />
+        </p>
+
+        <p class="ncp_heji float_r">
+            <span class="ncp_zongfeiyong">总重量(KG)：</span>
+            <span class="ncp_jutishuju">${totalWeight / 1000.0, '#0.0'}</span>
+            &nbsp;&nbsp;&nbsp;
+            <span class="ncp_zongfeiyong">合计总费用：</span>
+            <span class="ncp_jutishuju">￥<span class="totalFee"><#yuan value='${tradeTotalPrice}' /></span></span>
+            <br />
+            <button class="ncp_quzhifuBtn" title="确认订单" style="border: none;float:right;" onclick="">确认订单</button>
+        </p>
+    </div>
+    </form>
+</div>
+<%include("/web/common/foot.html"){}%>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>忘记密码</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="http://g.alicdn.com/sj/dpl/1.4.3/css/sui-append.min.css?v=${v}" />
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script src="http://g.alicdn.com/sj/dpl/1.4.3/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+
+    <script type="text/javascript">
+        $(function(){
+            bindSendCode($(".send_code"));
+            Common.ajaxForm($("form.form-edit"), null, function(json){
+                if (json.code == Common.SUCC) {
+                    xiyibu02();
+                } else {
+                    Msg.danger(json.message, top);
+                }
+            });
+            $(".ttzhpwd_xybu02").click(function(){
+                $("form.form-edit").submit();
+            });
+        });
+        var countdown = 60;
+        function bindSendCode(btn){
+            $(btn).unbind("click").bind("click", function () {
+                var form = $("form.form-edit");
+                var phone = form.find("input[name='phone']").val();
+                if (!Common.Rules.mobile.test(phone)) {
+                    form.validate("showError", "phone", "请输入正确的手机号", "myerror");
+                    return;
+                }
+                form.validate("hideError", "phone", "myerror");
+                var checkCode = form.find("input[name='code']").val();
+                if(checkCode + "" == ""){
+                    form.validate("showError", "code", "验证码必填", "myerror");
+                    return;
+                }
+                form.validate("hideError", "code", "myerror");
+                Common.post("/sendCode", {phone: phone, checkCode: checkCode}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        $(btn).unbind("click");
+                        setTime(btn);
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+        }
+        function setTime(btn) {
+            if (countdown == 0) {
+                btn.val("获取验证码");
+                bindSendCode(btn);
+                countdown = 60;
+            } else {
+                btn.val("重新发送(" + countdown + ")");
+                countdown--;
+                setTimeout(function () {
+                    setTime(btn)
+                }, 1000)
+            }
+        }
+        function checkCode(){
+            var form = $("form.form-edit");
+            var phone = form.find("input[name='phone']").val();
+            if (!Common.Rules.mobile.test(phone)) {
+                form.validate("showError", "phone", "请输入正确的手机号", "myerror");
+                return;
+            }
+            form.validate("hideError", "phone", "myerror");
+            var checkCode = form.find("input[name='code']").val();
+            if(checkCode + "" == ""){
+                form.validate("showError", "code", "验证码必填", "myerror");
+                return;
+            }
+            form.validate("hideError", "code", "myerror");
+            var smsCode = form.find("input[name='smsCode']").val();
+            if(checkCode + "" == ""){
+                form.validate("showError", "smsCode", "短信验证码必填", "myerror");
+                return;
+            }
+            form.validate("hideError", "smsCode", "myerror");
+            Common.post("/checkCode", {phone: phone, checkCode: checkCode, smsCode:smsCode}, function (json) {
+                if (json.code == Common.SUCC) {
+                    xiyibu();
+                } else {
+                    Msg.danger(json.message, top);
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <%include("/web/common/top.html"){}%>
+    <form action="updatePwd" class="sui-form form-horizontal sui-validate form-edit" method="post">
+        <div class="ttlog_main">
+            <!-- 注册信息第1步 start -->
+            <div class="ttzhpwd_conter" id="diyi">
+                <p class="ttzhpwd_p">
+                    <span class="ttzhpwd_spanL">手机号：</span>
+                    <span><input type="text" class="ttreg_input01" name="phone" maxlength="11" data-rules="required|mobile" data-empty-msg="手机号必填" data-error-msg="手机号不正确" placeholder="请输入正确的手机号" onfocus="javascript:this.className='redborder'" onblur="javascript:this.className='ttreg_input01'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p class="ttzhpwd_p02">
+                    <span class="ttzhpwd_spanL">验证码：</span>
+                    <span>
+                        <input type="text" class="ttreg_input02" name="code" maxlength="4" data-rules="required" data-empty-msg="验证码必填" placeholder="图片验证码" onfocus="javascript:this.className='redborder04'" onblur="javascript:this.className='ttreg_input02'" />
+                        <img src="/captcha" style="float: left;" title="看不清？点击换一张" width="130" height="36" onclick="this.src='/captcha?'+Math.random()" />
+                    </span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p class="ttzhpwd_p02">
+                    <span class="ttzhpwd_spanL">短信验证码：</span>
+                    <span>
+                        <input type="text" class="ttreg_input03" name="smsCode" maxlength="4" data-rules="required" data-empty-msg="短信验证码必填" placeholder="短信验证码" onfocus="javascript:this.className='redborder05'" onblur="javascript:this.className='ttreg_input03'" />
+                        <input type="button" value="获取验证码" style="width: 100px;" class="ttDT_pifaBtn send_code" />
+                    </span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p class="ttzhpwd_p02">
+                    <div class="ttzhpwd_xybu" onclick="checkCode();" title="下一步">下一步</div>
+                </p>
+            </div>
+            <!-- 注册信息第1步 end -->
+            <!-- 注册信息第2步 start -->
+            <div class="ttzhpwd_conter02" id="dier">
+                <div class="ty_gyClear"></div>
+                <p class="ttzhpwd_p">
+                    <span class="ttzhpwd_spanL">新密码</span>
+                    <span><input type="password" class="ttreg_input04" maxlength="20" name="password" data-rules="required" data-empty-msg="密码必填" placeholder="设置密码" onfocus="javascript:this.className='redborder06'" onblur="javascript:this.className='ttreg_input04'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p class="ttzhpwd_p02">
+                    <span class="ttzhpwd_spanL">确认密码</span>
+                    <span><input type="password" class="ttreg_input04" maxlength="20" name="repassword" data-rules="required|match=password" data-empty-msg="密码必填" data-error-msg="2次输入密码不一致" placeholder="设置密码" onfocus="javascript:this.className='redborder06'" onblur="javascript:this.className='ttreg_input04'" /></span>
+                </p>
+                <div class="ty_gyClear"></div>
+                <p class="ttzhpwd_p02">
+                <div class="ttzhpwd_xybu02" title="提交修改">提交修改</div>
+                </p>
+            </div>
+            <!-- 注册信息第2步 end -->
+            <!-- 注册信息第3步 start -->
+            <div class="ttzhpwd_conter03" id="disan">
+                <img class="ttzhpwd_cheg" src="/static/images/web/tt_acusse.png" width="60" />
+                <span class="ttzhpwd_chegText">修改密码成功</span>
+                <a href="login.html" class="ttzhpwd_lTest" title="登录纳车品供销服务平台">登录纳车品供销服务平台</a>
+            </div>
+            <!-- 注册信息第3步 end -->
+        </div>
+    </form>
+    <%include("/web/common/foot.html"){}%>
+</body>
+</html>

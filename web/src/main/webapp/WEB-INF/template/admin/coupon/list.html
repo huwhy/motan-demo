@@ -1,0 +1,230 @@
+<%layout("../layout/header_layout.html"){%>
+<title>待拣货订单列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        $(".btn-stop").click(function () {
+            var code = $(this).attr("data-code");
+            var id = $(this).attr("data-id");
+            var info;
+            if(code == "stop"){
+                info = "停用";
+            }else{
+                info = "启用";
+            }
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '确认' + info + '该优惠券？',
+                content: '确认' + info + '该优惠券？',
+                callback: function (win) {
+                    Common.post("/admin/coupon/manage/change",
+                            {id:id, status: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form">
+        <input type="hidden" name="perSize" value="${parameter.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        优惠券名称
+                    </span>
+                    <input type="text" class="input h22" name="couponName" value="${parameter.couponName!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        使用情况
+                    </span>
+                    <input type="text" class="input h22" name="activityName" value="${parameter.activityName!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend input-inner">
+                    <span class="add-on">
+                        有效期
+                    </span>
+                    <input type="text" class="input-date h22" name="fromTime" data-toggle="datepicker"
+                            value="${parameter.fromTime}">
+                    <span class="add-on">-&nbsp;&nbsp;</span>
+                    <input type="text" class="input-date h22" name="endTime" data-toggle="datepicker"
+                            value="${parameter.endTime}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        使用条件
+                    </span>
+                    <input type="text" class="input h22" name="condition" value="${parameter.condition!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        总发行量
+                    </span>
+                    <input type="text" class="input h22" name="num" value="${parameter.num!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        面值
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a id="drop12" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.denomination}" name="denomination" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    <%
+                                    if(isEmpty(parameter.denomination)){
+                                        print("请选择");
+                                    }else{
+                                        for(item in denominations) {
+                                            if(nums.yuan(item) == parameter.denomination){
+                                                print(nums.yuan(item) + "元");
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    %>
+                                </span>
+                            </a>
+                            <ul id="menu12" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <%for(item in denominations) {%>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${nums.yuan(item)}">${nums.yuan(item)}元</a></li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.status}" name="status" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.status, 'NORMAL', '正常', 'DISABLE', '停用', '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" >请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="NORMAL">正常</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="DISABLE">停用</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sui-row">
+            <div class="span3">
+                <button class="sui-btn btn-primary">查询</button>
+                <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            </div>
+            <div class="span3">
+                <a href="/admin/coupon/manage/add" class="sui-btn btn-primary">创建优惠券</a>
+            </div>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>优惠券名称</th>
+        <th>面值</th>
+        <th>状态</th>
+        <th>有效期</th>
+        <th>使用条件(大于等于)</th>
+        <th>总发放量</th>
+        <th>剩余数量</th>
+        <th>使用情况</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.name}</td>
+        <td>${nums.yuan(item.money)}元</td>
+        <td>${item.status.value}</td>
+        <td>
+            ${item.startTime, "yyyy-MM-dd"} &nbsp;至&nbsp;
+            ${item.endTime, "yyyy-MM-dd"}
+        </td>
+        <td>${nums.yuan(item.condition)}</td>
+        <td>${item.num}</td>
+        <td>${(item.num - item.sendNum)}</td>
+        <td>
+            <%if(isEmpty(item.activityName)){%>
+            无
+            <%}else{%>
+            <span style="color:red">${item.activityName!}</span>
+            <%}%>
+        </td>
+
+        <td>
+            <a href="/admin/coupon/manage/edit?id=${item.id}" class="sui-btn btn-small">编辑</a>
+            <%if(item.status == 'NORMAL'){%>
+            <a data-id="${item.id}" data-code="stop" class="sui-btn btn-small btn-stop">停用</a>
+            <%}else{%>
+            <a data-id="${item.id}" data-code="restart" class="sui-btn btn-small btn-stop">启用</a>
+            <%}%>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../common/dialog.html"){};%>
+<%}%>

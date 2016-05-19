@@ -1,0 +1,125 @@
+<%layout("../layout/header_layout.html"){%>
+<title>我的发货单</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        $(".btn-takeOrder").unbind("click").bind("click", function() {
+            var dataId = $(this).attr("data-id");
+            var expressCode = $(this).attr("data-code");
+            Common.post("/admin/deliver/my/deliverItems", {expressCode: expressCode}, function(json){
+                Confirm.show({
+                    id: '#dialog-tip',
+                    mask: '1',
+                    width: '40%',
+                    title: '填写物流信息',
+                    content: json.data,
+
+                    callback: function (win) {
+                        var code = $(win).find("input[name=expressCode]").val();
+                        var expressName = $(win).find("input[name=expressName]").val();
+
+                        if (expressName == undefined || expressName.length == 0) {
+                            $(win).find("input[name=expressName]").css("border", "solid 1px red");
+                            return false;
+                        } else {
+                            $(win).find("input[name=expressName]").css("border", "");
+                        }
+                        if (code == undefined || code.length == 0) {
+                            $(win).find("input[name=expressCode]").css("border", "solid 1px red");
+                            return false;
+                        } else {
+                            $(win).find("input[name=expressCode]").css("border", "");
+                        }
+                        Common.post("/admin/deliver/my/sendOrder",
+                                {id: dataId, expressName: expressName, code: code}, function (json) {
+                                    if (json.code == Common.SUCC) {
+                                        win.remove();
+                                        $('.dialog-mask').remove();
+                                        Common.refresh();
+                                        return true;
+                                    } else {
+                                        Dialog.show({
+                                            id: '#dialog-tip',
+                                            mask: '0',
+                                            width: '40%',
+                                            title: 'fail!',
+                                            content: json.message,
+                                            callback: function () {
+                                            }
+                                        });
+                                        return false;
+                                    }
+                                });
+                    }
+                });
+            });
+
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        发货单号
+                    </span>
+                    <input type="text" class="input h22" name="code" value="${parameter.code!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>编号</th>
+        <th>订单数</th>
+        <th>订单总重量(KG)</th>
+        <th>收货人姓名</th>
+        <th>收货人地址</th>
+        <th>收货人电话</th>
+        <th>邮政编码</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td>${item.orderCnt!}</td>
+        <td>${nums.g2k(item.weight!)}</td>
+        <td>${item.buyerName!}</td>
+        <td>${item.provinceName} ${item.cityName} ${item.countyName} ${item.buyerAddress!}</td>
+        <td>${item.buyerPhone!}</td>
+        <td>${item.buyerPostCode!}</td>
+        <td>
+            <a href="/admin/deliver/my/detail?id=${item.id}" class="sui-btn btn-small">查看</a>
+            <%if(!item.isSend){%>
+            <a data-id="${item.id}" data-code="${item.expressCode!}" class="sui-btn btn-small btn-takeOrder">发货</a>
+            <%}%>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("/admin/common/dialog.html"){};%>
+<%}%>

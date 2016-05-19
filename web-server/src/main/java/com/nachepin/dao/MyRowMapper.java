@@ -1,8 +1,25 @@
 package com.nachepin.dao;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.persistence.Enumerated;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.*;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.NotWritablePropertyException;
+import org.springframework.beans.PropertyAccessorFactory;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -12,13 +29,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.Enumerated;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.*;
+import com.nachepin.api.dto.EnumUtils;
+import com.nachepin.api.dto.EnumVal;
 
 /**
  * @auther huwhy
@@ -272,7 +284,14 @@ public class MyRowMapper<T> implements RowMapper<T> {
                                 }
                                 ordinalEnums.put(clazz, enumMap);
                             }
-                            value = enumMap.get(value);
+                            Object val = enumMap.get(value);
+                            if (val == null) {
+                                EnumVal aev = f.getAnnotation(EnumVal.class);
+                                if (aev != null) {
+                                    val = EnumUtils.getEnum(clazz, aev.value(), value);
+                                }
+                            }
+                            value = val;
                         }
                         bw.setPropertyValue(pd.getName(), value);
                     } catch (TypeMismatchException ex) {

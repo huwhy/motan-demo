@@ -1,0 +1,79 @@
+<div id="J_coupon_modal" tabindex="-1" role="dialog" data-hasfoot="false" class="sui-modal hide fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" data-dismiss="modal" aria-hidden="true" class="sui-close">×</button>
+                <h4 class="modal-title">发放优惠券</h4>
+            </div>
+            <div class="modal-body">
+                <form class="sui-form form-horizontal form-send" action="/admin/member/manage/sendCoupon" method="post">
+                    <div class="control-group">
+                        <div class="span2">
+                            <div class="input-prepend">
+                            <span class="add-on">
+                                类型
+                            </span>
+                            <span class="sui-dropdown dropdown-bordered select h22">
+                                <span class="dropdown-inner">
+                                    <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                        <input value="${ct.useType!}" name="useType" type="text" class="hide">
+                                        <i class="caret"></i>
+                                        <span>请选择</span>
+                                    </a>
+                                    <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                                   value="">请选择</a></li>
+                                        <%for(useType in useTypes!){%>
+                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                                   value="${useType}">${useType.value!}</a></li>
+                                        <%}%>
+                                    </ul>
+                                </span>
+                            </span>
+                            </div>
+                        </div>
+                        <div class="span2">
+                            <div class="input-prepend">
+                                <span class="add-on">优惠券</span>
+                                <span class="sui-dropdown dropdown-bordered select h22">
+                                    <span class="dropdown-inner">
+                                        <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                            <input value="${ac.couponTemplateId!}" name="couponTemplateId" type="hidden">
+                                            <i class="caret"></i>
+                                            <span id="templateName">请选择</span>
+                                        </a>
+                                        <ul role="menu" class="sui-dropdown-menu coupons">
+                                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                                       data-money="0" value="">请选择</a></li>
+                                        </ul>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <input id="codes" type="hidden" name="codes" >
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-ok="modal" class="sui-btn btn-primary btn-large">发放</button>
+                <button type="button" data-dismiss="modal" class="sui-btn btn-default btn-large">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $("input[name=useType]").change(function () {
+        var useType = $(this).val();
+        if (useType.length > 0) {
+            Common.post2({
+                url: '/admin/coupon/manage/enableTemplates',
+                param: {useType: useType},
+                success: function (json) {
+                    $("input[name='couponTemplateId']").val("");
+                    $("#templateName").text("请选择");
+                    $(".coupons").html(json.data);
+                }
+            });
+        }
+    });
+</script>

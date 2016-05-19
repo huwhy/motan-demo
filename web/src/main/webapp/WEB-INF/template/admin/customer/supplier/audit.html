@@ -1,0 +1,356 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>供货商资格审核</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.go("/admin/customerAudit/supplier?r=" + Math.random);
+        });
+        Common.ajaxForm($("form.save-form"), "", function(json){
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function () {
+                    Common.go("/admin/customerAudit/supplier");
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+        $(".btn-ok").unbind("click").bind("click", function () {
+            $("form.save-form").submit();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+    .buyInfo:after {
+        content: "供货商角色信息";
+    }
+
+    .sellInfo:after {
+        content: "审核";
+    }
+</style>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST"
+            action="/admin/customerAudit/supplier/audit">
+        <input type="hidden" name="id"  value="${apply.id!}"/>
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>编号</span>
+                    <span class="add-text h18">${customer.code!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户帐号</span>
+                        <span class="add-text h18">
+                            ${customer.username!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">手机号码</span>
+                        <span class="add-text h18">
+                            ${customer.phone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户邮箱</span>
+                        <span class="add-text h18">
+                            ${customer.email!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户密码</span>
+                        <span class="add-text h18">
+                            *****
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户姓名</span>
+                        <span class="add-text h18">
+                            ${customer.name!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户状态</span>
+                        <span class="add-text h18">
+                            ${customer.state.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户属性</span>
+                        <span class="add-text h18">
+                            ${customer.type.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司名称</span>
+                        <span class="add-text h18">
+                            ${apply.supplierCompany!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商法人代表</span>
+                        <span class="add-text h18">
+                            ${apply.artificialPerson!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商营业执照</span>
+                        <div class="pic_l">
+                            <span id="preview01">
+                                <img width="460" src="${img_url.fullPath(apply.businessLicence!)}"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">支付宝帐号</span>
+                        <span class="add-text h18">
+                            ${apply.alipayCode!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">支付宝真实姓名</span>
+                        <span class="add-text h18">
+                            ${apply.alipayName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">财付通帐户</span>
+                        <span class="add-text h18">
+                            ${apply.tenpayCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">紧急联系人姓名</span>
+                        <span class="add-text h18">
+                            ${apply.emergencyContact!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">紧急联系人电话</span>
+                        <span class="add-text h18">
+                            ${apply.emergencyPhone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司微信</span>
+                        <span class="add-text h18">
+                            ${apply.weiXin!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司常用qq</span>
+                        <span class="add-text h18">
+                            ${apply.qq}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商品类别</span>
+                        <span class="add-text h18">
+                            ${apply.outGoodsTypes2!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">是否是生产厂商</span>
+                        <span class="add-text h18">
+                            ${(apply.isProducer!false)?'是':'否'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">产品品牌</span>
+                        <span class="add-text h18">
+                            ${apply.brand!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">所在区域</span>
+                        <span class="add-text h18">
+                            ${apply.cityArea2!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取货地址</span>
+                        <span class="add-text h18">
+                            ${apply.address!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">邮政编码</span>
+                        <span class="add-text h18">
+                            ${apply.postCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <%if(apply.status.val != 10){%>
+        <div class="info-group sellInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">审核结果</span>
+                        <span class="add-text h18">
+                            ${apply.status.value!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商客户标签类型</span>
+                        <span class="add-text h18">${apply.sign!}</span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商备注</span>
+                        <span class="add-text h18">${apply.remarks!}</span>
+                    </div>
+                </div>
+                <%if(apply.status.val == 30){%>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">原因</span>
+                        <span class="add-text">${apply.comment!}</span>
+                    </div>
+                </div>
+                <%}%>
+            </div>
+        </div>
+        <%}else{%>
+        <div class="info-group sellInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">审核结果</span>
+                        <span class="add-text h18">
+                            <label class="radio-pretty inline checked">
+                                <input type="radio" checked name="result"
+                                       value="true"><span>同意</span>
+                            </label>
+                            <label class="radio-pretty inline">
+                                <input type="radio" name="result"
+                                       value="false"><span>不同意</span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+                <div class="input-prepend">
+                    <span class="add-on">供货商客户标签类型</span>
+                    <span class="add-text h18">
+                        <label class="checkbox-pretty inline ${strutil.contain(customer.sign!'' , '淘宝')?'checked'}">
+                            <input type="checkbox" name="sign" ${strutil.contain(customer.sign!'' , '淘宝')?'checked'}
+                                   value="淘宝"><span>淘宝</span>
+                        </label>
+                        <label class="checkbox-pretty inline ${strutil.contain(customer.sign!'' , '京东')?'checked'}">
+                            <input type="checkbox" name="sign" ${strutil.contain(customer.sign!'' , '京东')?'checked'}
+                                   value="京东"><span>京东</span>
+                        </label>
+                        <label class="checkbox-pretty inline ${strutil.contain(customer.sign!'' , '普通')?'checked'}">
+                            <input type="checkbox" name="sign" ${strutil.contain(customer.sign!'' , '普通')?'checked'}
+                                   value="普通"><span>普通</span>
+                        </label>
+                        <label class="checkbox-pretty inline ${strutil.contain(customer.sign!'' , '其他')?'checked'}">
+                            <input type="checkbox" name="sign" ${strutil.contain(customer.sign!'' , '其他')?'checked'}
+                                   value="其他"><span>其他</span>
+                        </label>
+                    </span>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">如不通过，反馈问题</span>
+                        <input type="text" class="input h22" name="reason" />
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商备注</span>
+                        <input type="text" class="input h22" name="remarks" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-ok" value="确定"/>
+        <%}%>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../../common/dialog.html"){}%>
+<%}%>
+
+
+
+

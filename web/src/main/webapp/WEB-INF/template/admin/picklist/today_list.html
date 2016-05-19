@@ -1,0 +1,256 @@
+<%layout("../layout/header_layout.html"){%>
+<title>待拣货订单列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input[name=ckAll]").click(function () {
+            $("input[name=id]:checkbox").prop("checked", 'true');
+        });
+        $("input[name=ckInv]").click(function () {
+            $("input[name=id]:checkbox").each(function (i, item) {
+                if ($(item).prop("checked")) {
+                    $(item).removeAttr("checked");
+                } else {
+                    $(item).prop("checked", 'true');
+                }
+            });
+        });
+        $("input[name=id]:checkbox").click(function () {
+            if ($("input[name=id]:checkbox:checked").length == $("input[name=id]:checkbox").length) {
+                $("input[name=ckAll]:checkbox").prop("checked", 'true');
+            } else {
+                $("input[name=ckAll]:checkbox").removeAttr("checked");
+            }
+        });
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        $("input.btn-export").click(function () {
+            var params = new Array();
+            if ($("input[name=id]:checkbox:checked").length > 0) {
+                var codes = new Array();
+                $("input[name=id]:checkbox:checked").each(function (i, item) {
+                    codes.push($(item).val());
+                });
+                params.push("codes=" + codes.join(","));
+            } else {
+                $($("form.query-form").serializeArray()).each(function (i, item) {
+                    params.push(item.name + "=" + item.value);
+                });
+            }
+            window.open("/admin/picklist/today/export?" + params.join("&"), "_blank");
+        });
+        $(".btn-finished").click(function () {
+            var code = $(this).attr("data-code");
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '确认拣货完成？',
+                content: '确认拣货完成？',
+                callback: function (win) {
+                    Common.post("/admin/picklist/today/picked",
+                            {code: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${parameter.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        创建时间
+                    </span>
+                    <input type="text" class="input-date h22" name="createdFrom" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${createdFrom}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="createdEnd" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${createdEnd}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        订单编号
+                    </span>
+                    <input type="text" class="input h22" name="orderCode" value="${parameter.orderCode!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        商品货号
+                    </span>
+                    <input type="text" class="input h22" name="itemNo" value="${parameter.itemNo!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        买家电话
+                    </span>
+                    <input type="text" class="input h22" name="buyerPhone" value="${parameter.buyerPhone!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        拣货人
+                    </span>
+                    <input type="text" class="input h22" name="picker" value="${parameter.picker!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        商品编号
+                    </span>
+                    <input type="text" class="input h22" name="goodsCode" value="${parameter.goodsCode!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        卖家电话
+                    </span>
+                    <input type="text" class="input h22" name="sellerPhone" value="${parameter.sellerPhone!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        是否拣货中
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a id="drop12" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.picking!false}" name="picking" type="hidden">
+                                <i class="caret"></i>
+                                <span>${decode(parameter.picking, '0', '请选择', 'true', '是', 'false', '否', '否')}</span>
+                            </a>
+                            <ul id="menu12" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="0">请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="true">是</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="false">否</a></li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        卖家地址
+                    </span>
+                    <input type="text" class="input-xxlarge h22" name="sellerAddress"
+                           value="${parameter.sellerAddress!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <input type="button" class="sui-btn btn-primary btn-export" value="导出"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>
+            <input type="button" class="sui-btn" name="ckAll" value="全选"/>
+            <br>
+            <input type="button" class="sui-btn" name="ckInv" value="反选"/>
+        </th>
+        <th>订单编号</th>
+        <th>创建时间</th>
+        <th>商品编号</th>
+        <th>商品名称</th>
+        <th>商品货号</th>
+        <th>商品数量</th>
+        <th>卖家电话</th>
+        <th>卖家</th>
+        <th>紧急联系人</th>
+        <th>紧急联系人电话</th>
+        <th>卖家地址</th>
+        <th>订单状态</th>
+        <th>是否拣货中</th>
+        <th>拣货人</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>
+            <input type="checkbox" name="id" value="${item.code}"/>
+        </td>
+        <td>
+            <a href="/admin/picklist/today/detail?code=${item.code}" class="sui-btn btn-small">${item.code!}</a>
+        </td>
+        <td>${item.created!, 'yyyy-MM-dd HH:mm:ss'}</td>
+        <td>${item.goodsCode!}</td>
+        <td>${item.goodsName!}</td>
+        <td>${item.goodsItemNo!}</td>
+        <td>${item.quantity!}</td>
+        <td>${item.sellerPhone!}</td>
+        <td>${item.sellerName!}</td>
+        <td>${item.emergencyContact!}</td>
+        <td>${item.emergencyPhone!}</td>
+        <td>${item.pickAddress!}</td>
+        <td>${item.status.name!}</td>
+        <td>${item.pickerId > 0 ? '是':'否'}</td>
+        <td>
+            <#username id='${item.pickerId!}' />
+        </td>
+        <td>
+            <a href="/admin/picklist/today/detail?code=${item.code}" class="sui-btn btn-small">订单详情</a>
+            <%if(item.pickerId == session.curUser.id && item.status.val == 35){%>
+            <a data-code="${item.code}" class="sui-btn btn-small btn-finished">拣货完成</a>
+            <%}%>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../common/dialog.html"){};%>
+<%}%>

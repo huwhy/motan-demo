@@ -1,0 +1,149 @@
+<%layout("../layout/header_layout.html"){%>
+<title>打印发货单</title>
+<script type="text/javascript">
+    $(function () {
+        var codes = "";
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        $(".btn-excel").click(function(){
+            codes="";
+            $("input:checkbox").each(function(){
+                if($(this).is(':checked')){
+                   codes += $(this).val() + ";";
+                }
+            });
+            if(codes == ""){
+                Msg.danger("请选择需打印的发货单");
+                return;
+            }
+            window.open("/admin/deliver/print/exportToExcel?codes=" + codes);
+        });
+        $(".btn-takeOrder").unbind("click").bind("click", function() {
+            var dataId = $(this).attr("data-id");
+            var expressCode = $(this).attr("data-code");
+            Common.post("/admin/deliver/my/deliverItems", {expressCode: expressCode}, function(json){
+                Confirm.show({
+                    id: '#dialog-tip',
+                    mask: '1',
+                    width: '40%',
+                    title: '填写物流信息',
+                    content: json.data,
+                    callback: function (win) {
+                        var code = $(win).find("input[name=expressCode]").val();
+                        var expressName = $(win).find("input[name=expressName]").val();
+
+                        if (expressName == undefined || expressName.length == 0) {
+                            $(win).find("input[name=expressName]").css("border", "solid 1px red");
+                            return false;
+                        } else {
+                            $(win).find("input[name=expressName]").css("border", "");
+                        }
+                        if (code == undefined || code.length == 0) {
+                            $(win).find("input[name=expressCode]").css("border", "solid 1px red");
+                            return false;
+                        } else {
+                            $(win).find("input[name=expressCode]").css("border", "");
+                        }
+                        Common.post("/admin/deliver/print/setExpressCode",
+                            {id: dataId, expressName: expressName, code: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '40%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                    }
+                });
+            });
+
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        发货单号
+                    </span>
+                    <input type="text" class="input h22" name="code" value="${parameter.code!}" />
+                </div>
+            </div>
+            <div data-toggle="datepicker" data-date-timepicker="true" class="span4 input-daterange">
+                <label class="control-label">时间选择：</label>
+                <div class="controls">
+                    <input type="text" class="input h22 input-date" name="startTime" value="${parameter.startTime!}"><span>-</span>
+                    <input type="text" class="input h22 input-date" name="endTime" value="${parameter.endTime!}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <a href="javascript:void(0);" class="sui-btn btn-primary btn-excel" >导出EXCEL</a>
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>选择</th>
+        <th>发货单时间</th>
+        <th>编号</th>
+        <th>订单数</th>
+        <th>订单总重量(KG)</th>
+        <th>收货人姓名</th>
+        <th>收货人地址</th>
+        <th>收货人电话</th>
+        <th>邮政编码</th>
+        <th>快递公司</th>
+        <th>快递单号</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in sendOrders!){%>
+    <tr>
+        <td width="30px"><input type="checkbox" checked value="${item.code!}"></td>
+        <td>${dts.d2s(item.created!)}</td>
+        <td>${item.code!}</td>
+        <td>${item.orderCnt!}</td>
+        <td>${nums.g2k(item.weight!)}</td>
+        <td>${item.buyerName!}</td>
+        <td>${item.provinceName} ${item.cityName} ${item.countyName} ${item.buyerAddress!}</td>
+        <td>${item.buyerPhone!}</td>
+        <td>${item.buyerPostCode!}</td>
+        <td>${item.expressName!}</td>
+        <td>${item.expressCode!}</td>
+        <td>
+            <a data-id="${item.id}" data-code="${item.expressCode!}" class="sui-btn btn-small btn-takeOrder">填写快递信息</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%include("/admin/common/dialog.html"){};%>
+<%}%>

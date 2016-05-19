@@ -1,0 +1,124 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>历史结算管理</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">月份</span>
+                    <input type="text" class="input h22" data-toggle="datepicker" data-date-format="yyyy-mm" name="month" value="${parameter.month!}"/>
+                </div>
+            </div>
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        查询条件
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select" style="margin-top: -4px;">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.fieldName!}" name="fieldName" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.fieldName, 'phone', '客户电话', 'code', '客户编号',
+                                    'name', '客户姓名',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="phone">客户电话</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="code">客户编号</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="name">客户姓名</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                    <span class="add-on2">=</span>
+                    <input type="text" class="input h22" name="value" value="${parameter.value!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>统计月分</th>
+        <th>供货商编号</th>
+        <th>供货商公司名</th>
+        <th>订单总数</th>
+        <th>订单总金额</th>
+        <th>取消订单总数</th>
+        <th>取消订单总金额</th>
+        <th>退款订单总数</th>
+        <th>退款订单总金额</th>
+        <th>退货订单总数</th>
+        <th>退货订单总金额</th>
+        <th>结算订单数</th>
+        <th>结算金额</th>
+        <th>是否打款</th>
+        <th>打款日期</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.month!, 'yyy-MM'}</td>
+        <td>${item.sellerCode!}</td>
+        <td>${item.supplierCompany!}</td>
+        <td>${item.totalNum!}</td>
+        <td><#yuan value='${item.totalPayment!}' /></td>
+        <td>${item.cancelNum!}</td>
+        <td><#yuan value='${item.cancelPayment!}' /></td>
+        <td>${item.refundNum!}</td>
+        <td><#yuan value='${item.refundPayment!}' /></td>
+        <td>${item.refundGoodsNum!}</td>
+        <td><#yuan value='${item.refundGoodsPayment!}' /></td>
+        <td>${item.finishNum!}</td>
+        <td>
+            <#yuan value='${item.finishPayment!}' />
+        </td>
+        <td>${item.paid ? '是' : '否'}</td>
+        <td>${item.paidDay, 'yyyy-MM-dd HH:mm'}</td>
+        <td>
+            <a href="/admin/finance/history/detail?sellerId=${item.sellerId}&month=${item.month!, 'yyyy-MM'}">明细</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

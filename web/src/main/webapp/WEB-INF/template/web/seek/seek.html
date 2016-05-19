@@ -1,0 +1,204 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>小批量定制</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $(".btn-submit").unbind("click").bind("click", function () {
+                submitForm()
+            });
+            Common.ajaxForm($("form.seek-form"), null, function(json){
+                if(json.code == Common.SUCC){
+                    Common.go("/seek/seekSuccess.html");
+                }else{
+                    $(".btn-submit").bind("click", function () {
+                        submitForm()
+                    });
+                    $(".ncp_addPageMban02").hide();
+                    Msg.danger(json.message);
+                }
+            });
+        });
+        function submitForm() {
+            $(".ncp_addPageMban02").show();
+            $(".btn-submit").unbind("click");
+            $("form.seek-form").submit();
+        }
+        function previewImage(file)
+        {
+            var MAXWIDTH  = 198;
+            var MAXHEIGHT = 198;
+            var div = document.getElementById('preview');
+            if (file.files && file.files[0])
+            {
+                div.innerHTML ='<img id=imghead>';
+                var img = document.getElementById('imghead');
+                img.onload = function(){
+                    var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                    img.width  =  rect.width;
+                    img.height =  rect.height;
+                    img.style.marginTop = rect.top+'px';
+                }
+                var reader = new FileReader();
+                reader.onload = function(evt){img.src = evt.target.result;}
+                reader.readAsDataURL(file.files[0]);
+            }
+            else //兼容IE
+            {
+                var sFilter='filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
+                file.select();
+                var src = document.selection.createRange().text;
+                div.innerHTML = '<img id=imghead>';
+                var img = document.getElementById('imghead');
+                img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+                var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                status =('rect:'+rect.top+','+rect.left+','+rect.width+','+rect.height);
+                div.innerHTML = "<div id=divhead style='width:"+rect.width+"px;height:"+rect.height+"px;margin-top:"+rect.top+"px;"+sFilter+src+"\"'></div>";
+            }
+        }
+
+        function clacImgZoomParam( maxWidth, maxHeight, width, height ){
+            var param = {top:0, left:0, width:width, height:height};
+            if( width>maxWidth || height>maxHeight )
+            {
+                rateWidth = width / maxWidth;
+                rateHeight = height / maxHeight;
+
+                if( rateWidth > rateHeight )
+                {
+                    param.width =  maxWidth;
+                    param.height = Math.round(height / rateWidth);
+                }else
+                {
+                    param.width = Math.round(width / rateHeight);
+                    param.height = maxHeight;
+                }
+            }
+            param.left = Math.round((maxWidth - param.width) / 2);
+            param.top = Math.round((maxHeight - param.height) / 2);
+            return param;
+        };
+    </script>
+</head>
+<body>
+<div class="ncp_addPageMban02" style="display: none;">
+    <!--进度条 start -->
+    <div class="warning001"><p>文件较大，请耐心等待……</p></div>
+    <!--进度条 end -->
+</div>
+<!-- top start -->
+<%include("/web/common/top.html"){}%>
+<!-- top end -->
+<div class="ttlog_main">
+    <form class="seek-form" action="addSeek" enctype="multipart/form-data" method="post">
+    <div class="ttppzq_con ty_rerelative">
+        <p class="ttppzq_title ttppzq_marTo">小批量定制流程：</p>
+        <p class="ttppzq_liucImg"></p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top">
+            <span class="ttppzq_title">小批量定制信息</span>
+            <span class="ttppzq_ps">&nbsp;&nbsp;( *注：纳车品供销服务平台对于小批量定制信息的真实性不承担任何责任 )</span>
+        </p>
+        <p class="ttppzq_top">
+            <span class="ttred_F">*</span>
+            <span class="float_l ttppzq_userName">联系电话</span>
+            <span class="float_l"><input type="text" name="phone" maxlength="11" value="${session.curCustomer.phone!}" class="ttppzq_input01" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'"/></span>
+            <span class="float_r ttxpldz_sc ttxpldz_right">
+                上传图片
+                <input type="file" name="imgUrl" class="ttxqldz_file" accept=".gif,.jpg,.jpeg,.bmp,.png" onchange="previewImage(this)" />
+            </span>
+            <div  id="preview" class="ttxqldz_upload">
+                <img id="imghead" border="0" src="/static/images/web/tt_upload.png" width="198" height="198" />
+             </div>
+            <span class="float_r ttppzq_userName03">样品图片</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top">
+            <span class="ttred_F ncp_touMing">*</span>
+            <span class="float_l ttppzq_userName">我的QQ</span>
+            <span class="float_l"><input type="text" name="qq" maxlength="15" class="ttppzq_input01" value="${session.curCustomer.qq!}" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top ttppzq_topTs">
+            <span class="ttred_F">*</span>
+            <span class="float_l ttppzq_userName">我的旺旺号</span>
+            <span class="float_l"><input type="text" name="wangwang" maxlength="40" class="ttppzq_input01" value="${session.curCustomer.wangwang!}" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top ttppzq_topTs">
+            <span class="ttred_F">*</span>
+            <span class="float_l ttppzq_userName">定制产品名称</span>
+            <span class="float_l"><input type="text" name="goodsName" maxlength="40" class="ttppzq_input01" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+         <p class="ttppzq_top ttppzq_topTs">
+            <span class="ttred_F">*</span>
+            <span class="float_l ttppzq_userName">数量</span>
+            <span class="float_l"><input type="text" id="int" maxlength="50" name="quantity" class="ttppzq_input01" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+         <p class="ttppzq_top ttppzq_topTs">
+             <span class="ttred_F ncp_touMing">*</span>
+            <span class="float_l ttppzq_userName">报价</span>
+            <span class="float_l"><input type="text" name="price" class="ttppzq_input01" maxlength="15" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+         <div class="ttppzq_top ttppzq_topTs02">
+            <span class="ttred_F">*</span>
+            <span class="float_l ttppzq_userName">要货时间</span>
+            <span class="float_l">
+                <div id="demo2" class="date">
+                    <span class="add-on"></span>
+                    <input type="text" name="needTime" class="ttppzq_input01" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'">
+                </div>
+            </span>
+        </div>
+        <div class="ty_gyClear"></div>
+        <script type="text/javascript">
+            $('#demo2.date').datepicker({});
+        </script>
+        <p class="ttppzq_top ttppzq_topTs02">
+            <span class="ttred_F">*</span>
+            <span class="float_l ttppzq_userName">材质</span>
+            <span class="float_l"><input type="text" name="material" maxlength="50" class="ttppzq_input01" onfocus="javascript:this.className='ttppzq_input11'" onblur="javascript:this.className='ttppzq_input01'"/></span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <span class="ttred_F04">*</span>
+        <p class="ttppzq_top">
+            <span class="float_l ttppzq_userName02">定制商品的详细说明</span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top">
+            <span class="float_l">
+                <textarea name="remark" class="ttxqldz_textarea02"  onfocus="javascript:this.className='ttxqldz_textarea12'" onblur="javascript:this.className='ttxqldz_textarea02'"></textarea>
+            </span>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top02">
+            <input type="button" class="ttppzq_marL ttppzq_tijBtn btn-submit" title="提交" value="提交" />
+            <input type="reset" class="ttppzq_resBtn" title="重置" value="重置" />
+        </p>
+        <div class="ttppzq_marBt"></div>
+    </div>
+    </form>
+</div>
+<!-- footer start -->
+<%include("/web/common/foot.html"){}%>
+<!-- footer end -->
+</body>
+</html>

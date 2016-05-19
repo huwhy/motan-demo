@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>审核商品详情</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+            Common.ajaxForm($("form.form-add"), "/member/waitCheck/list.html", null);
+        });
+        function previewImage(file, type)
+        {
+            var MAXWIDTH  = 198;
+            var MAXHEIGHT = 198;
+            var div = document.getElementById('preview' + type);
+            if (file.files && file.files[0])
+            {
+                div.innerHTML ='<img id=imghead' + type + '>';
+                var img = document.getElementById('imghead' + type);
+                img.onload = function(){
+                    var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                    img.width  =  rect.width;
+                    img.height =  rect.height;
+                    img.style.marginTop = rect.top+'px';
+                }
+                var reader = new FileReader();
+                reader.onload = function(evt){img.src = evt.target.result;}
+                reader.readAsDataURL(file.files[0]);
+            }
+            else //兼容IE
+            {
+                var sFilter='filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
+                file.select();
+                var src = document.selection.createRange().text;
+                div.innerHTML = '<img id=imghead' + type + '>';
+                var img = document.getElementById('imghead' + type);
+                img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+                var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                status =('rect:'+rect.top+','+rect.left+','+rect.width+','+rect.height);
+                div.innerHTML = "<div id=divhead"+ type + " style='width:"+rect.width+"px;height:"+rect.height+"px;margin-top:"+rect.top+"px;"+sFilter+src+"\"'></div>";
+            }
+        }
+
+        function clacImgZoomParam( maxWidth, maxHeight, width, height ){
+            var param = {top:0, left:0, width:width, height:height};
+            if( width>maxWidth || height>maxHeight )
+            {
+                rateWidth = width / maxWidth;
+                rateHeight = height / maxHeight;
+
+                if( rateWidth > rateHeight )
+                {
+                    param.width =  maxWidth;
+                    param.height = Math.round(height / rateWidth);
+                }else
+                {
+                    param.width = Math.round(width / rateHeight);
+                    param.height = maxHeight;
+                }
+            }
+            param.left = Math.round((maxWidth - param.width) / 2);
+            param.top = Math.round((maxHeight - param.height) / 2);
+            return param;
+        }
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<p class="ncjhs_numberT">
+    <span class="ncs01">商品管理</span>
+    <span class="ncs01"> > </span>
+    <span class="ncs01">待审核商品</span>
+    <span class="ncs01"> > </span>
+    <span class="ncs01">商品详情</span>
+</p>
+    <p class="ncp_jibenXinxi"><span>1. 商品基本信息：</span></p>
+    <p class="ncjhs_p001">
+        <span class="ncp_buSpanL">商品大类：</span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei01" name="type"  ${goods.type=="cushion"?"checked":""} value="汽车坐垫">&nbsp;<label for="dalei01" class="ncp_labelY">汽车坐垫</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei02" name="type" ${goods.type=="floorMat"?"checked":""} value="汽车脚垫">&nbsp;<label for="dalei02" class="ncp_labelY">汽车脚垫</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei03" name="type" ${goods.type=="wheelCover"?"checked":""} value="方向盘套">&nbsp;<label for="dalei03" class="ncp_labelY">汽车盘套</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei04" name="type"  ${goods.type=="carTrim"?"checked":""} value="汽车内饰">&nbsp;<label for="dalei04" class="ncp_labelY">汽车内饰</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei05" name="type" ${goods.type=="other"?"checked":""} value="其他">&nbsp;<label for="dalei05" class="ncp_labelY">其他</label>
+            </span>
+    </p>
+    <p class="ty_gyClear ncjhs_p001">
+        <span class="ncp_buSpanL">商品品牌：</span>
+             <span>
+                ${goods.brand}
+            </span>
+    </p>
+    <p class="ncjhs_p001">
+        <span class="ncp_buSpanL">商品名称：</span>
+             <span>
+                ${goods.name}
+            </span>
+    </p>
+    <p class="ncjhs_p001">
+        <span class="ncp_buSpanL">商品货号：</span>
+             <span>
+                ${goods.ItemNo}
+            </span>
+    </p>
+
+
+    <div style=" width: 748px; margin-left: 180px; height: auto; overflow:hidden;">
+        <table id="process" border="1" cellpadding="1" cellspacing="0" style="width:100%;padding:5px;">
+            <thead>
+                <tr>
+                    <th>产品规格</th>
+                    <th width="60">颜色</th>
+                    <th>尺寸</th>
+                    <th width="80">批发价格(元)</th>
+                    <th width="90">建议零售价(元)</th>
+                    <th width="80">库存</th>
+                    <th width="80">重量(千克)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <%if(color > 0 && size > 0){%>
+                <%for(item in sku!){%>
+                <%
+                    var specTd = "";
+                    if(color * size == 1){
+                        specTd = "";
+                    }else if(itemLP.index % (color * size) == 1){
+                        specTd = "rowspan= '" + (color * size) + "'";
+                    }else{
+                        specTd = "style='display: none;'";
+                    }
+                    var colorTd = "";
+                    if(size == 1){
+                        colorTd = "";
+                    }else if(itemLP.index % size == 1){
+                        colorTd = "rowspan= '" + size + "'";
+                    }else{
+                        colorTd = "style='display: none;'";
+                    }
+                %>
+                <tr>
+                    <td ${specTd}>${item.skuSpecValue!}</td>
+                    <td ${colorTd}>
+                        <span>${item.skuColorValue!}</span>
+                        <br />
+                        <%if(!isEmpty(item.imgUrl)){%>
+                        <img src="${img_url.getS(item.imgUrl)}" width="60" height="60" /></td>
+                        <%}%>
+                    <td>${item.skuSizeValue!}</td>
+                    <td>${item.price /100}</td>
+                    <td>${item.retailPrice/100}</td>
+                    <td>${item.stock}</td>
+                    <td>${item.weight/1000}</td>
+                </tr>
+                <%}%>
+                <%}%>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="ty_gyClear"></div>
+    <p class="ncjhs_p001" style="margin-top:20px;">
+        <span class="ncp_buSpanL">是否特殊商品：</span>
+             <span>
+                 <input type="radio" id="teshu01" name="isSpecial" ${goods.isSpecial?"checked":""} />&nbsp;<label for="teshu01">是</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 <input type="radio" id="teshu02" name="isSpecial" ${!goods.isSpecial?"checked":""} />&nbsp;<label for="teshu02">否</label>
+            </span>
+    </p>
+
+    <div class="ty_gyClear"></div>
+    <p class="ncp_jibenXinxi"><span>2. 商品图片：</span></p>
+    <div class="ncp_uploadPic">
+        <span class="ncnum_span101">顶部图片：</span>
+        <div class="ncp_uploadP01">
+            <div class="ncp_picDiv">
+                <img border="0" src="${img_url.getS(goods.headImgUrl1)}" title="顶部图片" onerror="javascript:this.src='/static/images/web/ncp_upload.png'" width="198" height="198" />
+            </div>
+        </div>
+        <div class="ncp_uploadP02">
+            <div class="ncp_picDiv">
+                <img border="0" src="${img_url.getS(goods.headImgUrl2)}" title="顶部图片" onerror="javascript:this.src='/static/images/web/ncp_upload.png'" width="198" height="198" />
+            </div>
+        </div>
+        <div class="ncp_uploadP03">
+            <div class="ncp_picDiv">
+                <img border="0" src="${img_url.getS(goods.headImgUrl3)}" title="顶部图片" onerror="javascript:this.src='/static/images/web/ncp_upload.png'" width="198" height="198" />
+            </div>
+        </div>
+        <div class="ncp_uploadP04">
+            <div class="ncp_picDiv">
+                <img border="0" src="${img_url.getS(goods.headImgUrl4)}" title="顶部图片" onerror="javascript:this.src='/static/images/web/ncp_upload.png'" width="198" height="198" />
+            </div>
+        </div>
+        <div class="ncp_uploadP05">
+            <div class="ncp_picDiv">
+                <img border="0" src="${img_url.getS(goods.headImgUrl5)}" title="顶部图片" onerror="javascript:this.src='/static/images/web/ncp_upload.png'" width="198" height="198" />
+            </div>
+        </div>
+    </div>
+    <p class="ncp_jibenXinxi"><span>3. 商品描述：</span></p>
+    <div class="ncp_shenheConTW">
+        ${goods.comment}
+    </div>
+    <p class="ncjhs_p001">
+        <span class="ncnum_span101">商品数据包上传：</span>
+    </p>
+    <p class="ty_gyClear"></p>
+    <div class="ncp_tmJar">
+        <p class="ncp_duanluo01">
+            已上传淘宝数据包：${files.getFileName(goods.dataPackageUrl2)}
+        </p>
+        <p class="ncp_duanluo02">
+            已上传淘宝图片包：${files.getFileName(goods.imgPackageUrl2)}
+        </p>
+        <p class="ncp_duanluo02">
+            已上传阿里数据包：${files.getFileName(goods.dataPackageUrl1)}
+        </p>
+        <p class="ncp_duanluo02">
+            已上传阿里图片包：${files.getFileName(goods.imgPackageUrl1)}
+        </p>
+        <p>
+            <span><input type="submit" class="ncp_tijiaoShenHe003" onclick="javascript:history.back();" value="关闭" title="关闭" /></span>
+        </p>
+    </div>
+<%}%>
+</html>

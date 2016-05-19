@@ -1,0 +1,211 @@
+<%layout("../layout/header_layout.html"){%>
+<title>退款处理详情</title>
+<script type="text/javascript">
+	$(function() {
+		$(".btn-close").unbind("click").bind("click", function() {
+			Common.backHistory();
+		});
+		Common.ajaxForm($("form.save-form"), "", function(json) {
+			if (json.code == Common.SUCC) {
+				Msg.success(json.message, function() {
+					if (json.data) {
+						Common.go(json.data);
+					} else {
+						Common.refresh();
+					}
+				});
+			} else {
+				Msg.danger(json.message);
+			}
+		});
+		$(".btn-ok").unbind("click").bind("click", function() {
+			$("form.save-form").submit();
+		});
+	});
+</script>
+<style>
+
+.buyInfo:after {
+	content: "物流信息";
+}
+
+.orderInfo:after {
+	content: "订单信息";
+}
+
+.refundInfo:after {
+	content: "退款信息";
+}
+</style>
+<%}%> <%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+	<form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST" action="/admin/moneyRefund/deal">
+		<input type="hidden" name="tradeId" value="${trade.id!}" />
+			<div class="control-group">
+				<div class="span2" style="margin-left: 0;">
+					<div class="input-prepend">
+						<span class="add-on">状态</span> <span class="add-text h18">${trade.status.name!}</span>
+					</div>
+				</div>
+			</div>
+		<div class="info-group orderInfo">
+			<table class="sui-table table-bordered">
+				<thead>
+				<tr>
+					<th>订单编号</th>
+					<th>创建时间</th>
+					<th>商品编号</th>
+					<th>商品货号</th>
+					<th>商品规格</th>
+					<th>购买数</th>
+					<th>颜色</th>
+					<th>尺寸</th>
+					<th>退款金额(元)</th>
+				</tr>
+				</thead>
+				<tbody>
+				<%var totalMoney = 0;%>
+				<%for(item in orders!){%>
+				<%
+					totalMoney = totalMoney + item.moneyRefund;
+				%>
+				<tr>
+					<td>${item.code!}</td>
+					<td>${item.created, 'yyyy-MM-dd'}</td>
+					<td>${item.goodsCode!}</td>
+					<td>${item.goodsItemNo!}</td>
+					<td>${item.specPropValue!}</td>
+					<td>${item.quantity!}</td>
+					<td>${item.color!}</td>
+					<td>${item.size!}</td>
+					<td>${item.moneyRefund / 100, '#0.00'}</td>
+				</tr>
+				<%}elsefor{%>
+				<tr>
+					<td colspan="4">没有数据</td>
+				</tr>
+				<%}%>
+				</tbody>
+			</table>
+		</div>
+		<div class="info-group buyInfo">
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人姓名</span> <span class="add-text h18"> ${sendOrder.buyerName!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人地址</span> <span class="add-text h18"> ${sendOrder.buyerAddress!} </span>
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人电话</span> <span class="add-text h18"> ${sendOrder.buyerPhone!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人邮编</span> <span class="add-text h18"> ${sendOrder.buyerPostCode!} </span>
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">物流公司</span> <span class="add-text h18"> ${sendOrder.expressName!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">物流单号</span> <span class="add-text h18"> ${sendOrder.expressCode!} </span>
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">拣货人ID</span> <span class="add-text h18"> ${orders[0].pickerId!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">拣货完成时间</span> <span class="add-text h18"> ${orders[0].pickTime!, 'yyyy-MM-dd HH:mm:ss'} </span>
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">发货人ID</span> <span class="add-text h18"> ${sendOrder.sendUserId!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">发货完成时间</span> <span class="add-text h18"> ${sendOrder.sendTime!, 'yyyy-MM-dd HH:mm:ss'} </span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="info-group dealInfo">
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">退款处理人ID</span> <span class="add-text h18"> ${orders[0].buyerId!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">退款申请理由</span> <span class="add-text h18"> ${orders[0].moneyRefundReason!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">退款确认金额</span><span class="add-text h18"> ${totalMoney!/100}(元)</span>
+					</div>
+				</div>
+			</div>
+			<%if(orders[0].status.val == 105){%>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">退款处理</span> <span class="sui-dropdown dropdown-bordered select">
+						<span class="dropdown-inner"> <a role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle h22">
+							<input value="${orders[0].moneyRefundDeal!}" name="moneyRefundDeal" type="hidden">
+							<i class="caret"></i><span>--请选择--</span>
+						</a>
+								<ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="退款确认">退款确认</a></li>
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="退款拒绝">退款拒绝</a></li>
+								</ul>
+						</span>
+						</span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">退款拒绝理由</span> <input type="text" class="input h22" name="dagMoneyRefundReason" value="${orders[0].dagMoneyRefundReason!}" />
+					</div>
+				</div>
+			</div>
+			<%} else if(orders[0].status.val == 110){%>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">退款拒绝理由</span><span class="add-text h18"> ${orders[0].dagMoneyRefundReason!}</span>
+					</div>
+				</div>
+			</div>
+			<%}%>
+		</div>
+		<%if(orders[0].status.val == 105){%>
+			<input type="button" class="sui-btn btn-primary btn-ok" value="确认" />
+		<%}%>
+		<input type="button" class="sui-btn btn-primary btn-close" value="关闭" />
+	</form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

@@ -1,0 +1,70 @@
+<%layout("../layout/header_layout.html"){%>
+<title>城市管理-添加</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        Common.ajaxForm($("form.save-form"), "/admin/city");
+        $(".btn-cancel").unbind("click").bind("click", function () {
+            Common.go("/admin/city");
+        });
+
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" action="/admin/city/save">
+        <input type="hidden" name="id" value="${city.id!}">
+
+        <div class="control-group">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">省</span>
+                    <span class="sui-dropdown dropdown-bordered select" style="">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${city.provinceId!}" name="provinceId" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${city.provinceName!''}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <%for(item in provinces!){%>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="${item.id}">${item.name}</a>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <input type="text" name="name" value="${city.name!}" maxlength="30"
+                           class="input-fat h18">
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">拼音</span>
+                    <input type="text" name="pinyin" value="${city.pinyin!}"
+                           class="input-fat h18">
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <button class="sui-btn btn-primary btn-save">保存</button>
+            <input type="button" class="sui-btn btn-primary btn-cancel" value="取消"/>
+        </div>
+    </form>
+</div>
+<%}%>

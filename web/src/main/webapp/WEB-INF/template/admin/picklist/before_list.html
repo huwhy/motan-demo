@@ -1,0 +1,148 @@
+<%layout("../layout/header_layout.html"){%>
+<title>历史货订单列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        创建时间
+                    </span>
+                    <input type="text" class="input-date h22" name="createdFrom" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${createdFrom!}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="createdEnd" data-toggle="datepicker"
+                           data-date-timepicker='true' value="${createdEnd!}">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        订单编号
+                    </span>
+                    <input type="text" class="input h22" name="orderCode" value="${parameter.orderCode!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        商品货号
+                    </span>
+                    <input type="text" class="input h22" name="itemNo" value="${parameter.itemNo!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        买家电话
+                    </span>
+                    <input type="text" class="input h22" name="buyerPhone" value="${parameter.buyerPhone!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        拣货人
+                    </span>
+                    <input type="text" class="input h22" name="picker" value="${parameter.picker!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        商品编号
+                    </span>
+                    <input type="text" class="input h22" name="goodsCode" value="${parameter.goodsCode!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        卖家电话
+                    </span>
+                    <input type="text" class="input h22" name="sellerPhone" value="${parameter.sellerPhone!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        卖家地址
+                    </span>
+                    <input type="text" class="input-xxlarge h22" name="pickAddress"
+                           value="${parameter.pickAddress!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>订单编号</th>
+        <th>创建时间</th>
+        <th>商品编号</th>
+        <th>商品名称</th>
+        <th>商品货号</th>
+        <th>商品数量</th>
+        <th>卖家电话</th>
+        <th>卖家</th>
+        <th>紧急联系人</th>
+        <th>紧急联系人电话</th>
+        <th>卖家地址</th>
+        <th>订单状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td>${item.created!, 'yyyy-MM-dd HH:mm:ss'}</td>
+        <td>${item.goodsCode!}</td>
+        <td>${item.goodsName!}</td>
+        <td>${item.goodsItemNo!}</td>
+        <td>${item.quantity!}</td>
+        <td>${item.sellerPhone!}</td>
+        <td>${item.sellerName!}</td>
+        <td>${item.emergencyContact!}</td>
+        <td>${item.emergencyPhone!}</td>
+        <td>${item.pickAddress!}</td>
+        <td>${item.status.name!}</td>
+        <td>
+            <a href="/admin/picklist/before/detail?code=${item.code}" class="sui-btn btn-small">订单详情</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

@@ -1,0 +1,125 @@
+<%layout("../layout/header_layout.html"){%>
+<title>退货列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        查询条件
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select" style="margin-top: -4px;">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.fieldName!}" name="fieldName" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.fieldName, 'orderCode', '订单编号', 'goodsCode', '商品编号',
+                                    'goodsItemNo', '商品货号', 'sellerPhone', '卖家电话', 'buyerPhone', '买家电话',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="orderCode">订单编号</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="goodsCode">商品编号</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="goodsItemNo">商品货号</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="sellerPhone">卖家电话</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="buyerPhone">买家电话</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                    <span class="add-on2">=</span>
+                    <input type="text" class="input h22" name="value" value="${parameter.value!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>订单编号</th>
+        <th>创建时间</th>
+        <th>商品编号</th>
+        <th>商品货号</th>
+        <th>商品规格</th>
+        <th>订单数</th>
+        <th>商品金额</th>
+        <th>买家电话</th>
+        <th>退回原因</th>
+        <th>订单状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td>${item.created}</td>
+        <td>${item.goodsCode!}</td>
+        <td>${item.goodsItemNo!}</td>
+        <td>${item.specPropValue!}</td>
+        <td>${item.quantity!}</td>
+        <td>
+            <#yuan value='${item.money}' />
+        </td>
+        <td>${item.buyerPhone!}</td>
+        <td>${item.refundReason!}</td>
+        <td>${item.status.name!}</td>
+        <td>
+            <a href="/admin/refund/toDeal?code=${item.code}" class="sui-btn btn-small">
+                <%if(item.status.val == 70 || item.status.val == 85 || item.status.val == 105){%>
+                处理
+                <%} else {%>
+                查看
+                <%}%>
+            </a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

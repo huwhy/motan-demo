@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>国群联运站</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $(".ttwl_tongzhiBtn").unbind("click").bind("click", function () {
+                var phone = $("#phone").val();
+                if (!Common.Rules.mobile.test(phone)) {
+                    Msg.warning("请输入正确的手机号");
+                    return;
+                }
+                $(".ncp_duanxinBG").show();
+            });
+            $(".ncp_queRenBtn").unbind("click").bind("click", function () {
+                var phone = $("#phone").val();
+                if (!Common.Rules.mobile.test(phone)) {
+                    Msg.warning("请输入正确的手机号");
+                    return;
+                }
+                var code = $("#wl_yanzhengma").val();
+                Common.post("/sendExpress", {id: ${company.id!0}, code:code, phone: phone}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        changePic();
+                        $(".ncp_duanxinBG").hide();
+                        Msg.success(json.message, top);
+                    } else {
+                        Msg.danger(json.message, top);
+                    }
+                });
+            });
+        });
+        function changePic(){
+            $(".ncp_yzmImg").attr("src","/captcha?" + Math.random());
+        }
+    </script>
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<div class="ttwl_main">
+    <div class="ttwl_banner"></div>
+</div>
+<div class="ty_gyClear"></div>
+<div class="ttppzq_main">
+    <div class="ttppzq_gongsi">
+        <div class="ttwl_Con"  style="position: relative;">
+            <p class="ttppzq_gsTitlewl">公司简介</p>
+            <div class="ttwl_Con">
+                <div class="ttwl_Con_l"><img src="/static/images/web/ttwl_img04.png" class="ttwl_gsimg" width="380" /></div>
+                <div class="ttwl_Con_r">
+                    <p>
+                        联系电话：0576-83710358
+                    </p>
+                    <p>
+                        联系电话：13968583728&nbsp;&nbsp;533728
+                    </p>
+                    <p>
+                        联系电话：13958505036&nbsp;&nbsp;665036
+                    </p>
+                </div>
+                <div class="ty_gyClear"></div>
+                <div>
+                    <p class="ttppzq_gsTitlewl">告诉物流公司</p>
+                    <script type="text/javascript">
+                        $("#wl_yanzhengma").unbind("blur").bind("blur", function(){
+                            $(this).addClass('ncp_wuliuInp02');
+                            $(this).removeClass('ncp_wuliuInp');
+                        }).unbind("focus").bind("focus", function(){
+                            $(this).addClass('ncp_wuliuInp');
+                            $(this).removeClass('ncp_wuliuInp02');
+                        });
+                    </script>
+                    <p class="ttwl_tongzhi">
+                        <span>告诉物流公司，我要发货，请与我联系：输入我的手机号</span>
+                        <span><input type="text" id="phone" class="ttwl_tel" onfocus="javascript:this.className='ttwl_telR'" onblur="javascript:this.className='ttwl_tel'" /></span>
+                        <a href="javascript:void(0);" title="通知快递公司"><span class="ttwl_tongzhiBtn">通知快递公司</span></a>
+                    <div class="ncp_duanxinBG02" style="display: none;">
+                        <input id="wl_yanzhengma" class="ncp_wuliuInp" onfocus="javascript:this.className='ncp_wuliuInp02'" onblur="javascript:this.className='ncp_wuliuInp'" placeholder="请输入下方验证码"/>
+                        <span class="ncp_queRenBtn" title="确定">确定</span>
+                        <img src="/captcha" width="106" height="30" class="ncp_yzmImg" />
+                        <span class="ncp_kanbuQing"><a href="javascript:void(0);" onclick="changePic();" title="看不清楚？换一张">看不清楚？换一张</a></span>
+                    </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="ty_gyClear"></div>
+<!-- footer start -->
+<%include("/web/common/foot.html"){}%>
+<!-- footer end -->
+</body>
+</html>

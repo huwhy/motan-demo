@@ -27,4 +27,8 @@
                    directUrl="localhost:8002"
                    interface="com.nachepin.api.service.ICustomerService"
                    connectTimeout="300" requestTimeout="300" basicReferer="motantestClientBasicConfig" />
+    <motan:referer id="goodsService"
+                   directUrl="localhost:8002"
+                   interface="com.nachepin.api.service.IGoodsService"
+                   connectTimeout="300" requestTimeout="300" basicReferer="motantestClientBasicConfig" />
 </beans>

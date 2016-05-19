@@ -1,0 +1,172 @@
+<%layout("../layout/header_layout.html"){%>
+<title>结算详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        Common.ajaxForm($("form.save-form"), "", function (json) {
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function () {
+                    Common.go("/admin/settlement/cur");
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+        $(".btn-save").unbind("click").bind("click", function () {
+            $("form.save-form").submit();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST"
+          action="/admin/settlement/cur/deal">
+        <input type="hidden" name="code" value="${settlement.code!}">
+
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>客户编号</span>
+                    <span class="add-text h18">${settlement.supplierCode!}</span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>结帐编号</span>
+                    <span class="add-text h18">${settlement.code!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司名</span>
+                        <span class="add-text h18">
+                            ${settlement.supplierCompany!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">统计开始时间</span>
+                        <span class="add-text h18">
+                            ${settlement.startTime!, 'yyyy-MM-dd'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">统计结束时间</span>
+                        <span class="add-text h18">
+                            ${settlement.endTime!, 'yyyy-MM-dd'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商支付宝帐号</span>
+                        <span class="add-text h18">
+                            ${settlement.alipayCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商财付通帐号</span>
+                        <span class="add-text h18">
+                            ${settlement.tenpayCode!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">正常订单数</span>
+                        <span class="add-text h18">
+                            ${settlement.orderCnt!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">正常订单总金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${settlement.orderMoney!}'/>
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">一般退款订单数</span>
+                        <span class="add-text h18">
+                            ${settlement.backCnt!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">一般退款订单金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${settlement.backMoney!}'/>
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">协商退款订单数</span>
+                        <span class="add-text h18">
+                            ${settlement.negotiationBackCnt!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">协商退款总金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${settlement.negotiationBackMoney!}'/>
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">人工实付金额(万)</span>
+                        <input type="text" class="input h22" name="payMoney"
+                               value=""/>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">备注</span>
+                        <input type="text" class="input h22" name="remark"
+                               value=""/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-save" value="人工付款完成"/>
+        <input type="button" class="sui-btn btn-primary btn-close" value="取消"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

@@ -1,0 +1,42 @@
+<%layout("../layout/header_layout.html"){%>
+<title>会员设置</title>
+
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="huanyingBg">
+    <p>
+        <span class="pingtai_title">平台当前会员:&nbsp;${totalCount}位</span>
+        <span class="pintai_mess"><a href="/admin/member/manage">管理查看</a></span>
+    </p>
+</div>
+<div class="ncpTable_Con">
+    <p>
+        <span class="huiyuan_jiegu">当前会员结构</span>
+        <span class="huiyuan_quanyi"><a href="/admin/member/level/edit" title="修改"><button class="sui-btn btn-primary">修改</button></a></span>
+    </p>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>会员等级</th>
+        <th>人数</th>
+<!--        <th>对应权益</th>-->
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in memberLevels!){%>
+    <tr>
+        <td>${item.name!}</td>
+        <td>${item.memberCount!}</td>
+<!--        <td>${item.info!}</td>-->
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="3" class="member_noData">
+            <p>没有数据</p>
+        </td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<%}%>

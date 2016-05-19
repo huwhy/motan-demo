@@ -1,0 +1,190 @@
+<%layout("../layout/header_layout.html"){%>
+<title>会员详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "会员基本资料";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户帐号</span>
+                        <span class="add-text h18">
+                            ${customer.username!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户来源</span>
+                        <span class="add-text">${customer.sign!}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">姓名</span>
+                        <span class="add-text h18">
+                            ${customer.name!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品类别</span>
+                        <span class="add-text h18">
+                            ${customer.inGoodsTypes2!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">手机号码</span>
+                        <span class="add-text h18">
+                            ${customer.phone!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户邮箱</span>
+                        <span class="add-text h18">
+                            ${customer.email!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">所在区域</span>
+                        <span class="add-text h18">
+                            ${customer.cityArea!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">详细地址</span>
+                        <span class="add-text">${customer.address!}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户状态</span>
+                        <span class="add-text h18">
+                            ${customer.state.name!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">是否是生产厂商</span>
+                        <span class="add-text h18">
+                            ${(customer.isProducer!false)?'是':'否'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                    <span class="add-on">会员等级</span>
+                        <span class="add-text h18">
+                            ${memberLevels.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <table class="sui-table table-bordered">
+                        <thead>
+                        <tr>
+                            <th></th>
+
+                            <th>累计</th>
+                            <th>上个自然月</th>
+                            <th>上个自然季度</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>采购金额</td>
+                            <td>${customer.totalPurchaseMoney!}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>采购单数</td>
+                            <td>${customer.totalPurchaseCount!}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">现有优惠券</span>
+                        <span class="add-text h18">
+                            ${customer.level!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <table class="sui-table table-bordered">
+                        <thead>
+                        <tr>
+                            <th></th>
+
+                            <th>5元</th>
+                            <th>10元</th>
+                            <th>20元</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>抵运费</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>抵货款</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

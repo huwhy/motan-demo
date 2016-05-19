@@ -1,0 +1,119 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>退款订单列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        $(".btn-deal").unbind("click").bind("click", function () {
+            var code = $(this).attr("data-code");
+            var alipay = $(this).attr("data-alipay");
+            var name = $(this).attr("data-name");
+            var fee = $(this).attr("data-fee");
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '确认已退款',
+                content: "确认支付给" + alipay + "(" + name + ")，金额" + fee,
+                callback: function (win) {
+                    Common.post("/admin/finance/refund/deal",
+                            {code: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        订单号
+                    </span>
+                    <input type="text" class="input h22" name="code" value="${parameter.code!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>订单编号</th>
+        <th>创建时间</th>
+        <th>商品总金额</th>
+        <th>买家电话</th>
+        <th>支付宝帐户姓名</th>
+        <th>支付宝帐户</th>
+        <th>退款金额(元)</th>
+        <th>完成日期</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(trade in pager.data!){%>
+    <%for(item in trade.orders!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td>${item.created!, 'yyyy-MM-dd HH:mm:ss'}</td>
+        <td>
+            <#yuan value='${item.money}' />
+        </td>
+        <td>${item.buyerPhone!}</td>
+        <td>${item.alipayName!}</td>
+        <td>${item.alipayCode!}</td>
+        <td>${item.refundFee / 100, '#0.00'}</td>
+        <td>${item.endTime, 'yyyy-MM-dd HH:mm'}</td>
+        <td>
+            <%if(item.status.val == 32 || item.status.val == 90 || item.status.val == 100 || item.status.val == 115){%>
+            <a data-code="${item.code}" data-alipay="${item.alipayCode!}" data-name="${item.alipayName!}"
+               data-fee="${item.refundFee / 100, '#0.00'}" class="sui-btn btn-small btn-deal">
+                处理
+            </a>
+            <%}%>
+        </td>
+    </tr>
+    <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../../common/dialog.html"){};%>
+<%}%>
+

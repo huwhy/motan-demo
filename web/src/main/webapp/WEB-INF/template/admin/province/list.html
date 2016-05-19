@@ -1,0 +1,77 @@
+<%layout("../layout/header_layout.html"){%>
+<title>省份管理</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        $(".btn-set").unbind("click").bind("click", function () {
+            var id = $(this).attr("data-id");
+            Common.post2({
+                url: '/admin/province/setDisplay',
+                param: {id: id},
+                success: function (json) {
+                    Common.refresh();
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span3 w200">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <input id="prependedInput2" type="text" name="name" value="${parameter.name!''}"
+                           placeholder="名称"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>名称</th>
+        <th>状态</th>
+        <th>简拼</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.name!}</td>
+        <td>${item.display? '显示' : '隐藏'}</td>
+        <td>${item.pinyin!}</td>
+        <td>
+            <a data-id="${item.id}" class="sui-btn btn-small btn-set">${item.display? '隐藏' : '显示'}</a>
+            <a href="/admin/city?provinceId=${item.id}" class="sui-btn btn-small">城市管理</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<input type="hidden" name="id" value=""/>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../modal/user_modal.html"){}%>
+<%}%>

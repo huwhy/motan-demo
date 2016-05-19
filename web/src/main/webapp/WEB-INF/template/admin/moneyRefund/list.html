@@ -1,0 +1,91 @@
+<%layout("../layout/header_layout.html"){%>
+<title>退款列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%> <%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on"> 买家名称 </span>
+                    <input type="text" class="input h22" name="buyerName"
+                           value="${parameter.buyerName!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group"></div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>订单编号</th>
+        <th>创建时间</th>
+        <th>商品编号</th>
+        <th>商品货号</th>
+        <th>商品规格</th>
+        <th>数量</th>
+        <th>总金额</th>
+        <th>买家电话</th>
+        <th>退款原因</th>
+        <th>订单状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(trade in pager.data!){%>
+        <%for(item in trade.orders!){%>
+        <tr>
+            <td>${item.code!}</td>
+            <td>${item.created, 'yyyy-MM-dd HH:mm'}</td>
+            <td>${item.goodsCode!}</td>
+            <td>${item.goodsItemNo!}</td>
+            <td>${item.specPropValue!}</td>
+            <td>${item.quantity!}</td>
+            <td>
+                <#yuan value='${item.money}' />
+            </td>
+            <td>${item.buyerPhone!}</td>
+            <%if(trade.orders.~size > 0){%>
+                <%if(itemLP.isFirst){%>
+                    <td rowspan="${trade.orders.~size}">${item.moneyRefundReason!}</td>
+                    <td rowspan="${trade.orders.~size}">${trade.status.name!}</td>
+                    <td rowspan="${trade.orders.~size}">
+                        <a href="/admin/moneyRefund/toDeal?tid=${trade.id}" class="sui-btn btn-small">
+                            ${item.status.val == 105? '处理':'查看'}
+                        </a>
+                    </td>
+                <%}%>
+            <%}else{%>
+                <td>${item.moneyRefundReason!}</td>
+                <td>${item.status.name!}</td>
+                <td>
+                    <a href="/admin/moneyRefund/toDeal?tid=${trade.id}" class="sui-btn btn-small">
+                        ${item.status.val == 105? '处理':'查看'}
+                    </a>
+                </td>
+            <%}%>
+        </tr>
+        <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/> <%}%>

@@ -1,0 +1,188 @@
+<%layout("../layout/header_layout.html"){%>
+<title>退款处理详情</title>
+<script type="text/javascript">
+	$(function() {
+		$(".btn-close").unbind("click").bind("click", function() {
+			Common.backHistory();
+		});
+		Common.ajaxForm($("form.save-form"), "", function(json) {
+			if (json.code == Common.SUCC) {
+				Msg.success(json.message, function() {
+					if (json.data) {
+						Common.go(json.data);
+					} else {
+						Common.refresh();
+					}
+				});
+			} else {
+				Msg.danger(json.message);
+			}
+		});
+		$(".btn-ok").unbind("click").bind("click", function() {
+			$("form.save-form").submit();
+		});
+	});
+</script>
+<style>
+
+.buyInfo:after {
+	content: "物流信息";
+}
+
+.orderInfo:after {
+	content: "订单信息";
+}
+
+.refundInfo:after {
+	content: "退款信息";
+}
+</style>
+<%}%> <%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+	<form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST" action="/admin/applyCancelTrade/deal">
+		<input type="hidden" name="tradeId" value="${trade.id!}" />
+			<div class="control-group">
+				<div class="span2" style="margin-left: 0;">
+					<div class="input-prepend">
+						<span class="add-on">状态</span> <span class="add-text h18">${trade.status.name!}</span>
+					</div>
+				</div>
+				<div class="span2" style="margin-left: 0;">
+					<div class="input-prepend">
+						<span class="add-on">邮费</span> <span class="add-text h18">${trade.postFee/100, '#0.00'}</span>
+					</div>
+				</div>
+			</div>
+		<div class="info-group orderInfo">
+			<table class="sui-table table-bordered">
+				<thead>
+				<tr>
+					<th>订单编号</th>
+					<th>创建时间</th>
+					<th>商品编号</th>
+					<th>商品货号</th>
+					<th>商品规格</th>
+					<th>购买数</th>
+					<th>颜色</th>
+					<th>尺寸</th>
+					<th>退款金额(元)</th>
+					<th>优惠券信息</th>
+				</tr>
+				</thead>
+				<tbody>
+				<%var totalMoney = 0;%>
+				<%for(item in orders!){%>
+				<%
+					totalMoney = totalMoney + item.payment;
+				%>
+				<tr>
+					<td>${item.code!}</td>
+					<td>${item.created, 'yyyy-MM-dd'}</td>
+					<td>${item.goodsCode!}</td>
+					<td>${item.goodsItemNo!}</td>
+					<td>${item.specPropValue!}</td>
+					<td>${item.quantity!}</td>
+					<td>${item.color!}</td>
+					<td>${item.size!}</td>
+					<td>${item.payment / 100, '#0.00'}</td>
+					<td>
+						<%if(trade.couponId > 0){%>
+						${trade.useType == 'PAYMENT'? '免货款' : '免运费'} ${trade.couponFee / 100, "#0.00"}元
+						<%}else{%>
+						无
+						<%}%>
+					</td>
+				</tr>
+				<%}elsefor{%>
+				<tr>
+					<td colspan="4">没有数据</td>
+				</tr>
+				<%}%>
+				</tbody>
+			</table>
+		</div>
+		<div class="info-group buyInfo">
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人姓名</span> <span class="add-text h18"> ${sendOrder.buyerName!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人地址</span> <span class="add-text h18"> ${sendOrder.buyerAddress!} </span>
+					</div>
+				</div>
+			</div>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人电话</span> <span class="add-text h18"> ${sendOrder.buyerPhone!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">收货人邮编</span> <span class="add-text h18"> ${sendOrder.buyerPostCode!} </span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="info-group refundInfo">
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">处理人ID</span> <span class="add-text h18"> ${orders[0].buyerId!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">申请理由</span> <span class="add-text h18"> ${orders[0].refundReason!} </span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">退款金额</span><span class="add-text h18"> ${(totalMoney + trade.postFee)/100}(元)</span>
+					</div>
+				</div>
+			</div>
+			<%if(orders[0].status.val == 31){%>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">处理</span> <span class="sui-dropdown dropdown-bordered select">
+						<span class="dropdown-inner"> <a role="button" href="javascript:void(0);" data-toggle="dropdown" class="dropdown-toggle h22">
+							<input value="${orders[0].refundDeal!}" name="refundDeal" type="hidden">
+							<i class="caret"></i><span>--请选择--</span>
+						</a>
+								<ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="同意">同意</a></li>
+									<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="拒绝">拒绝</a></li>
+								</ul>
+						</span>
+						</span>
+					</div>
+				</div>
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">拒绝理由</span> <input type="text" class="input h22" name="disagreeRefundReason" value="${orders[0].disagreeRefundReason!}" />
+					</div>
+				</div>
+			</div>
+			<%} else if(orders[0].status.val != 32 && orders[0].status.val != 33){%>
+			<div class="control-group">
+				<div class="span3">
+					<div class="input-prepend">
+						<span class="add-on">拒绝理由</span><span class="add-text h18"> ${orders[0].disagreeRefundReason!}</span>
+					</div>
+				</div>
+			</div>
+			<%}%>
+		</div>
+		<%if(orders[0].status.val == 31){%>
+			<input type="button" class="sui-btn btn-primary btn-ok" value="确认" />
+		<%}%>
+		<input type="button" class="sui-btn btn-primary btn-close" value="关闭" />
+	</form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

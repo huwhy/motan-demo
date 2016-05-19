@@ -1,0 +1,267 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>退货处理详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        Common.ajaxForm($("form.save-form"), "", function(json){
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function () {
+                    if (json.data) {
+                        Common.go(json.data);
+                    } else {
+                        Common.refresh();
+                    }
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+        $(".btn-ok").unbind("click").bind("click", function () {
+            $("form.save-form").submit();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+    .buyInfo:after {
+        content: "物流信息";
+    }
+
+    .dealInfo:after {
+        content: "退货信息";
+    }
+
+</style>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST" action="/admin/finance/refund/deal">
+        <input type="hidden" name="code" value="${order.code!}"/>
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on">编号</span>
+                    <span class="add-text h18">${order.code!}</span>
+                </div>
+            </div>
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on">状态</span>
+                    <span class="add-text h18">${order.status.name!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">创建时间</span>
+                        <span class="add-text h18">
+                            ${order.created!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品单价</span>
+                        <span class="add-text h18">
+                            <#yuan value='${order.price}' />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品编号</span>
+                        <span class="add-text h18">
+                            ${order.goodsCode!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">购买数量</span>
+                        <span class="add-text h18">
+                            ${order.quantity!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品货号</span>
+                        <span class="add-text h18">
+                            ${order.goodsItemNo!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">总交易金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${order.money}' />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品颜色</span>
+                        <span class="add-text h18">
+                            ${order.color!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">是否特殊商品</span>
+                        <span class="add-text h18">
+                            ${order.isSpecial? '是':'否'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品尺寸</span>
+                        <span class="add-text h18">
+                            ${order.size!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">适合车型</span>
+                        <span class="add-text h18">
+                            ${order.fitCar!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户备注</span>
+                        <span class="add-text h18">
+                            ${order.buyerMessage!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品总重量</span>
+                        <span class="add-text h18">
+                            ${order.weight / 1000, '#0.00'}KG
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品规格</span>
+                        <span class="add-text h18">
+                            ${order.specPropValue}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-group buyInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家ID</span>
+                        <span class="add-text h18">
+                            ${order.buyerId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家电话</span>
+                        <span class="add-text h18">
+                            ${order.buyerPhone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">卖家ID</span>
+                        <span class="add-text h18">
+                            ${order.sellerId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">卖家电话</span>
+                        <span class="add-text h18">
+                            ${order.sellerPhone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-group buyInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退货处理人ID</span>
+                        <span class="add-text h18">
+                            <#username id='${order.buyerId!}'/>
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退货理由</span>
+                        <span class="add-text h18">
+                            ${order.refundReason!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on">状态</span>
+                        <span class="add-text h18">${order.status.name!}</span>
+                    </div>
+                </div>
+                <%if (order.status.val == 100) {%>
+                <input value="${order.refundDeal!}" name="backDeal" type="hidden">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">协商处理的结果</span>
+                        <span class="add-text">${order.negotiationResult!}</span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">协商退款金额</span>
+                        <span class="add-text">${(order.negotiationRefundMoney!0 / 100.0)}</span>
+                    </div>
+                </div>
+                <%}%>
+            </div>
+        </div>
+        <%if(order.status.val == 32 || order.status.val == 90 || order.status.val == 100 || order.status.val == 115){%>
+        <input type="button" class="sui-btn btn-primary btn-ok" value="确认已退款"/>
+        <%}%>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../../common/dialog.html"){}%>
+<%}%>

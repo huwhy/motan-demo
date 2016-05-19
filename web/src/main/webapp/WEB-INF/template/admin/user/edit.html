@@ -1,0 +1,125 @@
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST"
+          action="/admin/user/save">
+        <input type="hidden" name="id" value="${user.id}" />
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>帐号</span>
+                    <input type="text" name="username" value="${user.username!}"
+                           data-rules="required|minlength=2|maxlength=30"
+                           data-error-msg="帐号必须是2-30位" data-empty-msg="亲，帐号别忘记填了"
+                           class="input-fat h18">
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>姓名</span>
+                    <input type="text" name="name" value="${user.name!}"
+                           data-rules="required|minlength=2|maxlength=30"
+                           data-error-msg="姓名必须是2-30位" data-empty-msg="亲，姓名别忘记填了"
+                           class="input-fat h18">
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>密码</span>
+                    <input type="password" name="password" value=""
+                           data-rules="required|minlength=2|maxlength=30"
+                           data-error-msg="密码必须是2-30位" data-empty-msg="亲，密码别忘记填了"
+                           class="input-fat h18">
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>手机号码</span>
+                    <input type="text" name="phone" value="${user.phone!}"
+                           data-rules="required|minlength=2|maxlength=30"
+                           data-error-msg="手机号码必须是2-60位" data-empty-msg="亲，手机号码别忘记填了"
+                           class="input-fat h18 ">
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>紧急联系人电话</span>
+                    <input type="text" name="emergencyPhone" value="${user.emergencyPhone}"
+                           data-rules="required|minlength=2|maxlength=30"
+                           data-error-msg="紧急联系人电话必须是2-60位" data-empty-msg="亲，紧急联系人电话别忘记填了"
+                           class="input-fat h18 ">
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${user.state!}" name="state" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${user.state.value!}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="normal">在职</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="leave">离职</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">权限</span>
+                    <span class="add-text">
+                        <%for(role in roles!){%>
+                        <label class="checkbox-pretty inline ${array.contain(roleIds, role.id)? 'checked'}">
+                            <input type="checkbox" name="role" ${array.contain(roleIds, role.id)? 'checked'} value="${role.id}"><span>${role.name!}</span>
+                        </label>
+                        <%}%>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">职责描述</span>
+                    <textarea name="comment" rows="3" class="input-xlarge">${user.comment!}</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label"></label>
+
+            <div class="controls">
+                <button type="button" class="sui-btn btn-primary btn-save">保存</button>
+            </div>
+        </div>
+    </form>
+</div>

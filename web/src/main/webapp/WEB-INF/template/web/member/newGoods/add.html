@@ -1,0 +1,504 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>新增商品</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/jindutiao.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/file.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/webuploader.css?v=${v}">
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    
+    <!--添加规格 start -->
+    <script type="text/javascript" src="/static/js/web/liandong.js?v=${v}"></script>
+    <!--添加规格 end -->
+    <!-- 一次性上传多个图片 start -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js?v=${v}"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js?v=${v}"></script>
+    <![endif]-->
+    <link rel="stylesheet" type="text/css" href="/static/css/web/demo.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <!-- 一次性上传多个图片 end -->
+    <script type="text/javascript">
+        $(function () {
+            $(".subNav").click(function () {
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+            $(".btn-submit").unbind("click").bind("click", function () {
+                submitForm()
+            });
+            $("form.form-add").validate({
+                success: function () {
+                    var btn = $(".btn-submit");
+                    var validateResult = true;
+                    $('#process tbody tr').each(function(){
+                        if($(this).find('input[name="price"]').val() == ""){
+                            Msg.danger("请输入批发价格");
+                            $(this).find('input[name="price"]').focus();
+                            validateResult = false;
+                            return false;
+                        }
+                        if($(this).find('input[name="retailPrice"]').val() == ""){
+                            Msg.danger("请输入零售价格");
+                            $(this).find('input[name="retailPrice"]').focus();
+                            validateResult = false;
+                            return false;
+                        }
+                        if($(this).find('input[name="stock"]').val() == ""){
+                            Msg.danger("请输入库存");
+                            $(this).find('input[name="stock"]').focus();
+                            validateResult = false;
+                            return false;
+                        }
+                        if($(this).find('input[name="weight"]').val() == ""){
+                            Msg.danger("请输入重量");
+                            $(this).find('input[name="weight"]').focus();
+                            validateResult = false;
+                            return false;
+                        }
+                    });
+                    if(!validateResult){
+                        return false;
+                    }
+                    var state = true;
+                    $("input.uploadState").each(function(){
+                        if($(this).val() != ""){
+                            state = false;
+                            return false;
+                        }
+                    });
+                    if(!state){
+                        Msg.danger("规格图片上传中，请上传完成后提交");
+                        return false;
+                    }
+                    if ($("input[name=headImgUrl]").length == 0) {
+//                        MsgBox.danger(btn,"请上传图片");
+                        Msg.danger("请上传图片");
+                        return false;
+                    }
+                    if($("#uploading1").val().length > 0 || $("#uploading2").val().length > 0 || $("#uploading3").val().length > 0 || $("#uploading2").val().length > 0){
+//                        MsgBox.danger(btn, "图片包或数据包上传中，请上传完成后提交");
+                        Msg.danger("图片包或数据包上传中，请上传完成后提交");
+                        return false;
+                    }
+                    if ($("input[name=dataPackageUrl2]").val().length > 0 || $("input[name=imgPackageUrl2]").val().length > 0 ||
+                        $("input[name=dataPackageUrl1]").val().length > 0 || $("input[name=imgPackageUrl1]").val().length > 0) {
+                        $(".ncp_addPageMban").show();
+                        $(".btn-submit").unbind("click");
+                        return true;
+                    }else{
+//                        MsgBox.danger(btn, "请上传至少一个图片包或数据包");
+                        Msg.danger("请上传至少一个图片包或数据包");
+                        return false;
+                    }
+                }
+            });
+            Common.ajaxForm($("form.form-add"), null, function (json) {
+                if (json.code == Common.SUCC) {
+                    Common.go("/member/waitCheck/list.html");
+                } else {
+                    $(".btn-submit").bind("click", function () {
+                        submitForm()
+                    });
+                    $(".ncp_addPageMban").hide();
+//                    MsgBox.danger($(".btn-submit"), json.message);
+                    Msg.danger(json.message);
+                }
+            });
+        });
+
+        function submitForm() {
+            $("form.form-add").submit();
+        }
+        function showBan() {
+            $(".ncp_addPageMban").show();
+        }
+        function previewImage(file, type) {
+            var MAXWIDTH = 198;
+            var MAXHEIGHT = 198;
+            var div = document.getElementById('preview' + type);
+            if (file.files && file.files[0]) {
+                div.innerHTML = '<img id=imghead' + type + '>';
+                var img = document.getElementById('imghead' + type);
+                img.onload = function () {
+                    var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                    img.width = rect.width;
+                    img.height = rect.height;
+                    img.style.marginTop = rect.top + 'px';
+                }
+                var reader = new FileReader();
+                reader.onload = function (evt) {
+                    img.src = evt.target.result;
+                }
+                reader.readAsDataURL(file.files[0]);
+            }
+            else //兼容IE
+            {
+                var sFilter = 'filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src="';
+                file.select();
+                var src = document.selection.createRange().text;
+                div.innerHTML = '<img id=imghead' + type + '>';
+                var img = document.getElementById('imghead' + type);
+                img.filters.item('DXImageTransform.Microsoft.AlphaImageLoader').src = src;
+                var rect = clacImgZoomParam(MAXWIDTH, MAXHEIGHT, img.offsetWidth, img.offsetHeight);
+                status = ('rect:' + rect.top + ',' + rect.left + ',' + rect.width + ',' + rect.height);
+                div.innerHTML = "<div id=divhead" + type + " style='width:" + rect.width + "px;height:" + rect.height + "px;margin-top:" + rect.top + "px;" + sFilter + src + "\"'></div>";
+            }
+        }
+
+        function clacImgZoomParam(maxWidth, maxHeight, width, height) {
+            var param = {top: 0, left: 0, width: width, height: height};
+            if (width > maxWidth || height > maxHeight) {
+                rateWidth = width / maxWidth;
+                rateHeight = height / maxHeight;
+
+                if (rateWidth > rateHeight) {
+                    param.width = maxWidth;
+                    param.height = Math.round(height / rateWidth);
+                } else {
+                    param.width = Math.round(width / rateHeight);
+                    param.height = maxHeight;
+                }
+            }
+            param.left = Math.round((maxWidth - param.width) / 2);
+            param.top = Math.round((maxHeight - param.height) / 2);
+            return param;
+        }
+        function getFileName(path) {
+            var pos = path.lastIndexOf("\\");
+            return path.substring(pos + 1);
+        }
+    </script>
+</head>
+
+<%layout("../../layout/body_layout.html"){%>
+    <div class="ncp_addPageMban" style="display: none;">
+        <!--进度条 start -->
+        <div class="warning001"><p>文件较大，请耐心等待……</p></div>
+        <!--进度条 end -->
+    </div>
+    <input type="hidden" id="imagePolicy" value="${imagePolicy.policy!}" />
+    <input type="hidden" id="imageSignature" value="${imagePolicy.signature!}" />
+    <input type="hidden" id="filePolicy" value="${filePolicy.policy!}" />
+    <input type="hidden" id="fileSignature" value="${filePolicy.signature!}" />
+    <p class="ncjhs_numberT">
+        <span class="ncs01">商品管理</span>
+        <span class="ncs01"> > </span>
+        <span class="ncs01">新增商品</span>
+    </p>
+    <form action="add" class="sui-form form-horizontal form-add" novalidate="novalidate" enctype="multipart/form-data" method="post">
+        <p class="ncp_jibenXinxi"><span>1. 商品基本信息：</span></p>
+        <p class="ncjhs_p001">
+            <span class="ncp_buSpanL">商品大类：</span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei01" name="type" checked="checked" value="cushion">&nbsp;<label
+                    for="dalei01" class="ncp_labelY">汽车坐垫</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei02" name="type" value="floorMat">&nbsp;<label
+                    for="dalei02" class="ncp_labelY">汽车脚垫</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei03" name="type" value="wheelCover">&nbsp;<label
+                    for="dalei03" class="ncp_labelY">方向盘套</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei04" name="type" value="carTrim">&nbsp;<label
+                    for="dalei04" class="ncp_labelY">汽车内饰</label>
+            </span>
+            <span>
+                <input type="radio" data-rules="required" id="dalei05" name="type" value="other">&nbsp;<label for="dalei05"
+                                                                                                           class="ncp_labelY">其他</label>
+            </span>
+        </p>
+
+        <p class="ty_gyClear ncjhs_p001">
+            <span class="ncp_buSpanL">商品品牌：</span>
+             <span>
+                <input type="text" name="brand" data-rules="required"
+                       onfocus="javascript:this.className='ncjhs_inputxZ'" maxlength="50" onblur="javascript:this.className=''"/>
+            </span>
+        </p>
+
+        <p class="ncjhs_p001">
+            <span class="ncp_buSpanL">商品名称：</span>
+            <span>
+                <input type="text" name="name" data-rules="required" maxlength="50" onfocus="javascript:this.className='ncjhs_inputxZ'"
+                       onblur="javascript:this.className=''"/>
+            </span>
+        </p>
+        <p class="ncjhs_p001">
+            <span class="ncp_buSpanL">商品货号：</span>
+            <span>
+                <input type="text" name="itemNo" data-rules="required"
+                       onfocus="javascript:this.className='ncjhs_inputxZ'" maxlength="20" onblur="javascript:this.className=''"/>
+            </span>
+        </p>
+        <!-- 商品规格 start -->
+        <p class="guigeFenLi">
+            <div class="ncp_shangPinGG">商品规格：</div>
+            <div id="navtab1">
+                <div tabid="tabItem3">
+                    <div id="Div1">
+                        <div position="center">
+                            <!--aaa-->
+                            <div class="div_content" style="width: 900px; padding-bottom: 20px;margin-bottom:20px;">
+                                <!--aaa-->
+                                <div class="div_contentlist">
+                                    <div class="ty_gyClear"></div>
+                                    <ul class="Father_Title"><li style="opacity: 0;height: 1px;">产品规格</li></ul>
+                                    <ul class="Father_Item0" id="addGuigeCon">
+                                        <div class="ty_gyClear"></div>
+                                        <li>
+                                            <label>
+                                                <table class="addGuiGeTab" border="0" cellspacing="0" cellpadding="0" id="guigeTable">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <input name="specValue" maxlength="10" value="" type="text" width="190px">
+                                                        </td>
+                                                        <td>
+                                                            <input type="button" value="删除" class="del-guige" onClick="delGuigeRow(this);">
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <span class="li_empty" ></span>
+                                            </label>
+                                            <span style="float: left;">
+                                                <span class="addInputBtn" style="line-height: 30px;margin-left:9px;margin-bottom: 15px;margin-top:10px;" title="点击添加商品规格" onClick="AddNewGuiGe()">添加商品规格</span>
+                                            </span>
+                                        </li>
+                                        <div class="ty_gyClear"></div>
+                                    </ul>
+                                    <ul class="Father_Title"><li style="opacity: 0;height: 1px;">颜色</li></ul>
+                                    <ul class="Father_Item1" style="margin:0;">
+                                        <li>
+                                            <label>
+                                                <table class="addColorTab" style="margin-left:9px;padding-top:10px;margin-bottom: 10px;" border="0" cellspacing="0" cellpadding="0" id="categoryTable">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <input name="color" maxlength="10" value="" type="text" width="190px">
+                                                        </td>
+                                                        <td>
+                                                            <input type="button" value="删除" class="del-guige" onClick="delColorRow(this);">
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <span class="li_empty" ></span>
+                                            </label>
+                                            <div class="ty_gyClear"></div>
+                                            <span style="float: left;">
+                                                <span class="addInputBtn" style="line-height: 30px;margin-left: 9px;margin-bottom:0px;" title="点击添加商品" onClick="AddNewColor()">添加商品颜色</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                    <ul class="Father_Title"><li style="opacity: 0;height: 1px;height: 1px;">尺寸</li></ul>
+                                    <ul class="Father_Item2">
+                                        <li>
+                                            <label>
+                                                <table class="addSizeTab" border="0" cellspacing="0" cellpadding="0" id="sizeTable">
+                                                    <tbody>
+                                                    <tr>
+                                                        <td>
+                                                            <input name="size" maxlength="10" value="" type="text" width="190px">
+                                                        </td>
+                                                        <td>
+                                                            <input type="button" value="删除" class="del-guige" onClick="delSizeRow(this);">
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                                <span class="li_empty" ></span>
+                                            </label>
+                                            <span style="float: left;">
+                                                <span class="addInputBtn" style="line-height: 30px;margin-left: 0px;margin-top:5px; margin-bottom:10px;" title="点击添加商品尺寸" onClick="AddNewSize()">添加商品尺寸</span>
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="div_contentlist2">
+                                    <ul>
+                                        <div class="ty_gyClear"></div>
+                                        <li><div id="createTable"></div></li>
+                                        <div class="ty_gyClear"></div>
+                                    </ul>
+                                    <div class="ty_gyClear"></div>
+                                    <ul class="guige_submitBtn"><li></li></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p>
+
+        <p class="ncjhs_p001">
+             <span class="ncp_buSpanL">是否特殊商品：</span>
+             <span>
+                 <input type="radio" data-rules="required" id="teshu01" name="isSpecial" value=1 >&nbsp;<label
+                     for="teshu01">是</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 <input type="radio" data-rules="required" id="teshu02" name="isSpecial" value=0 checked="checked"/>&nbsp;<label
+                     for="teshu02">否</label>
+            </span>
+        </p>
+
+        <div class="ty_gyClear"></div>
+        <p class="ncp_jibenXinxi"><span>2. 商品图片：( 点击"点击选择图片"按钮， 可一次性选择多张图片进行上传，最多可上传5张 )</span></p>
+
+        <div id="uploader" class="wu-example">
+            <div class="queueList">
+                <div id="dndArea" class="placeholder">
+                    <div id="filePicker"></div>
+                </div>
+            </div>
+            <div class="statusBar" style="display:none;">
+                <div class="progress">
+                    <span class="text">0%</span>
+                    <span class="percentage"></span>
+                </div>
+                <div class="info"></div>
+                <div class="btns">
+                    <div id="filePicker2"></div>
+                    <div class="uploadBtn">开始上传</div>
+                </div>
+            </div>
+        </div>
+        <p class="ty_gyClear"></p>
+
+        <p class="ncp_jibenXinxi"><span>3. 商品描述：</span></p>
+
+        <div class="control-group" style="margin-left:75px;">
+            <script id="container" name="comment" type="text/plain">
+            </script>
+            <!-- 配置文件 -->
+            <script type="text/javascript" src="/static/ue/ueditor.config.js?v=${v}"></script>
+            <!-- 编辑器源码文件 -->
+            <script type="text/javascript" src="/static/ue/ueditor.all.js?v=${v}"></script>
+            <!-- 实例化编辑器 -->
+            <script type="text/javascript">
+                var ue = UE.getEditor('container', {
+                    toolbars: [[
+                        'source',  //html
+                        'undo', //撤销
+                        'redo', //重做
+                        'forecolor', //字体颜色
+                        'bold', //加粗
+                        'italic', //斜体
+                        'blockquote', //引用
+                        'fontfamily', //字体
+                        'fontsize', //字号
+                        'paragraph',//段落格式
+                        'link', //超链接
+//                        'simpleupload', //单图上传
+                        'insertimage', //多图上传
+                        'insertvideo',//插入视频
+                        'justifyleft', //居左对齐
+                        'justifyright', //居右对齐
+                        'justifycenter', //居中对齐
+                        'justifyjustify', //两端对齐
+                        'insertorderedlist', //有序列表
+                        'insertunorderedlist', //无序列表
+                        'rowspacingtop', //段前距
+                        'rowspacingbottom', //段后距
+                        'lineheight', //行间距
+                        'imagenone', //默认
+                        'imageleft', //左浮动
+                        'imageright', //右浮动
+                        'indent', //首行缩进
+                        'removeformat',
+                        'underline'//下划线
+                    ]],
+                initialFrameWidth: 880,
+                initialFrameHeight: 850
+                });
+            </script>
+        </div>
+        <p class="ncp_jibenXinxi"><span>4. 商品数据包：</span></p>
+        <p class="ty_gyClear"></p>
+        <div class="ncp_yijianshangC">
+            <div id="uploader_d1" class="uploader_d1 wu-example" style="border:0;margin-left: 120px;">
+                <!--用来存放文件信息-->
+                <div class="btns float_l">
+                    <div id="filePicker_d1" class="filePicker_d1" title="上传淘宝数据包">上传淘宝数据包</div>
+                </div>
+                <div id="thelist" class="uploader-list">
+                    <input type="hidden" name="dataPackageUrl2" value="" />
+                </div>
+            </div>
+        </div>
+        <div class="ncp_yijianshangC">
+            <div id="uploader_d2" class="uploader_d1 wu-example" style="border:0;margin-left: 120px;">
+                <!--用来存放文件信息-->
+                <div class="btns float_l">
+                    <div id="filePicker_d2" class="filePicker_d1" title="上传淘宝图片包">上传淘宝图片包</div>
+                </div>
+                <div id="thelist02" class="uploader-list">
+                    <input type="hidden" name="imgPackageUrl2" value="" />
+                </div>
+            </div>
+        </div>
+        <div class="ncp_yijianshangC">
+            <div id="uploader_d03" class="uploader_d1 wu-example" style="border:0;margin-left: 120px;">
+                <!--用来存放文件信息-->
+                <div class="btns float_l">
+                    <div id="filePicker_d3" class="filePicker_d1" title="上传阿里数据包">上传阿里数据包</div>
+                </div>
+                <div id="thelist03" class="uploader-list">
+                    <input type="hidden" name="dataPackageUrl1" value="" />
+                </div>
+            </div>
+        </div>
+        <div class="ncp_yijianshangC">
+            <div id="uploader_d04" class="uploader_d1 wu-example" style="border:0;margin-left: 120px;">
+                <!--用来存放文件信息-->
+                <div class="btns float_l">
+                    <div id="filePicker_d4" class="filePicker_d1" title="上传阿里图片包">上传阿里图片包</div>
+                </div>
+                <div id="thelist04" class="uploader-list">
+                    <input type="hidden" name="imgPackageUrl1" value="" />
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="uploading1" value=""/>
+        <input type="hidden" id="uploading2" value=""/>
+        <input type="hidden" id="uploading3" value=""/>
+        <input type="hidden" id="uploading4" value=""/>
+        <div class="ty_gyClear"></div>
+        <div class="ncp_yijianshangC02">
+            <span><input type="button" class="ncp_tijiaoShenHe003 btn-submit"  value="提交审核" title="提交审核" /></span>
+        </div>
+    </form>
+
+    <%}%>
+    <!-- 一次性上传多张图片 start -->
+    <script type="text/javascript">
+        // 添加全局站点信息
+        var BASE_URL = '/webuploader';
+    </script>
+    <!--<script type="text/javascript" src="/static/js/web/jquery-1.10.2.min.js?v=${v}"></script>-->
+    <script type="text/javascript" src="/static/js/web/bootstrap.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/global.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/webuploader.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/demo.js?v=${v}"></script>
+    <!-- 一次性上传多张图片 end -->
+</html>

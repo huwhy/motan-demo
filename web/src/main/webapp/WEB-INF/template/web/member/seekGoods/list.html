@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>商品定制列表页</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+            $(".btn-end").unbind("click").bind("click", function(){
+                if(!confirm("确认要结束定制吗？")){
+                    return;
+                }
+                var code = $(this).attr("data-code");
+                Common.post("endSeek", {code:code}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+            $(".btn-xq").unbind("click").bind("click", function(){
+                var code = $(this).attr("data-code");
+                $("#seekCode").val(code);
+                $(this).siblings(".btn-details").click();
+            });
+            $("#J_model_modal").on("show", function(){
+                var code = $("#seekCode").val();
+                $("#J_model_modal .modal-body").html("");
+                Common.post("details", {code:code}, function (json) {
+                    if(json.code == Common.SUCC){
+                        $("#J_model_modal .modal-body").html(json.data);
+                    }else{
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+        })
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+    <p class="ncjhs_numberT">
+        <span class="ncs01">商品定制列表</span>
+    </p>
+    <p class="ttppzq_top">
+        <span class="float_r ncpgr_dzhiBtn"><a href="/seek/seek.html" style="width: 120px;" title="找厂家定制商品">找厂家定制商品</a></span>
+    </p>
+    <p class="ttppzq_top">
+    <table class="sui-table table-bordered" style="width:960px;margin:0 auto;">
+        <thead>
+        <tr>
+            <th>定制编号</th>
+            <th>商品名称</th>
+            <th width="70">材质</th>
+            <th width="60">商品报价</th>
+            <th width="60">需求数量</th>
+            <th>要货时间</th>
+            <th>商品详情说明</th>
+            <th>申请时间</th>
+            <th width="80">定制状态</th>
+            <th width="150">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(item in pager.data){%>
+        <tr>
+            <td>${item.code}</td>
+            <td>${item.goodsName}</td>
+            <td>${item.material}</td>
+            <td>${item.price}</td>
+            <td>${item.quantity}</td>
+            <td>${item.needTime, "yyyy-MM-dd"}</td>
+            <td>${item.remark}</td>
+            <td>${item.created, "yyyy-MM-dd"}</td>
+            <td>${item.status.val == 1?'定制中':'完成'}</td>
+            <td class="ncgrzx_ddxqing">
+                <a href="javascript:void(0);" id="chakanxQ" title="查看详情" class="btn-xq" data-code="${item.code}" >查看详情</a>
+                <%if(item.status.val == 1){%>
+                <span id="czDZwanche"><a href="javascript:void(0);" class="btn-end" data-code="${item.code}" title="定制完成">定制完成</a></span>
+                <%}%>
+                <button data-toggle="modal" data-target="#J_model_modal" data-keyboard="false" class="hidden btn-details"></button>
+            </td>
+        </tr>
+        <%}elsefor{%>
+        <tr>
+            <td colspan="11">
+                <div class="guanzhuTabNo"><p>暂无数据</p></div>
+            </td>
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+    <#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+    </p>
+    <input type="hidden" id="seekCode" value="" />
+    <%include("../../common/model.html"){}%>
+<%}%>
+</html>

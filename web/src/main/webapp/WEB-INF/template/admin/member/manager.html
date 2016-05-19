@@ -1,0 +1,443 @@
+<%layout("../layout/header_layout.html"){%>
+<title>会员管理</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        $(".btn-excel").click(function () {
+            codes = "";
+//            type = $(".typeName").val();
+            $("input:checkbox").each(function () {
+                if ($(this).is(':checked')) {
+                    codes += $(this).val() + ";";
+                }
+            });
+            if (codes == "") {
+                Msg.danger("请选择需打印的客户");
+                return;
+            }
+                window.open("/admin/member/manage/exportToExcel?codes=" + codes);
+        });
+
+        $("input[name=ckAll]").click(function () {
+            $("input[name=id]:checkbox").prop("checked", 'true');
+        });
+        $("input[name=ckInv]").click(function () {
+            $("input[name=id]:checkbox").each(function (i, item) {
+                if ($(item).prop("checked")) {
+                    $(item).removeAttr("checked");
+                } else {
+                    $(item).prop("checked", 'true');
+                }
+            });
+        });
+        $("input[name=id]:checkbox").click(function () {
+            if ($("input[name=id]:checkbox:checked").length == $("input[name=id]:checkbox").length) {
+                $("input[name=ckAll]:checkbox").prop("checked", 'true');
+            } else {
+                $("input[name=ckAll]:checkbox").removeAttr("checked");
+            }
+        });
+        var params = new Array();
+        if ($("input[name=id]:checkbox:checked").length > 0) {
+            var codes = new Array();
+            $("input[name=id]:checkbox:checked").each(function (i, item) {
+                codes.push($(item).val());
+            });
+            params.push("codes=" + codes.join(","));
+        } else {
+            $($("form.query-form").serializeArray()).each(function (i, item) {
+                params.push(item.name + "=" + item.value);
+            });
+        }
+
+        $(".btn-send").click(function () {
+            codes = "";
+            $("input:checkbox").each(function () {
+                if ($(this).is(':checked')) {
+                    codes += $(this).val() + ";";
+                }
+            });
+            if (codes == "") {
+                Msg.danger("请选择需发放优惠券的客户");
+                return;
+            }
+            $("#codes").val(codes);
+            $("#J_remote").trigger("click");
+        });
+        $("#J_coupon_modal").on('okHide', function (e) {
+            if($("input[name='couponTemplateId']").val() == ""){
+                Msg.danger("请选择优惠券");
+                return false;
+            }
+            var a = confirm('确认要发送优惠券吗');
+            if (!a) return false;
+            $("form.form-send").submit();
+        });
+
+        Common.ajaxForm($("form.form-send"), null, null);
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span3 w200">
+                <div class="input-prepend">
+                    <span class="add-on">会员账号</span>
+                    <input id="prependedInput2" type="text" name="username" value="${parameter.username!''}"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        采购总额
+                    </span>
+                        <input type="text" class="input h22" name="totalStart" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" value="${parameter.totalStart!}">
+                        <span class="add-on2">至</span>
+                        <input type="text" class="input h22" name="totalEnd" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" value="${parameter.totalEnd!}">
+                </div>
+            </div>
+            <div class="span1">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        会员来源
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22 w100">
+                                <input value="${params.sign!}" name="sign" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.sign, '京东', '京东', '淘宝', '淘宝', '普通', '普通', '其他', '其他',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="京东">京东</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="淘宝">淘宝</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="普通">普通</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="其他">其他</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+
+                <div class="span2">
+                    <div class="input-prepend">
+                    <span class="add-on">
+                        采购时间
+                    </span>
+                        <input type="text" class="input-date h22" name="lastStart" data-toggle="datepicker"
+                               data-date-timepicker='true' value="${parameter.lastStart!}">
+                        <span class="add-on2">至</span>
+                        <input type="text" class="input-date h22" name="lastEnd" data-toggle="datepicker"
+                               data-date-timepicker='true' value="${parameter.lastEnd!}">
+                    </div>
+                </div>
+            </div>
+        <div class="sui-row">
+            <div class="span1">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        会员等级
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22 w100">
+                                <input value="${params.level!}" name="level" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                <%if(isEmpty(parameter.level))
+                                        print('请选择');
+                                    for(item in memberLevels!){
+
+                                    if(isNotEmpty(parameter.level) && parseInt(parameter.level) == item.level){
+                                        print(item.name!);
+                                        break;
+                                    }
+                                }%>
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <%for(item in memberLevels!){%>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${item.level!}">${item.name!}</a>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span1">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        采购单数
+                    </span>
+                    <input type="text" class="input h22" name="countStart" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"  value="${parameter.countStart!}">
+                    <span class="add-on2">至</span>
+                    <input type="text" class="input h22" name="countEnd" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"  value="${parameter.countEnd!}">
+                </div>
+            </div>
+            <div class="span1">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        所在地区
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22 w100">
+                                <input value="${params.province!}" name="province" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.province, '浙江', '浙江', '上海', '上海', '江苏', '江苏', '安徽', '安徽','江西','江西','山东','山东','广东','广东','北京','北京','福建','福建','天津','天津','河北','河北',
+                                    '湖北','湖北','湖南','湖南','河南','河南','四川','四川','重庆','重庆','山西','山西','陕西','陕西','辽宁','辽宁','广西','广西','海南','海南','贵州','贵州','吉林','吉林','黑龙江','黑龙江','内蒙古',
+                                    '内蒙古','云南','云南','宁夏','宁夏','甘肃','甘肃','青海','青海','新疆','新疆','西藏','西藏',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="浙江">浙江</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="上海">上海</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="江苏">江苏</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="安徽">安徽</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="江西">江西</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="山东">山东</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="广东">广东</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="北京">北京</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="福建">福建</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="天津">天津</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="河北">河北</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="湖北">湖北</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="湖南">湖南</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="河南">河南</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="四川">四川</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="重庆">重庆</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="山西">山西</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="陕西">陕西</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="辽宁">辽宁</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="广西">广西</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="海南">海南</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="贵州">贵州</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="吉林">吉林</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="黑龙江">黑龙江</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="内蒙古">内蒙古</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="云南">云南</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="宁夏">宁夏</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="甘肃">甘肃</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="青海">青海</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="新疆">新疆</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="西藏">西藏</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        会员状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${params.state!}" name="state" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.state, 'normal', '正常', 'stop', '停用',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="normal">正常</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="stop">停用</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        会员类型
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${params.type!}" name="type" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.type, 'buyer', '仅进货商', 'seller', '供货商同时进货商',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="buyer">仅进货商</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="seller">供货商同时进货商</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <a href="javascript:void(0);" class="sui-btn btn-primary btn-excel" >导出</a>
+            <a href="javascript:void(0);" class="sui-btn btn-primary btn-send" >发放优惠券</a>
+            <button id="J_remote" hidden data-toggle="modal" data-target="#J_coupon_modal" >发放优惠券</button>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>
+            <input type="button" class="sui-btn" name="ckAll" value="全选"/>
+            <br>
+            <input type="button" class="sui-btn" name="ckInv" value="反选"/>
+        </th>
+        <th>会员账号</th>
+        <th>会员等级</th>
+        <th>采购金额(元)/单数</th>
+        <th>上次采购时间</th>
+        <th>会员类型</th>
+        <th>会员状态</th>
+        <th>会员来源</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>
+            <input type="checkbox" name="id" value="${item.code}"/>
+        </td>
+        <td>${item.username!}</td>
+        <td>${item.levelName!}</td>
+        <td>${item.totalPurchaseMoney/100,'#0.00'}/${item.totalPurchaseCount!}</td>
+        <td>${item.lastPurchaseTime!}</td>
+        <td>${item.type.name!}</td>
+        <td>${item.state.name!}</td>
+        <td>${item.sign!}</td>
+        <td>
+            <a href="/admin/member/manage/detail?id=${item.id}">查看</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../modal/send_coupon_modal.html"){}%>
+<%}%>

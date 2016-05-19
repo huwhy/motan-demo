@@ -1,0 +1,89 @@
+<%layout("../layout/header_layout.html"){%>
+<title>员工账号管理</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        var selUser = new DialogSel({
+            targetId: "#J_user_sel_modal", title: "员工", url: "/admin/user/selList", form: "form.query-form",
+            selFn: function (data) {
+                var o = $.parseJSON(data);
+                Common.post2({
+                    url: "/admin/area/setPickUser",
+                    param: {id: $("input[name=id]").val(), pickUserId: o.id},
+                    success: function (json) {
+                        Common.refresh();
+                    }
+                })
+            }
+        });
+
+        $(".btn-edit").unbind("click").bind("click", function () {
+            $this = $(this);
+            $this.siblings(".btn-edit-sel").trigger("click");
+            $("input[name=id]").val($this.attr("data-id"));
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span3 w200">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <input id="prependedInput2" type="text" name="name" value="${parameter.name!''}"
+                           placeholder="名称"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>村</th>
+        <th>拣货负责人</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.name!}</td>
+        <td>${item.pickUserName!}</td>
+        <td>
+            <#auth name="edit">
+                <a class="hidden btn-edit-sel" data-toggle="modal"
+                   data-width="large"
+                   data-title="添加员工" data-remote="/admin/user/selUser"
+                   data-target="#J_user_sel_modal"></a>
+                <a data-id="${item.id}" class="sui-btn btn-small btn-edit">编辑</a>
+            </#auth>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<input type="hidden" name="id" value=""/>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../modal/user_modal.html"){}%>
+<%}%>

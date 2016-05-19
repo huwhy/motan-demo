@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>我的尾货处理</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/js/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <script type="text/javascript">
+        $(function(){
+            Pagination.init();
+        });
+    </script>
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<div class="ttlog_main">
+    <div class="ttppzq_con ty_rerelative">
+        <p class="ttppzq_title ttppzq_marTo">尾货处理流程：</p>
+        <p class="ttwhcl_liucImg"></p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top">
+            <span class="ttppzq_title">尾货处理信息</span>
+            <span class="ttppzq_ps">&nbsp;&nbsp;( *注：纳车品供销服务平台对于尾货处理信息的真实性不承担任何责任 )</span>
+            <%if(customer.type.val == 2){%>
+            <a href="/member/tailGoods/list.html"><span class="ttwhlist_title">我的尾货处理</span></a>
+            <a href="/seek/tailGoods.html" title="尾货处理申请"><span class="ttwhlist_title110">尾货处理申请</span></a>
+            <%}else{%>
+            <a href="/member/supplier.html?showMsg=true"><span class="ttwhlist_title">我的尾货处理</span></a>
+            <a href="/member/supplier.html?showMsg=true" title="尾货处理申请"><span class="ttwhlist_title110">尾货处理申请</span></a>
+            <%}%>
+
+        </p>
+        <div class="ty_gyClear"></div>
+        <p class="ttppzq_top">
+        <table class="sui-table table-bordered" style="width:1148px;margin:0 auto;">
+            <thead>
+            <tr>
+                <th>编号</th>
+                <th>供货商公司名</th>
+                <th>联系人</th>
+                <th>联系电话</th>
+                <th>尾货产品名称</th>
+                <th>数量</th>
+                <th>材质</th>
+                <th>总价</th>
+                <th>提货方式</th>
+                <th width="70px">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(item in pager.data){%>
+            <tr>
+                <td>${item.code}</td>
+                <td>${customer.type.val==0?'仅供货商、进货商可见':item.company} </td>
+                <td>${customer.type.val==0?'仅供货商、进货商可见':item.contacts}</td>
+                <td>${customer.type.val==0?'仅供货商、进货商可见':item.phone}</td>
+                <td>${item.goodsName}</td>
+                <td>${item.quantity}</td>
+                <td>${item.material}</td>
+                <td>${item.money}</td>
+                <td>${item.getMethod}</td>
+                <td><a href="/seek/tailGoodsDetails/${item.code}.html" class="sui-btn btn-xlarge btn-info">查看</a></td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        </p>
+        <div class="ty_gyClear"></div>
+        <p>
+            <#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+        </p>
+        <div class="tt_comTop">&nbsp;</div>
+    </div>
+</div>
+<%include("/web/common/foot.html"){}%>
+</body>
+</html>

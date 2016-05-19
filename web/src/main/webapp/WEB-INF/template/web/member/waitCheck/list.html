@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>待审核商品</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+            Pagination.init();
+        });
+        function resetForm(){
+            $("input.ttlog_input").val('');
+        };
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+    <p class="ncjhs_numberT">
+        <span class="ncs01">商品管理</span>
+        <span class="ncs01"> > </span>
+        <span class="ncs01">待审核商品</span>
+    </p>
+    <form action="" method="post">
+        <p class="ttlog_search">
+            <span>商品编号：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.code!}" name="code" />
+            </span>
+            <span>商品名称：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.goodsName!}" name="goodsName" />
+            </span>
+            <span>商品货号：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="${params.itemNo}" name="itemNo" />
+            </span>
+            <span><input type="submit" value="查询" title="查询" class="daishenhe_Btn01" /> </span>
+            <span><input type="button" class="daishenhe_Btn02" onclick="resetForm()" value="重置"/></span>
+        </p>
+    </form>
+    <p class="ttppzq_top">
+    <table class="sui-table table-bordered" style="width:960px;margin:0 auto;">
+        <thead>
+        <tr>
+            <th>商品编号</th>
+            <th>商品名称</th>
+            <th>商品货号</th>
+            <th>创建日期</th>
+            <th width="66">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <%for(goods in pager.data!){%>
+        <tr>
+            <td width="50">
+                ${goods.code}
+            </td>
+            <td>${goods.name}</td>
+            <td>${goods.itemNo}</td>
+            <td>${goods.created, "yyyy-MM-dd"}</td>
+            <td>
+                <span class="chaKan_XiangQi"><a href="${goods.code}.html" title="查看详情" >查看详情</a></span>
+            </td>
+        </tr>
+        <%}elsefor{%>
+        <tr>
+            <td colspan="5">
+                <div class="guanzhuTabNo"><p>暂无数据</p></div>
+            </td>
+        </tr>
+        <%}%>
+        </tbody>
+    </table>
+    <#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+    </p>
+<%}%>
+</html>

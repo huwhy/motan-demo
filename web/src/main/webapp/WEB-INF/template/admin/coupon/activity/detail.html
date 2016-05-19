@@ -1,0 +1,225 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>优惠券管理-明细</title>
+<script type="text/javascript">
+    $(function () {
+        Common.ajaxForm($("form.save-form"), "/admin/coupon/activity");
+
+        $(".btn-cancel").unbind("click").bind("click", function () {
+            Common.go("/admin/coupon/activity");
+        });
+    });
+</script>
+<style>
+    .condition:after {
+        content: "活动参与条件";
+    }
+    .condition2:after {
+        content: "活动参与对象";
+    }
+    .img-round {
+        border-radius: 3px;
+        display: block;
+        padding: 3px;
+        border: 1px solid #ccc;
+        position: relative;
+    }
+    .img-round .upload-label {
+        position: absolute;
+        display: inline-block;
+        padding: 0px 0;
+        width: 99%;
+        left: 1%;
+        top: 8%;
+        margin-top: -15px;
+        text-align: center;
+        cursor: pointer;
+        height: 100%;
+    }
+    .coupon {
+        height: 160px;
+        width: 220px;
+        border-radius: 5px;
+    }
+    .coupon .money {
+        position: relative;
+        top: 48px;
+        left: 60px;
+        font-size: 30px;
+        color: #FFF;
+    }
+    .coupon_1{
+        background: url('/static/images/coupon/coupon_1.png') no-repeat ;
+        background-position: -1px -6px;
+    }
+    .coupon_2{
+        background: url('/static/images/coupon/coupon_2.png') no-repeat ;
+        background-position: -1px -10px;
+    }
+</style>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form" >
+        <input type="hidden" name="id" value="${ac.id!}">
+        <div class="control-group">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <span class="add-text">${ac.name!}</span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        使用优惠券
+                    </span>
+                    <span class="add-text">${ct.useType.value!''}</span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">面值</span>
+                    <span class="add-text">${nums.yuan(ct.money!0)}元</span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class=" coupon coupon_${(ct.useType.value!'')=='抵运费'?'1':'2'}">
+                <span class="money">${ct.money/100}元</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        活动时间
+                    </span>
+                    <span class="add-text">${ac.startTime!, 'yyyy-MM-dd'}</span>
+                    <span>-</span>
+                    <span class="add-text">${ac.endTime!, 'yyyy-MM-dd'}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group condition">
+            <div class="control-group">
+                <div class="span2">
+                    <span class="sui-label label-danger">0表示没有限制</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline disabled ${(ac.conditionJson.chkPreMonthMoney!false) ? 'checked'}">
+                                <input name="chkPreMonthMoney" disabled value="true" type="checkbox" ${(ac.conditionJson.chkPreMonthMoney!false)? 'checked'}>
+                                <span>上个自然月采购额大于等于</span>
+                            </label>
+                            <input type="text" disabled class="input-small h22" name="preMonthMoney"
+                               value="${nums.yuan(ac.conditionJson.preMonthMoney!)}">
+                            <span>元</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline disabled ${(ac.conditionJson.chkPreMonthNum!false)? 'checked'}">
+                                <input name="chkPreMonthNum" disabled value="true" type="checkbox" ${(ac.conditionJson.chkPreMonthNum!false)? 'checked'}>
+                                <span>上个自然月采购订单数大于等于</span>
+                            </label>
+                            <input type="text" class="input-small h22" disabled name="preMonthNum"
+                               value="${nums.yuan(ac.conditionJson.preMonthNum!)}">
+                            <span>笔</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline disabled ${(ac.conditionJson.chkPreSeasonMoney!false) ? 'checked'}">
+                                <input name="chkPreSeasonMoney" disabled value="true" type="checkbox" ${(ac.conditionJson.chkPreSeasonMoney!false)? 'checked'}>
+                                <span>上个自然季采购额大于等于</span>
+                            </label>
+                            <input type="text" class="input-small h22" disabled name="preSeasonMoney"
+                               value="${nums.yuan(ac.conditionJson.preSeasonMoney!)}">
+                            <span>元</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline disabled ${(ac.conditionJson.chkPreSeasonNum!false)? 'checked'}">
+                                <input name="chkPreSeasonNum" value="true" disabled type="checkbox" ${(ac.conditionJson.chkPreSeasonNum!false)? 'checked'}>
+                                <span>上个自然季采购订单数大于等于</span>
+                            </label>
+                            <input type="text" class="input-small h22" disabled name="preSeasonNum"
+                               value="${nums.yuan(ac.conditionJson.preSeasonNum!)}">
+                            <span>笔</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on">多个参与条件</span>
+                        <span class="add-text">
+                            <label class="radio-pretty inline disabled ${(ac.andOr!false)?'checked'}">
+                                <input type="radio" disabled ${(ac.andOr!false)?'checked'} name="andOr" value="true"><span>满足所有条件</span>
+                            </label>
+                              <label class="radio-pretty  disabled inline ${!(ac.andOr!true)?'checked'}">
+                                  <input type="radio" disabled name="andOr" ${!(ac.andOr!true)?'checked'} value="false"><span>满足其中一条</span>
+                              </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-group condition2">
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <%for(level in levels!){%>
+                            <label class="checkbox-pretty inline disabled ${(ac.memberLevelId!0) == level.id? 'checked'}">
+                                <input name="memberLevelId" type="radio" disabled value="${level.id}" ${(ac.memberLevelId!0) == level.id? 'checked'}>
+                                <span>${level.name}(${level.memberCount!})</span>
+                            </label>
+                            <%}%>
+                            <label class="checkbox-pretty inline disabled ${(ac.memberLevelId!(-1)) == 0 && isEmpty(ac.memberRange)? 'checked'}">
+                                <input name="memberLevelId" class="allMembers" disabled type="radio" value="0" ${(ac.memberLevelId!(-1)) == 0 && isEmpty(ac.memberRange)? 'checked'}>
+                                <input name="allMembers" type="checkbox" disabled value="true" class="hide" />
+                                <span>所有会员</span>
+                            </label>
+                            <label class="checkbox-pretty inline disabled ${(ac.memberLevelId!(-1)) == 0 && isNotEmpty(ac.memberRange)? 'checked'}">
+                                <input name="memberLevelId" class="selfAdd" disabled  type="radio" value="0" ${(ac.memberLevelId!(-1)) == 0 && isNotEmpty(ac.memberRange)? 'checked'}>
+                                <input name="selfMembers" type="checkbox" disabled value="true" class="hide" />
+                                <span>自主添加进货商</span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group" style="display: ${isEmpty(ac.memberRange)?'none'};">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on">进货商</span>
+                        <span class="add-text">
+                            ${ac.memberRange!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <input type="button" class="sui-btn btn-primary btn-cancel" value="取消"/>
+        </div>
+    </form>
+</div>
+<%}%>

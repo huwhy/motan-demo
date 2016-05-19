@@ -1,0 +1,132 @@
+<%layout("../layout/header_layout.html"){%>
+<title>待分配拣货单</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+        $(".btn-taking").unbind("click").bind("click", function() {
+            var dataId = $(this).attr("data-id");
+            Common.post("/admin/picklist/waitAssign/takeOrder", {id:dataId}, function(json){
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message, function(){
+                        Common.refresh();
+                    });
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        查询条件
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select" style="margin-top: -4px;">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.fieldName!}" name="fieldName" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.fieldName, 'companyName', '供货商公司名', 'address', '取货地址',
+                                    'supplyName', '供应商姓名', 'supplyPhone', '供应商电话', 'areaCode', '取货地址编码',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="companyName">供货商公司名</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="areaCode">取货地址编码</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="address">取货地址</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="supplyName">供应商姓名</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="supplyPhone">供应商电话</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                    <span class="add-on2">=</span>
+                    <input type="text" class="input h22" name="value" value="${parameter.value!}" />
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        拣货日期
+                    </span>
+                    <input type="text" class="h22" data-toggle="datepicker" name="pickingDate" value="${parameter.pickingDate!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>编号</th>
+        <th>拣货日期</th>
+        <th>供应商公司名</th>
+        <th>供应商姓名</th>
+        <th>供应商电话</th>
+        <th>紧急联系电话</th>
+        <th>取货地址</th>
+        <th>取货地址编码</th>
+        <th>订单数</th>
+        <th>订单总重量(kg)</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.id!}</td>
+        <td>${item.created, 'yyyy-MM-dd'}</td>
+        <td>${item.companyName!}</td>
+        <td>${item.supplierName!}</td>
+        <td>${item.phone!}</td>
+        <td>${item.emergencyPhone!}</td>
+        <td>${item.address!}</td>
+        <td>${item.areaCode!}</td>
+        <td>${item.orderCnt!}</td>
+        <td>${nums.g2k(item.weight)}</td>
+        <td>
+            <a href="/admin/picklist/waitAssign/detail?id=${item.id}" class="sui-btn btn-small">查看</a>
+            <a data-id="${item.id}" class="sui-btn btn-small btn-taking">接单</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

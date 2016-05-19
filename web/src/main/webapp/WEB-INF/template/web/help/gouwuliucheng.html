@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>购物流程</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+</head>
+<body>
+<!-- 直通车 start -->
+<div class="tt_topCon">
+    <div class="tt_topConent">
+        <ul class="tttop_01">
+            <li class="tttop_indhome"><a href="/index.html" title="首页" class="tttop_left">首页</a><span>|</span></li>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li><a href="/register.html" title="免费注册">注册</a></li>
+            <%}%>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li class="ty_rerelative" style="width: 55px;text-align:center;">
+                <span style="position: absolute;top:0;left: -5px;">|</span><a href="/login.html" title="请登录">请登录</a>
+            </li>
+            <%}%>
+        </ul>
+        <ul class="tttop_02">
+            <li class="tttop_indhome02"><div class="tttop_left02">0576-81300105</div></li>
+            <%if(!isEmpty(session.curCustomer)){%>
+            <li class="float_r"><a href="/member/follow.html" title="我的关注">我的关注</a><span>|</span></li>
+            <li class="float_r ty_rerelative">
+                <a href="${decode(session.curCustomer.type.val,0,'/member/index.html',1,'/member/buyOrder/list.html','/member/sellOrder/list.html')}" title="我的订单" class="ttTop_myDiDa">我的订单</a>
+                <span class="ttTop_dingdan"><img src="/static/images/web/tt_hot01.gif" /></span>
+                <span>|</span>
+            </li>
+            <li class="float_r">
+                <a href="/member/index.html" title="${session.curCustomer.name}的个人中心">${session.curCustomer.name}的个人中心</a>&nbsp;&nbsp;&nbsp;
+                <a href="/logout" title="注销">注销</a>
+                <span>|</span>
+            </li>
+            <%}%>
+        </ul>
+    </div>
+</div>
+<!-- 直通车 end -->
+<!-- menu start -->
+<div class="tt_menuCon">
+    <div class="tt_menuConter">
+        <a href="/index.html"><img src="/static/images/web/tt_logo.png" class="tt_menuCtImg" width="160" /></a>
+        <span class="nc_pageTitle">关于纳车品</span>
+        <ul class="float_r ty_rerelative">
+            <li><a href="/index.html" title="首页">首页</a></li>
+            <span class="ncmum_jg01">|</span>
+            <li class="${strutil.startWith(actionKey,'/goods')?'tt_indxZ':''}" ><a href="/goods/list.html" target="_blank" title="货源商城">货源商城</a></li>
+            <span class="ncmum_jg02">|</span>
+            <li class="${strutil.startWith(actionKey,'/brand')?'tt_indxZ':''}"><a href="/brand/list.html" title="品牌专区">帮助中心</a></li>
+        </ul>
+    </div>
+</div>
+<!-- menu end -->
+<div class="ncnum_main">
+    <div class="ncpHelp_conter">
+        <!-- 左侧 start -->
+        <div class="ncnHelp_L">
+            <p class="ncnum_lTitle01">关于纳车品</p>
+            <ul>
+                <li class="ncnum_zi"><a href="/companyProfile.html" title="公司简介">公司简介</a> </li>
+                <li class="ncnum_zi"><a href="contactUs.html" title="联系我们">联系我们</a></li>
+                <li class="ncnum_zi"><a href="http://www.2788.com/" target="_blank" title="友情链接">友情链接</a></li>
+            </ul>
+            <p class="help_fwzxTilBg">服务保障</p>
+            <ul style="background: #f2f2f2;">
+                <li class="ncnum_zi"><a href="/brand/list.html" title="实体工厂货源">实体工厂货源</a></li>
+                <li class="ncnum_zi"><a href="returnGoods.html" title="8天无理由放心退货">8天无理由放心退货</a></li>
+            </ul>
+            <p class="help_xinshouzhiNam02">新手指南</p>
+            <ul>
+                <li class="ncnum_bor ncnum_zi"><a href="registeredAccount.html" title="账户注册">账户注册</a></li>
+                <li class="ncnum_bor ncnum_zi02"><a href="gouwuliucheng.html" title="购物流程">购物流程</a></li>
+                <li class="ncnum_bor ncnum_zi"><a href="peisongfanwei.html" title="配送范围及时间">配送范围及时间</a></li>
+            </ul>
+            <p class="ncnum_lTitle05">售后服务</p>
+            <ul style="background: #f2f2f2;">
+                <li class="ncnum_zi"><a href="zhengce.html" title="退换货政策">退换货政策</a> </li>
+                <li class="ncnum_zi"><a href="banliliucheng.html" title="退换货办理流程">退换货办理流程</a></li>
+                <li class="ncnum_zi"><a href="tuikuanshuoM.html" title="退款说明">退款说明</a></li>
+            </ul>
+            <p class="ncnum_lTitle05">帮助中心</p>
+            <ul>
+                <li class="ncnum_bor ncnum_zi"><a href="zaixiankefu.html" title="在线客服">在线客服</a></li>
+                <li class="ncnum_bor ncnum_zi"><a href="forgetPwd.html" title="找回密码">找回密码</a></li>
+                <li class="ncnum_bor ncnum_zi"><a href="falvshenming.html" title="法律申明">法律申明</a></li>
+            </ul>
+        </div>
+        <!-- 左侧 end -->
+        <!--主体 start-->
+        <div class="ncpHelp_R">
+            <p class="ncnHelp_numberT">购物流程</p>
+            <div class="ncpHelp_gsMain02">
+                <p class="ncpHelp_jsTitle">购物流程</p>
+                <p class="ncpHelp_tilZWen">购物步骤：</p>
+                <p class="ncpHelp_tilZText">选择商品 → 加入购物车 → 填写收货信息 → 提交订单 → 在线支付 → 平台货运。</p>
+                <p class="ncpHelp_tilZWen">购物图示：</p>
+                <p class="ncpHelp_tilZText">
+                    <img src="/static/images/web/liucheng_zc03.png" width="780" alt="购物流程图" />
+                </p>
+            </div>
+        </div>
+    </div>
+    <!--主体 end-->
+    <div class="ty_gyClear"></div>
+    <%include("/web/common/foot.html"){}%>

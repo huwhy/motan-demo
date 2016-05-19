@@ -1,0 +1,46 @@
+<div class="query-zone">
+    <form class="sui-form form-horizontal sel-form">
+        <input type="hidden" name="perSize" value="${parameter.perSize!}"/>
+        <div class="sui-row">
+            <div class="span3 w200">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <input id="prependedInput2" type="text" name="name" value="${parameter.name!}" placeholder="称呼"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+            <div class="span2 w200">
+                <input type="button" class="sui-btn btn-primary btn-query" value="查询" />
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered  sel-table">
+    <thead>
+    <tr>
+        <th>＃</th>
+        <th>名称</th>
+        <th>手机号</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>
+            ${item.id}
+        </td>
+        <td>${item.name!}</td>
+        <td>${item.phone!}</td>
+        <td><a href="javascript:void(0);"
+               data="{&quot;id&quot;:${item.id},&quot;name&quot;:&quot;${item.name!}&quot;}"
+               class="sui-btn btn-small btn-sel btn-link">选择</a></td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="small" params="${parameter.map!}"/>

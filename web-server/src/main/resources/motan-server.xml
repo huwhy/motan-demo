@@ -7,6 +7,7 @@
 
     <bean id="userServiceImpl" class="com.nachepin.service.UserServiceImpl"/>
     <bean id="customerServiceImpl" class="com.nachepin.service.CustomerServiceImpl" />
+    <bean id="goodsServiceImpl" class="com.nachepin.service.GoodsServiceImpl" />
 
     <!-- 注册中心配置 使用不同注册中心需要依赖对应的jar包。如果不使用注册中心，可以把check属性改为false，忽略注册失败。-->
     <motan:registry regProtocol="local" name="registry" />
@@ -26,6 +27,9 @@
                    requestTimeout="200"
                    basicService="serviceBasicConfig"/>
     <motan:service interface="com.nachepin.api.service.ICustomerService" ref="customerServiceImpl"
+                   requestTimeout="200"
+                   basicService="serviceBasicConfig"/>
+    <motan:service interface="com.nachepin.api.service.IGoodsService" ref="goodsServiceImpl"
                    requestTimeout="200"
                    basicService="serviceBasicConfig"/>
 </beans>

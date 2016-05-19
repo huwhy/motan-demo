@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>小批量定制--详情</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/js/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            Common.ajaxForm($("form.seek-form"), "/seek/seekSuccess.html", null);
+        });
+    </script>
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<div class="ttlog_main">
+        <div class="ttppzq_con ty_rerelative">
+            <p class="ttppzq_title ttppzq_marTo">小批量定制流程：</p>
+            <p class="ttppzq_liucImg"></p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttppzq_title">小批量定制信息</span>
+                <span class="ttppzq_ps">&nbsp;&nbsp;( *注：纳车品供销服务平台对于小批量定制信息的真实性不承担任何责任 )</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">联系电话：</span>
+                <span class="dingzhiXqing">${customer.type.val==2?seek.phone:'仅供货商可见'}</span>
+                <span class="ttred_F03">&nbsp;</span>
+            <div  id="preview" class="ttxqldz_upload">
+                <img id="imghead" border="0" src="${img_url.fullPath(seek.imgUrl)}" width="198" height="198" />
+            </div>
+            <span class="yangpinTuPian">样品图片：</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">我的QQ：</span>
+                <span class="dingzhiXqing">${customer.type.val==2?seek.qq:'仅供货商可见'}</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">我的旺旺号：</span>
+                <span class="dingzhiXqing">${customer.type.val==2?seek.wangwang:'仅供货商可见'}</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">定制产品名称：</span>
+                <span class="dingzhiXqing">${seek.goodsName}</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">数量：</span>
+                <span class="dingzhiXqing">${seek.quantity}</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">报价：</span>
+                <span class="dingzhiXqing">${seek.price}</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">要货时间：</span>
+                <span class="dingzhiXqing">${seek.needTime!,"yyyy-MM-dd"}</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ncp_buchongSpan">材质：</span>
+                <span class="dingzhiXqing">${seek.material}</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <span class="ttred_F">&nbsp;</span>
+            <p class="ttppzq_top">
+                <div class="ncp_miaoshuQuYu02">定制商品的详细说明：</div>
+                <div class="ncp_miaoshuQuYu">
+                    <p style="padding-left:0;">${seek.remark}</p>
+                </div>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_topBuChong">
+                <input type="submit" class="ttppzq_marL ttppzq_tijBtn" onClick="javascript :history.back(-1);" title="关闭" value="关闭" />
+            </p>
+            <div class="ttppzq_marBt"></div>
+        </div>
+</div>
+<%include("/web/common/foot.html"){}%>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<%layout("../layout/header_layout.html"){%>
+<title>上线商品审核详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        Common.ajaxForm($("form.save-form"), "", function(json){
+            if (json.code == Common.SUCC) {
+                Msg.success(json.message, function () {
+                    Common.backHistory();
+                });
+            } else {
+                Msg.danger(json.message);
+            }
+        });
+        $(".btn-ok").unbind("click").bind("click", function () {
+            $("form.save-form").submit();
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+    .pic1Info:after {
+        content: "头部图片";
+    }
+
+
+    .descInfo:after {
+        content: "商品描述";
+    }
+
+
+    .skuInfo:after {
+        content: "SKU信息";
+    }
+
+    .dataInfo:after {
+        content: "数据包图片包";
+    }
+
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST" action="/admin/goods/waitAudit/audit">
+        <input type="hidden" name="id"  value="${goods.id!}"/>
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on">编号</span>
+                    <span class="add-text h18">${goods.code!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品名称</span>
+                        <span class="add-text h18">
+                            ${goods.name!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品品牌</span>
+                        <span class="add-text h18">
+                            ${goods.brand!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品货号</span>
+                        <span class="add-text h18">
+                            ${goods.code!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">创建日期</span>
+                        <span class="add-text h18">
+                            ${goods.created!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">最新上架日期</span>
+                        <span class="add-text h18">
+                            ${goods.onlineTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">颜色</span>
+                        <span class="add-text h18">
+                            ${goods.color!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">尺寸</span>
+                        <span class="add-text h18">
+                            ${goods.size!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品大类</span>
+                        <span class="add-text h18">
+                            ${goods.type.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">适合车型</span>
+                        <span class="add-text h18">
+                            ${goods.fitCar!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">总存货数</span>
+                        <span class="add-text h18">
+                            ${goods.stock!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">预计到货时间</span>
+                        <span class="add-text h18">
+                            ${goods.arrivalTime!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品状态</span>
+                        <span class="add-text h18">
+                            ${goods.status.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">是否特殊商品</span>
+                        <span class="add-text h18">
+                            ${goods.isSpecial? '是' : '否'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">关注数</span>
+                        <span class="add-text h18">
+                            ${goods.followCnt!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">浏览数</span>
+                        <span class="add-text h18">
+                            ${goods.pv!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">卖家ID</span>
+                        <span class="add-text h18">
+                            ${goods.sellerId!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-group skuInfo">
+            <table class="sui-table table-bordered">
+                <thead>
+                <tr>
+                    <th>SKU属性</th>
+                    <th>重量(kg)</th>
+                    <th>批发价</th>
+                    <th>建议零售价</th>
+                    <th>库存</th>
+                    <th>锁定库存</th>
+                    <th>创建时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <%for(sku in skus!){%>
+                <tr>
+                    <td>${sku.skuSpecValue!}</td>
+                    <td>${(sku.weight / 1000), "#0.00"}</td>
+                    <td><#yuan value="${sku.price}" /></td>
+                    <td><#yuan value="${sku.retailPrice}" /></td>
+                    <td>${sku.stock!}</td>
+                    <td>${sku.lockStock!}</td>
+                    <td>${sku.created!, 'yyyy-MM-dd HH:mm'}</td>
+                </tr>
+                <%}elsefor{%>
+                <tr>
+                    <td colspan="7">没有SKU</td>
+                </tr>
+                <%}%>
+                </tbody>
+            </table>
+        </div>
+        <div class="info-group pic1Info">
+            <div class="control-group">
+                <img src="${img_url.getS(goods.headImgUrl1!)}" width="200px" height="200px" class="img-thumbnail" alt="无图片">
+                <img src="${img_url.getS(goods.headImgUrl2!)}" width="200px" height="200px" class="img-thumbnail" alt="无图片">
+                <img src="${img_url.getS(goods.headImgUrl3!)}" width="200px" height="200px" class="img-thumbnail" alt="无图片">
+                <img src="${img_url.getS(goods.headImgUrl4!)}" width="200px" height="200px" class="img-thumbnail" alt="无图片">
+                <img src="${img_url.getS(goods.headImgUrl5!)}" width="200px" height="200px" class="img-thumbnail" alt="无图片">
+            </div>
+        </div>
+        <div class="info-group descInfo">
+            <span class="add-text">${goods.comment!}</span>
+        </div>
+        <div class="info-group dataInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">阿里数据包</span>
+                        <span class="add-text h18">
+                            <a href="${img_url.fullPath(goods.dataPackageUrl1)}">${img_url.fullPath(goods.dataPackageUrl1)}</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">阿里图片包</span>
+                        <span class="add-text h18">
+                            <a href="${img_url.fullPath(goods.imgPackageUrl1)}">${img_url.fullPath(goods.imgPackageUrl1)}</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">淘宝数据包</span>
+                        <span class="add-text h18">
+                            <a href="${img_url.fullPath(goods.dataPackageUrl2)}">${img_url.fullPath(goods.dataPackageUrl2)}</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">淘宝图片包</span>
+                        <span class="add-text h18">
+                            <a href="${img_url.fullPath(goods.imgPackageUrl2)}">${img_url.fullPath(goods.imgPackageUrl2)}</a>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-group dataInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">审核意见</span>
+                        <span class="add-text h18">
+                            <label class="radio-pretty inline checked">
+                                <input type="radio" checked name="result"
+                                value="true"><span>同意</span>
+                            </label>
+                            <label class="radio-pretty inline">
+                                <input type="radio" name="result"
+                                value="false"><span>不同意</span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">审核备注</span>
+                        <input type="text" class="input h22" name="reason" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-ok" value="保存"/>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

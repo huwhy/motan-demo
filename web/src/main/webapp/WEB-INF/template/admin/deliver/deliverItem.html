@@ -1,0 +1,44 @@
+<form class="sui-form form-horizontal detail-form">
+    <div class="control-group">
+        <div class="span2">
+            <div class="input-prepend">
+        <span class="add-on">
+            快递公司
+        </span>
+                <input type="text" name="expressName" value="天天快递"
+                       class="input-large h22">
+                <!--<span class="sui-dropdown dropdown-bordered select">-->
+                <!--<span class="dropdown-inner">-->
+                <!--<a role="button" href="javascript:void(0);" data-toggle="dropdown"-->
+                <!--class="dropdown-toggle h22">-->
+                <!--<input value="" name="expressId" type="hidden">-->
+                <!--<i class="caret"></i>-->
+                <!--<span>-->
+                <!--请选择-->
+                <!--</span>-->
+                <!--</a>-->
+                <!--<ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">-->
+                <!--<li role="presentation">-->
+                <!--<a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>-->
+                <!--</li>-->
+                <!--<%for(item in expresses!){%>-->
+                <!--<li role="presentation">-->
+                <!--<a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${item.id}">${item.name!}</a>-->
+                <!--</li>-->
+                <!--<%}%>-->
+                <!--</ul>-->
+                <!--</span>-->
+                <!--</span>-->
+            </div>
+        </div>
+    </div>
+    <div class="control-group">
+        <div class="span3 w200">
+            <div class="input-prepend">
+                <span class="add-on">快递单号</span>
+                <input type="text" name="expressCode" value="${parameter.expressCode!}"
+                       class="input-large h22">
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,194 @@
+<%layout("../layout/header_layout.html"){%>
+<title>发货单详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-takeOrder").unbind("click").bind("click", function() {
+            var dataId = $(this).attr("data-id");
+            var expressCode = $(this).attr("data-code");
+            Common.post("/admin/deliver/my/deliverItems", {expressCode: expressCode}, function(json){
+                Confirm.show({
+                    id: '#dialog-tip',
+                    mask: '1',
+                    width: '40%',
+                    title: '填写物流信息',
+                    content: json.data,
+
+                    callback: function (win) {
+                        var code = $(win).find("input[name=expressCode]").val();
+                        var expressName = $(win).find("input[name=expressName]").val();
+
+                        if (expressName == undefined || expressName.length == 0) {
+                            $(win).find("input[name=expressName]").css("border", "solid 1px red");
+                            return false;
+                        } else {
+                        }
+                        if (code == undefined || code.length == 0) {
+                            $(win).find("input[name=expressCode]").css("border", "solid 1px red");
+                            return false;
+                        } else {
+                            $(win).find("input[name=expressCode]").css("border", "");
+                        }
+                        Common.post("/admin/deliver/my/sendOrder",
+                            {id: dataId, expressName: expressName, code: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '40%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                    }
+                });
+            });
+
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on">编号</span>
+                    <span class="add-text h18">${sendOrder.code!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人姓名</span>
+                        <span class="add-text h18">
+                            ${sendOrder.buyerName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人地址</span>
+                        <span class="add-text h18">
+                            ${sendOrder.provinceName} ${sendOrder.cityName} ${sendOrder.countyName} ${sendOrder.buyerAddress!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人电话</span>
+                        <span class="add-text h18">
+                            ${sendOrder.buyerPhone!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人邮编</span>
+                        <span class="add-text h18">
+                            ${sendOrder.buyerPostCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">发货人ID</span>
+                        <span class="add-text h18">
+                            ${sendOrder.sendUserId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">订单数</span>
+                        <span class="add-text h18">
+                            ${sendOrder.orderCnt!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">货物总重(KG)</span>
+                        <span class="add-text h18">
+                            ${nums.g2k(sendOrder.weight!)}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">快递公司</span>
+                        <span class="add-text h18">
+                            ${sendOrder.expressName!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">快递单号</span>
+                        <span class="add-text h18">
+                            ${sendOrder.expressCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="sui-table table-bordered">
+            <thead>
+            <tr>
+                <th>订单编号</th>
+                <th>创建时间</th>
+                <th>商品编号</th>
+                <th>商品货号</th>
+                <th>商品规格</th>
+                <th>购买数</th>
+                <th>颜色</th>
+                <th>尺寸</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(item in orders!){%>
+
+            <tr>
+                <td>${item.code!}</td>
+                <td>${item.created, 'yyyy-MM-dd'}</td>
+                <td>${item.goodsCode!}</td>
+                <td>${item.goodsItemNo!}</td>
+                <td>${item.specPropValue!}</td>
+                <td>${item.quantity!}</td>
+                <td>${item.color!}</td>
+                <td>${item.size!}</td>
+            </tr>
+            <%}elsefor{%>
+            <tr>
+                <td colspan="4">没有数据</td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        <a href="javascript:" class="sui-btn btn-primary btn-close" onclick="self.location=document.referrer;">关闭</a>
+        <%if(!sendOrder.isSend){%>
+        <a data-id="${sendOrder.id}" data-code="${sendOrder.expressCode!}" class="sui-btn btn-primary btn-takeOrder">发货</a>
+        <%}%>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

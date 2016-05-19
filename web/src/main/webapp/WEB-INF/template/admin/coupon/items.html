@@ -1,0 +1,8 @@
+<li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                           data-money="0"  value="">请选择</a></li>
+<%for(t in templates!){%>
+<li role="presentation">
+    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+       data-money="${t.money/100}" value="${t.id}">${t.name!} ${nums.yuan(t.money!0)}元</a>
+</li>
+<%}%>

@@ -1,0 +1,20 @@
+<table class="sui-table table-bordered" style="width: 90%;margin:0 auto; overflow: hidden;border:1px solid #ddd;">
+    <tr>
+        <th>规格</th>
+        <th>颜色</th>
+        <th>尺寸</th>
+        <th width="180">库存</th>
+    </tr>
+<%for(sku in skus){%>
+    <tr>
+        <td>${sku.skuSpecValue}</td>
+        <td>${sku.skuColorValue}</td>
+        <td>${sku.skuSizeValue}</td>
+        <td>
+            <input type="text" value="${sku.stock}" name="stock" style="width: 160px;height: 30px;padding:0 10px;" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+            <input type="hidden" value="${sku.id}" name="id">
+        </td>
+    </tr>
+<%}%>
+</table>
+<input type="hidden" name="goodsCode" value="${goodsCode}" />

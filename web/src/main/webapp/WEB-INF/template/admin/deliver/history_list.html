@@ -1,0 +1,70 @@
+<%layout("../layout/header_layout.html"){%>
+<title>发货历史</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        发货单号
+                    </span>
+                    <input type="text" class="input h22" name="code" value="${parameter.code!}" />
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>编号</th>
+        <th>订单数</th>
+        <th>订单总重量(KG)</th>
+        <th>收货人姓名</th>
+        <th>收货人地址</th>
+        <th>收货人电话</th>
+        <th>邮政编码</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td>${item.orderCnt!}</td>
+        <td>${nums.g2k(item.weight!)}</td>
+        <td>${item.buyerName!}</td>
+        <td>${item.provinceName} ${item.cityName} ${item.countyName} ${item.buyerAddress!}</td>
+        <td>${item.buyerPhone!}</td>
+        <td>${item.buyerPostCode!}</td>
+        <td>
+            <a href="/admin/deliver/history/detail?id=${item.id}" class="sui-btn btn-small">查看</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("/admin/common/dialog.html"){};%>
+<%}%>

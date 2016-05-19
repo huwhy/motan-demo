@@ -1,0 +1,202 @@
+<%layout("../layout/header_layout.html"){%>
+<title>拣货单详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        $(".btn-finish").unbind("click").bind("click", function () {
+            Common.post("/admin/picklist/before/finish", {id: $(this).attr("data-id")}, function(json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message, function() {
+                        Common.refresh();
+                    });
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" novalidate="novalidate" method="POST">
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on">编号</span>
+                    <span class="add-text h18">${pick.id!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货日期</span>
+                        <span class="add-text h18">
+                            ${pick.created!, 'yyyy-MM-dd'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商ID</span>
+                        <span class="add-text h18">
+                            ${pick.supplierId!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商公司名</span>
+                        <span class="add-text h18">
+                            ${pick.companyName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商姓名</span>
+                        <span class="add-text h18">
+                            ${pick.supplierName!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商电话</span>
+                        <span class="add-text h18">
+                            ${pick.phone!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">紧急联系电话</span>
+                        <span class="add-text h18">
+                            ${pick.emergencyPhone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取货地址</span>
+                        <span class="add-text h18">
+                            ${pick.address!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取货地址编码</span>
+                        <span class="add-text h18">
+                            ${pick.areaCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">订单数</span>
+                        <span class="add-text h18">
+                            ${pick.orderCnt!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">订单总重量(KG)</span>
+                        <span class="add-text h18">
+                            ${nums.g2k(pick.weight!)}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货人ID</span>
+                        <span class="add-text h18">
+                            ${pick.pickerId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货人姓名</span>
+                        <span class="add-text h18">
+                            ${pick.pickerName!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货人电话</span>
+                        <span class="add-text h18">
+                            ${pick.pickerPhone!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">备注</span>
+                        <span class="add-text h18">
+                            ${pick.remark!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table class="sui-table table-bordered">
+            <thead>
+            <tr>
+                <th>订单编号</th>
+                <th>创建时间</th>
+                <th>商品编号</th>
+                <th>商品货号</th>
+                <th>订单数</th>
+                <th>总金额</th>
+                <th>卖家电话</th>
+                <th>买家电话</th>
+                <th>订单状态</th>
+            </tr>
+            </thead>
+            <tbody>
+            <%for(item in orders!){%>
+            <tr>
+                <td>${item.code!}</td>
+                <td>${item.created}</td>
+                <td>${item.goodsCode!}</td>
+                <td>${item.goodsItemNo!}</td>
+                <td>${item.quantity!}</td>
+                <td><#yuan value='${item.money}' /></td>
+                <td>${item.sellerPhone!}</td>
+                <td>${item.buyerPhone!}</td>
+                <td>${item.status.name!}</td>
+            </tr>
+            <%}elsefor{%>
+            <tr>
+                <td colspan="4">没有数据</td>
+            </tr>
+            <%}%>
+            </tbody>
+        </table>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+        <%if(!pick.isFinished){%>
+        <input type="button" data-id="${pick.id!}" class="sui-btn btn-primary btn-finish" value="完成"/>
+        <%}%>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

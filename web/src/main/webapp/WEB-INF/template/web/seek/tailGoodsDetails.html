@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>尾货处理--详情</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function(){
+            Common.ajaxForm($("form.tail-form"), "/seek/tgSuccess.html", null);
+        });
+    </script>
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<div class="ttlog_main">
+        <div class="ttppzq_con ty_rerelative">
+            <p class="ttppzq_title ttppzq_marTo">尾货处理流程：</p>
+            <p class="ttwhcl_liucImg"></p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttppzq_title">尾货处理信息</span>
+                <span class="ttppzq_ps">&nbsp;&nbsp;( *注：纳车品供销服务平台对于小批量定制信息的真实性不承担任何责任 )</span>
+            </p>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ttppzq_userName">公司名</span>
+                <span class="float_l"><input type="text" name="company" value="${customer.type.val==0?'仅供货商、进货商可见':tail.company}" class="ttppzq_input01" disabled="disabled"/></span>
+                <span class="ttppzq_right float_r"><input type="text" name="quantity" class="ttppzq_input01" disabled="disabled" value="${tail.quantity}" /></span>
+                <span class="float_r ttppzq_userName03">数量</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ttppzq_userName">联系人</span>
+                <span class="float_l"><input type="text" name="contacts" value="${customer.type.val==0?'仅供货商、进货商可见':tail.contacts}" class="ttppzq_input01" disabled="disabled" /></span>
+                <span class="ttppzq_right float_r"><input type="text" name="material" class="ttppzq_input01" disabled="disabled" value="${tail.material}" /></span>
+                <span class="float_r ttppzq_userName03">材质</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ttppzq_userName">联系电话</span>
+                <span class="float_l"><input type="text" name="phone" value="${customer.type.val==0?'仅供货商、进货商可见':tail.phone}" class="ttppzq_input01" disabled="disabled" /></span>
+                <span class="ttppzq_right float_r"><input type="text" name="money" class="ttppzq_input01" disabled="disabled" value="${tail.money}" /></span>
+                <span class="float_r ttppzq_userName03">总价</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+                <span class="ttred_F">&nbsp;</span>
+                <span class="float_l ttppzq_userName">尾货产品名称</span>
+                <span class="float_l"><input type="text" name="goodsName" class="ttppzq_input01" disabled="disabled" value="${tail.goodsName}" /></span>
+                <span class="ttppzq_right float_r"><input type="text" name="getMethod" class="ttppzq_input01" disabled="disabled" value="${tail.getMethod}" /></span>
+                <span class="float_r ttppzq_userName03">提货方式</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <span class="ttred_F04">&nbsp;</span>
+            <p class="ttppzq_top">
+                <span class="float_l ttppzq_userName02">产品说明</span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top">
+            <span class="float_l">
+                <textarea name="comment" class="ttxqldz_textarea02" disabled="disabled" >${tail.comment}</textarea>
+            </span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="ttppzq_top02">
+                <input type="submit" class="ttppzq_marL ttppzq_tijBtn" title="关闭" onClick="javascript :history.back(-1);" value="关闭" />
+            </p>
+            <div class="ttppzq_marBt"></div>
+        </div>
+</div>
+<%include("/web/common/foot.html"){}%>
+</body>
+</html>

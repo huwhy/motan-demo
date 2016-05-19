@@ -1,0 +1,83 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>订单列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+    });
+</script>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        客户
+                    </span>
+                    <span class="add-text">
+                        ${customer.name!}
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        月份
+                    </span>
+                    <span class="add-text">
+                        ${parameter.month!}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>订单编号</th>
+        <th>创建时间</th>
+        <th>商品编号</th>
+        <th>商品货号</th>
+        <th>商品规格</th>
+        <th>订单数</th>
+        <th>总金额</th>
+        <th>卖家电话</th>
+        <th>买家电话</th>
+        <th>订单状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td>${item.created!, 'yyyy-MM-dd HH:mm:ss'}</td>
+        <td>${item.goodsCode!}</td>
+        <td>${item.goodsItemNo!}</td>
+        <td>${item.specPropValue!}</td>
+        <td>${item.quantity!}</td>
+        <td>
+            <#yuan value='${item.money}' />
+        </td>
+        <td>${item.sellerPhone!}</td>
+        <td>${item.buyerPhone!}</td>
+        <td>${item.status.name!}</td>
+        <td>
+            <a href="/admin/order/detail?code=${item.code}" class="sui-btn btn-small">查看</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%}%>

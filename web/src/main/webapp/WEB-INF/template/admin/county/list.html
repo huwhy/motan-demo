@@ -1,0 +1,142 @@
+<%layout("../layout/header_layout.html"){%>
+<title>县区管理</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        $(".btn-set").unbind("click").bind("click", function () {
+            var id = $(this).attr("data-id");
+            Common.post2({
+                url: '/admin/county/setDisplay',
+                param: {id: id},
+                success: function (json) {
+                    Common.refresh();
+                }
+            });
+        });
+        $("input[name=provinceId]").change(function(){
+            var id = $(this).val();
+            Common.post2({
+                url: '/admin/city/items',
+                param: {id: id},
+                success: function(json){
+                    $(".cities").html(json.data);
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">省</span>
+                    <span class="sui-dropdown dropdown-bordered select" style="">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.provinceId!}" name="provinceId" type="text" class="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${province.name!''}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <%for(item in provinces!){%>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="${item.id}">${item.name}</a>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">市</span>
+                    <span class="sui-dropdown dropdown-bordered select" style="">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.cityId!}" name="cityId" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${city.name!''}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu cities">
+                                <%for(item in cities!){%>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="${item.id}">${item.name}</a>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span3 w200">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <input id="prependedInput2" type="text" name="name" value="${parameter.name!''}"
+                           placeholder="名称"
+                           class="input-fat h18 w100">
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+                <a href="/admin/county/add" class="sui-btn btn-primary">添加城市</a>
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>省</th>
+        <th>市</th>
+        <th>名称</th>
+        <th>状态</th>
+        <th>简拼</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.provinceName!}</td>
+        <td>${item.cityName!}</td>
+        <td>${item.name!}</td>
+        <td>${item.display? '显示' : '隐藏'}</td>
+        <td>${item.pinyin!}</td>
+        <td>
+            <a data-id="${item.id}" class="sui-btn btn-small btn-set">${item.display? '隐藏' : '显示'}</a>
+            <a href="/admin/county/edit?id=${item.id}" class="sui-btn btn-small">编辑</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<input type="hidden" name="id" value=""/>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../modal/user_modal.html"){}%>
+<%}%>

@@ -173,7 +173,7 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
                     <httpConnector>
-                        <port>80</port>
+                        <port>8888</port>
                     </httpConnector>
                     <reload>automatic</reload>
                     <webApp>

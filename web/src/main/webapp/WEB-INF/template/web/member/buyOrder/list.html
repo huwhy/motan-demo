@@ -1,0 +1,569 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>我的订单</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <script type="text/javascript">
+        $(function () {
+            Pagination.init();
+            $(".subNav").click(function () {
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+
+            Common.ajaxForm($("form.form-cancel"), null, function (json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message);
+                    Common.refresh();
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+
+            $(".btn-cancel-trade").unbind("click").bind("click", function () {
+                var tradeId = $(this).attr("data-trade");
+                var status = $(this).attr("data-status");
+                var money = $(this).attr("data-money");
+                if (status != "30") {
+                    Msg.danger("未发货的订单才能取消");
+                    return;
+                } else {
+                    $("input[name=tradeId]").val(tradeId);
+                    $("form.form-cancel .money").text(money + '元');
+                    $(this).siblings(".modal-dialog").click();
+                }
+            });
+
+            Common.ajaxForm($("form.form-refund"), null, function (json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message);
+                    Common.refresh();
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+
+            $(".btn-close-trade").unbind("click").bind("click", function(){
+                if(!confirm("确认要关闭交易吗？")){
+                    return;
+                }
+                var code = $(this).attr("data-code");
+                Common.post("/member/buyOrder/closeTrade", {code:code}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+
+            $(".btn-apply-refund").unbind("click").bind("click", function () {
+                var orderCode = $(this).attr("data-trade");
+                var status = $(this).attr("data-status");
+                var money = $(this).attr("data-money");
+                if (status == "40") {
+                    Msg.danger("待发货中的订单不能退货");
+                    return;
+                } else {
+                    $("input[name=code]").val(orderCode);
+                    $("input[name=refundFee]").val(money);
+                    $(this).siblings(".modal-dialog").click();
+                }
+            });
+
+            Common.ajaxForm($("form.form-send"), null, function (json) {
+                if (json.code == Common.SUCC) {
+                    Msg.success(json.message);
+                    Common.refresh();
+                } else {
+                    Msg.danger(json.message);
+                }
+            });
+            $(".btn-back").unbind("click").bind("click", function () {
+                var code = $(this).parent().siblings(".orderCode").val();
+                $("#orderCode").val(code);
+                $(this).siblings(".modal-dialog").click();
+            });
+
+            $(".btn-notBack").unbind("click").bind("click", function () {
+                Msg.danger("特殊商品不能退货");
+            });
+            $(".btn-notBack2").unbind("click").bind("click", function () {
+                Msg.danger("特殊商品不能退款");
+            });
+            $(".btn-back2").unbind("click").bind("click", function () {
+                var code = $(this).parent().siblings(".orderCode").val();
+                var money = $(this).parent().siblings(".money").val();
+                $("#orderCode2").val(code);
+                $("#backMoney").html(money);
+                $(this).siblings(".btn-fahui").click();
+            });
+        });
+        $('#demo2.date').datepicker({});
+        $('#demo.date').datepicker({});
+        function resetForm() {
+            $("input.ttlog_input").val('');
+            $("input[name=status]").val("");
+            $("input[name=status]").siblings("span").text("请选择");
+        }
+        ;
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<p class="ncjhs_numberT">
+    <span class="ncs01">我的订单</span>
+</p>
+
+<form action="" method="get">
+    <p class="ttlog_search">
+        <span>货号：</span>
+            <span>
+                <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" style="width: 60px;"
+                       value="${params.goodsItemNo!}" name="goodsItemNo"/>
+            </span>
+        <span>名称：</span>
+            <span>
+                <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" style="width: 80px;"
+                       value="${params.goodsName!}" name="goodsName"/>
+            </span>
+        <span>下单时间：</span>
+            <span id="demo2" class="date float_l">
+                <span class="add-on">从</span>
+                <input type="text" name="startTime" value="${params.startTime!}" style="width: 66px;"
+                       class="ttlog_input" onfocus="javascript:this.className='ttlog_input02'"
+                       onblur="javascript:this.className='ttlog_input'">
+            </span>
+        <script type="text/javascript">
+            $('#demo2.date').datepicker({});
+        </script>
+            <span id="demo" class="date float_l">
+                <span class="add-on">至</span>
+                <input type="text" name="endTime" value="${params.endTime}" style="width: 66px;" class="ttlog_input"
+                       onfocus="javascript:this.className='ttlog_input02'"
+                       onblur="javascript:this.className='ttlog_input'">
+            </span>
+        <script type="text/javascript">
+            $('#demo.date').datepicker({});
+        </script>
+    <div style="position: absolute;top:58px;right:160px;">
+        <div class="ty_gyClear"></div>
+        <style>
+            .sui-dropup .caret::before, .sui-dropdown .caret::before {
+                content: "";
+            }
+        </style>
+        <span style="float: none;margin-top:6px;margin-right:5px;">订单类型：</span>
+                <span class="sui-dropdown dropdown-bordered select">
+                    <span class="dropdown-inner" style="padding-top:2px;padding-bottom:2px;">
+                        <a id="drop12" role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                            <input name="status" value="${params.status!}" type="hidden"><i class="caret reset"></i>
+                            <span>${decode(params.status,'10','待付款','20','已付款','30','拣货','40','发货','50','待收','60','完成','70','退货申请','80','退货发回','90','退货完成','100','退货协商','105','退款申请','110','退款拒绝','115','退款确认','请选择')}</span>
+                        </a>
+                        <ul id="menu12" role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="10" title="未付款">待付款</a></li>
+
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="20" title="已付款">已付款</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="30" title="拣货">拣货</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="40" title="发货">发货</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="50" title="待收">待收</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="60" title="完成">完成</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="70" title="退货申请">退货申请</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="80" title="退货发回">退货发回</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="90" title="退货完成">退货完成</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="100" title="退货协商">退货协商</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="105" title="退货协商">退款申请</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="110" title="退货协商">退款拒绝</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="115" title="退货协商">退款确认</a></li>
+                            <li role="presentation" class="divider"></li>
+                            <li role="presentation" class="active"><a role="menuitem" tabindex="-1"
+                                                                      href="javascript:void(0);" title="请选择">请选择</a>
+                            </li>
+                        </ul>
+                    </span>
+                </span>
+    </div>
+    <div style="position: absolute;top:42px;right:20px;">
+        <span><input type="submit" style="width: 56px;" class="ttLog_chaXun" title="查询" value="查询"/> </span>
+        <span><input type="button" style="width: 56px;" class="ttLog_chongzhi" onclick="resetForm()" value="重置"/></span>
+    </div>
+    </p>
+</form>
+<p class="ttppzq_top">
+<table class="sui-table table-bordered" style="width:960px;margin:6px auto 0 auto;">
+    <thead>
+    <tr>
+        <th width="64">下单时间</th>
+        <th width="46">订单编号</th>
+        <th>商品编号</th>
+        <th width="66">商品名称</th>
+        <th width="66">商品规格</th>
+        <th width="50">商品图片</th>
+        <th width="66">商品单价</th>
+        <th width="58">商品数量</th>
+        <th title="商品总金额(不含运费)">金额</th>
+        <th width="75">是否特殊商品</th>
+        <th>运费</th>
+        <th width="58">交易状态</th>
+        <th width="102">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(trade in pager.data!){%>
+    <%for(item in trade.orders!){%>
+    <tr>
+        <td>${item.created, "yyyy-MM-dd HH:mm:ss"}</td>
+        <td>${item.code}</td>
+        <td>${item.goodsCode}</td>
+        <td>${item.goodsName}</td>
+        <td>${item.specPropValue!}</td>
+        <td><img width="50" src="${img_url.getS(item.goodsImg)}"/></td>
+        <td>${item.price/100, "#0.00"}</td>
+        <td>${item.quantity}</td>
+        <td>${(item.money-item.couponFee)/100, "#0.00"}
+            <%if(item.couponFee > 0){%>
+            (优惠${item.couponFee/100, "#0.00"})
+            <%}%>
+        </td>
+        <td>${item.isSpecial?'是':'否'}</td>
+        <%if(trade.orders.~size > 0){%>
+        <%if(itemLP.isFirst){%>
+        <td rowspan="${trade.orders.~size}">
+            <%if(trade.couponId > 0 && item.couponFee == 0){%>
+            ${(trade.postFee - trade.couponFee) / 100, '#0.00'}
+            (原运费${trade.postFee/100, '#0.00'}优惠${trade.couponFee/100, "#0.00"})
+            <%}else {%>
+            ${trade.postFee / 100, '#0.00'}
+            <%}%>
+        </td>
+        <td width="80" rowspan="${trade.orders.~size}">
+            <span>${item.status.name}</span>
+            <%if(trade.status.val == 10){%>
+            <br/>
+            <span class="ncgrzx_ddxqing">
+                <a href="/trade/toPay.html?t=${tradePrefix}${item.tradeId}&payment=${trade.payment/ 100, '#0.00'}"
+                   title="去支付">去支付</a>
+                <a data-code="${item.code}"
+                   style="display: block;width: auto;padding:0 0 0 10px;border:1px solid #fd7009;color: #fd7009;"
+                   class="btn-close-trade" title="关闭交易">关闭交易</a>
+            </span>
+
+            <%}%>
+            <%if(trade.status.val == 30 || trade.status.val == 39){%>
+            <br/>
+                <span class="ncp_spanandA">
+                    <a href="javascript:void(0);"
+                       data-money="${trade.payment / 100, '#0.00'}"
+                       data-status="${trade.status.val!0}" data-trade="${trade.id}"
+                       style="display: block;width: auto;padding:0 0 0  14px;border:1px solid #fd7009;color: #fd7009;"
+                       class="btn-cancel-trade" title="取消">取消</a>
+                    <button data-toggle="modal" data-target="#applyCancelDialog" data-keyboard="false"
+                            class="hidden modal-dialog"></button>
+                </span>
+            <%}%>
+        </td>
+        <%}%>
+        <%}else{%>
+        <td width="80">
+            <span>${item.status.name}</span>
+            <%if(item.status.val == 10){%>
+            <span class="ncgrzx_ddxqing">
+                <a href="/trade/toPay.html?t=${tradePrefix}${item.tradeId}&payment=${trade.payment/ 100, '#0.00'}"
+                   title="去支付">去支付</a>
+            </span>
+
+            <div class="ty_gyClear"></div>
+            <%}%>
+            <%if(item.status.val == 30){%>
+            <br/>
+                <span class="ncp_spanandA">
+                    <a href="javascript:void(0);"
+                       data-money="${trade.payment / 100, '#0.00'}"
+                       data-status="${trade.status.val!0}" data-trade="${trade.id}"
+                       style="display: block;width: auto;padding:0 0 0  14px;border:1px solid #fd7009;color: #fd7009;"
+                       class="btn-cancel-trade" title="取消">取消</a>
+                    <button data-toggle="modal" data-target="#applyCancelDialog" data-keyboard="false"
+                            class="hidden modal-dialog"></button>
+                </span>
+            <%}%>
+        </td>
+        <%}%>
+        <td>
+                <span class="ncgrzx_ddxqing" style="margin-left: 10px;">
+                    <a href="${item.code}.html" title="查看订单">查看订单</a>
+                </span>
+
+            <div class="ty_gyClear"></div>
+            <%if(item.status.val >= 50){%>
+                <span class="ncgrzx_ddxqing" style="display: block;margin-left:10px;">
+                    <a href="${item.code}.html">物流详情</a>
+                </span>
+
+            <div class="ty_gyClear"></div>
+            <%}%>
+            <%if(item.status.val == 50){%>
+            <span class="chakan_Btn02 helideJianGe">
+                <a href="javascript:void(0);"
+                   data-money="${item.refundFee / 100, '#0.00'}"
+                   data-status="${item.status.val!0}" data-trade="${item.code}" style="display: block;width: 28px;"
+                   class="${item.isSpecial?'btn-notBack2':'btn-apply-refund'}"
+                   title="退款">退款</a>
+                <div class="ty_gyClear"></div>
+                <button data-toggle="modal" data-target="#applyRefundDialog" data-keyboard="false"
+                        class="hidden modal-dialog"></button>
+            </span>
+
+            <div class="ty_gyClear"></div>
+                <span class="chakan_Btn02 helideJianGe">
+                    <a href="javascript:void(0);" style="display: block;width: 28px;"
+                       class="${item.isSpecial?'btn-notBack':'btn-back'}"
+                       title="退货">退货</a>
+                    <div class="ty_gyClear"></div>
+                    <button data-toggle="modal" data-target="#applyRefundGoods" data-keyboard="false"
+                            class="hidden modal-dialog"></button>
+                </span>
+
+            <div class="ty_gyClear"></div>
+            <%}%>
+            <%if(item.status.val == 80){%>
+                <span class="chakan_Btn02">
+                    <a href="javascript:void(0);" style="display: block;width: 56px;" title="退货发回"
+                       class="btn-back2">退货发回</a>
+                    <button data-toggle="modal" data-target="#tuihuofahui" data-keyboard="false"
+                            class="hidden btn-fahui"></button>
+                </span>
+
+            <div class="ty_gyClear"></div>
+            <%}%>
+            <input type="hidden" class="orderCode" value="${item.code}"/>
+            <input type="hidden" class="money" value="${item.money/100,'#0.00'}"/>
+        </td>
+    </tr>
+    <%}%>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="11">
+            <div class="guanzhuTabNo"><p>暂无数据</p></div>
+        </td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+</p>
+
+<!--关闭订单 start-->
+<div id="applyCancelDialog" tabindex="-1" role="dialog" data-hasfoot="false" class="sui-modCity hide fade">
+    <div class="zdCity_Con">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="sui-close">×</button>
+        <form action="applyCancelTrade" class="form-cancel" method="post">
+            <p class="ncpth_til">取消订单</p>
+
+            <p class="ncpth_xiala">
+            </p>
+                <div class="ty_gyClear"></div>
+                <span class="sui-dropdown dropdown-bordered select tuihuoyuanyin02 float_l">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;原因：
+                    <span class="dropdown-inner" style="padding-top:2px;padding-bottom:2px;">
+                        <a role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                            <input value="其它原因" name="reason" type="hidden"><i class="caret"></i><span>其它原因</span>
+                        </a>
+                        <ul role="menu" aria-labelledby="xiala" class="sui-dropdown-menu">
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="商品质量有问题" title="商品质量有问题">商品质量有问题</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="商品尺寸不符合" title="商品尺寸不符合">商品尺寸不符合</a></li>
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                       value="其它原因" title="其它原因">其它原因</a></li>
+                        </ul>
+                    </span>
+                </span>
+                <span class="tuiKuanJinY">&nbsp;&nbsp;&nbsp;&nbsp;退款金额：</span>
+                <span class="money tuiKuanJinY">元</span>
+            <div class="ty_gyClear"></div>
+            <p class="tuihuoyuanyin ncp_beizhu">
+                <span>备注：</span>
+                    <span>
+                        <textarea name="remark" class="textarea_tuihuo"
+                                  onfocus="javascript:this.className='textarea_tuihuo02'"
+                                  onblur="javascript:this.className='textarea_tuihuo'"></textarea>
+                    </span>
+            </p>
+            <input type="hidden" name="tradeId" value=""/>
+
+            <p class="tuihuoyuanyin ncp_beizhu">
+                <input type="submit" class="ncp_tijiaotuihuoBtn" title="提交申请" value="提交申请"/>
+            </p>
+        </form>
+    </div>
+</div>
+<!--关闭订单 end-->
+<!--申请退款弹窗 start-->
+<div id="applyRefundDialog" tabindex="-1" role="dialog" data-hasfoot="false" class="sui-modCity hide fade">
+    <div class="zdCity_Con">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="sui-close">×</button>
+        <form action="applyRefund" class="form-refund" method="post">
+            <p class="ncpth_til">退款申请页</p>
+
+            <p class="ncpth_xiala">
+
+            <div class="ty_gyClear"></div>
+                    <span class="sui-dropdown dropdown-bordered select tuihuoyuanyin02 float_l">退款原因：<span
+                            class="dropdown-inner" style="padding-top:2px;padding-bottom:2px;">
+                         <a role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                             <input value="其它原因" name="reason" type="hidden"><i class="caret"></i><span>其它原因</span>
+                         </a>
+                          <ul role="menu" aria-labelledby="xiala" class="sui-dropdown-menu">
+                              <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                         value="商品质量有问题" title="商品质量有问题">商品质量有问题</a></li>
+                              <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                         value="商品尺寸不符合" title="商品尺寸不符合">商品尺寸不符合</a></li>
+                              <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                         value="其它原因" title="其它原因">其它原因</a></li>
+                          </ul>
+                    </span>
+                    </span>
+                    <span class="tuiKuanJinY">&nbsp;&nbsp;&nbsp;&nbsp;退款金额：</span>
+                    <span class="float_l">
+                    <input type="text" class="ttlog_input" onblur="javascript:this.className='ttlog_input'"
+                           onfocus="javascript:this.className='ttlog_input02'" style="width: 50px;margin-top:0;" name="refundFee"/>元
+                    </span>
+            <div class="ty_gyClear"></div>
+            </p>
+            <p class="tuihuoyuanyin ncp_beizhu">
+                <span>备注：</span>
+                    <span>
+                        <textarea name="remark" class="textarea_tuihuo"
+                                  onfocus="javascript:this.className='textarea_tuihuo02'"
+                                  onblur="javascript:this.className='textarea_tuihuo'"></textarea>
+                    </span>
+            </p>
+            <input type="hidden" name="code" value=""/>
+
+            <p class="tuihuoyuanyin ncp_beizhu">
+                <input type="submit" class="ncp_tijiaotuihuoBtn" title="提交申请" value="提交申请"/>
+            </p>
+        </form>
+    </div>
+</div>
+<!--申请退款弹窗 end-->
+<!--申请退货弹窗 start-->
+<div id="applyRefundGoods" tabindex="-1" role="dialog" data-hasfoot="false" class="sui-modCity hide fade">
+    <div class="zdCity_Con">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="sui-close">×</button>
+        <form action="applyRefundGoods" class="form-refund" method="post">
+            <p class="ncpth_til">退货申请页</p>
+            <p class="ncpth_xiala">
+            <div class="ty_gyClear"></div>
+                <span class="sui-dropdown dropdown-bordered select tuihuoyuanyin02 float_l">退货原因：<span class="dropdown-inner" style="padding-top:2px;padding-bottom:2px;">
+                         <a role="button" data-toggle="dropdown" href="javascript:void(0);" class="dropdown-toggle">
+                             <input value="其它原因" name="reason" type="hidden"><i class="caret"></i><span>其它原因</span>
+                         </a>
+                          <ul role="menu" aria-labelledby="xiala" class="sui-dropdown-menu">
+                              <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                         value="商品质量有问题" title="商品质量有问题">商品质量有问题</a></li>
+                              <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                         value="商品尺寸不符合" title="商品尺寸不符合">商品尺寸不符合</a></li>
+                              <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                         value="其它原因" title="其它原因">其它原因</a></li>
+                          </ul>
+                    </span>
+                    </span>
+            </p>
+            <div class="ty_gyClear"></div>
+            <p class="tuihuoyuanyin ncp_beizhu">
+                <span>备注：</span>
+                    <span>
+                        <textarea name="remark" class="textarea_tuihuo"
+                                  onfocus="javascript:this.className='textarea_tuihuo02'"
+                                  onblur="javascript:this.className='textarea_tuihuo'"></textarea>
+                    </span>
+            </p>
+            <input type="hidden" id="orderCode" name="code" value=""/>
+
+            <p class="tuihuoyuanyin ncp_beizhu">
+                <input type="submit" class="ncp_tijiaotuihuoBtn" title="提交申请" value="提交申请"/>
+            </p>
+        </form>
+    </div>
+</div>
+<!--申请退货弹窗 end-->
+<!--退货发回弹窗 start-->
+<div id="tuihuofahui" tabindex="-1" role="dialog" data-hasfoot="false" class="sui-modCity hide fade">
+    <div class="zdCity_Con">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="sui-close">×</button>
+        <form action="goodsBack" class="form-send" method="post">
+            <p class="ncpth_til">退货物流信息填写</p>
+
+            <p class="ncpth_xiala02" style="padding-left:20px;">
+                <span class="ncps_s01">平台同意退货，退款金额</span>
+                <span class="ncps_s02">￥<label id="backMoney"></label>元</span>
+                <span class="ncps_s01">，请及时退货并填写具体物流信息。</span>
+            </p>
+
+            <p class="ncpth_xiala">
+
+            <div class="ty_gyClear"></div>
+            <p class="tuihuoyuanyin02 ncp_beizhu">
+
+            <div class="keshuRuXiaLa">物流公司：</div>
+            <div class="sui-dropdown-like">
+                <input type="text" value="" name="refundExpressCompany" class="xialaLieBiaoKang"
+                       data-toggle="autocomplete"
+                       data-lookup="[&quot;申通快递&quot;, &quot;圆通快递&quot;, &quot;天天快递&quot;, &quot;顺风快递&quot;, &quot;铁通快递&quot;]"
+                       data-minchars="0" class="input-large"><i class="sui-icon icon-pc-chevron-bottom"></i>
+            </div>
+            </p>
+            </p>
+            <p class="tuihuoyuanyin02 ncp_beizhu62">
+                <span class="yunDanHjLeft">运单号：</span>
+                    <span>
+                        <input type="text" class="tiantianKuaiDi" onblur="javascript:this.className='tiantianKuaiDi'"
+                               onfocus="javascript:this.className='tiantianKuaiDi02'" value=""
+                               name="refundExpressCode"/>
+                    </span>
+            </p>
+            <input type="hidden" id="orderCode2" name="code" value=""/>
+
+            <p class="tuihuoyuanyin ncp_beizhu02">
+                <input type="submit" class="ncp_tijiaotuihuoBtn" title="提交信息" value="提交信息"/>
+            </p>
+        </form>
+    </div>
+</div>
+<!--申请退货弹窗 end-->
+<%}%>
+</html>

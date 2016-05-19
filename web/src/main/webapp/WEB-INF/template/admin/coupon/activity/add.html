@@ -1,0 +1,375 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>优惠券管理-添加</title>
+<script type="text/javascript">
+    $(function () {
+        Common.ajaxForm($("form.save-form"), "/admin/coupon/activity", function(json){
+            if (json.code == Common.SUCC) {
+                if ("/admin/coupon/activity") {
+                    Common.go("/admin/coupon/activity");
+                } else {
+                    Msg.success(json.message, function () {
+                        if (json.data) {
+                            Common.go(json.data);
+                        } else {
+                            Common.refresh();
+                        }
+                    });
+                }
+            } else {
+                if (json.subCode == 505) {
+                    Confirm.show({
+                        id: '#dialog-tip',
+                        mask: '1',
+                        width: '40%',
+                        title: '注意',
+                        content: json.message,
+                        callback: function (win) {
+                            $("input[name=noNums]").val("true");
+                            $("form.save-form").submit();
+                        }
+                    });
+                } else {
+                    Msg.danger(json.message);
+                }
+            }
+        });
+        $(".btn-cancel").unbind("click").bind("click", function () {
+            Common.go("/admin/coupon/activity");
+        });
+
+//        $("#up").uploadPreview({Img: "ImgPr", Width: 120, Height: 120});
+
+        $(".selfAdd").change(function () {
+            if ($(this).prop("checked")) {
+                $(".selfAddDiv").show();
+                $("input[name=selfMembers]").prop("checked", 'true');
+            } else {
+                $(".selfAddDiv").hide();
+                $("input[name=selfMembers]").removeProp("checked");
+            }
+        });
+        $("input[name=memberLevelId]").change(function () {
+            if (!$(this).hasClass("selfAdd")) {
+                $(".selfAddDiv").hide();
+            }
+            if ($(this).hasClass("allMembers")) {
+                $("input[name=allMembers]").prop("checked", 'true');
+            } else {
+                $("input[name=allMembers]").removeProp("checked");
+            }
+        });
+
+        $("input[name=useType]").change(function () {
+            var useType = $(this).val();
+            if (useType.length > 0) {
+                Common.post2({
+                    url: '/admin/coupon/manage/enableTemplates',
+                    param: {useType: useType},
+                    success: function (json) {
+                        $(".coupons").html(json.data);
+                        $(".coupons li a").click(function(){
+                            var money = $(this).attr("data-money");
+                            $(".money").text(money + "元");
+                        });
+                    }
+                });
+                if (useType == 'POST_FEE') {
+                    $(".coupon").addClass("coupon_1").removeClass("coupon_2");
+                } else {
+                    $(".coupon").addClass("coupon_2").removeClass("coupon_1");
+                }
+            }
+        });
+        $(".coupons li a").click(function(){
+            var money = $(this).attr("data-money");
+            $(".money").text(money + "元");
+        });
+    });
+</script>
+<style>
+    .condition:after {
+        content: "活动参与条件";
+    }
+
+    .condition2:after {
+        content: "活动参与对象";
+    }
+
+    .img-round {
+        border-radius: 3px;
+        display: block;
+        padding: 3px;
+        border: 1px solid #ccc;
+        position: relative;
+    }
+
+    .img-round .upload-label {
+        position: absolute;
+        display: inline-block;
+        padding: 0px 0;
+        width: 99%;
+        left: 1%;
+        top: 8%;
+        margin-top: -15px;
+        text-align: center;
+        cursor: pointer;
+        height: 100%;
+    }
+
+    .coupon {
+        height: 160px;
+        width: 220px;
+        border-radius: 5px;
+    }
+    .coupon .money {
+        position: relative;
+        top: 48px;
+        left: 60px;
+        font-size: 30px;
+        color: #FFF;
+    }
+    .coupon_1{
+        background: url('/static/images/coupon/coupon_1.png') no-repeat ;
+        background-position: -1px -6px;
+    }
+    .coupon_2{
+        background: url('/static/images/coupon/coupon_2.png') no-repeat ;
+        background-position: -1px -10px;
+    }
+</style>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal save-form" action="/admin/coupon/activity/save" method="post"
+          enctype="multipart/form-data">
+        <input type="hidden" name="id" value="${ac.id!}">
+
+        <div class="control-group">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">名称</span>
+                    <input type="text" name="name" value="${ac.name!}" maxlength="10"
+                           class="input-fat h18">
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        使用优惠券
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${ct.useType!}" name="useType" type="text" class="hide">
+                                <i class="caret"></i>
+                                <span>${ct.useType.value!'请选择'}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                           value="">请选择</a></li>
+                                <%for(useType in useTypes!){%>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                           value="${useType}">${useType.value!}</a></li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">优惠券</span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${ac.couponTemplateId!}" name="couponTemplateId" type="hidden">
+                                <i class="caret"></i>
+                                <span>${ct.name!} ${nums.yuan(ct.money!0)}元</span>
+                            </a>
+                            <ul role="menu" class="sui-dropdown-menu coupons">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                                           data-money="0" value="">请选择</a></li>
+                                <%for(t in templates!){%>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="${t.id}" data-money="${t.money/100}">${t.name!} ${nums.yuan(t.money!0)}元</a>
+                                </li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="control-group">
+            <div class=" coupon coupon_${(ct.useType.value!'')=='抵运费'?'1':'2'}">
+                <span class="money">${nums.yuan(ct.money!0)}元</span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        活动时间
+                    </span>
+                    <input type="text" class="input-date h22" name="from" data-toggle="datepicker"
+                           value="${ac.startTime!, 'yyyy-MM-dd'}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="end" data-toggle="datepicker"
+                           value="${ac.endTime!, 'yyyy-MM-dd'}">
+                </div>
+            </div>
+        </div>
+        <!--<div class="control-group">-->
+            <!--<div class="img-round">-->
+                <!--<img id="ImgPr" width="200" height="200" src="http://placehold.it/200x200/f0f0f0/&amp;text=no picture"-->
+                     <!--alt="">-->
+                <!--<label class="upload-label">-->
+                    <!--<input class="hide" type="file" id="up" name="icon">-->
+                    <!--<i class="sui-icon-plus sui-text-info"></i>-->
+                <!--</label>-->
+            <!--</div>-->
+        <!--</div>-->
+        <div class="info-group condition">
+            <div class="control-group">
+                <div class="span2">
+                    <span class="sui-label label-danger">0表示没有限制</span>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline ${(ac.conditionJson.chkPreMonthMoney!false) ? 'checked'}">
+                                <input name="chkPreMonthMoney" value="true" type="checkbox"
+                                       ${(ac.conditionJson.chkPreMonthMoney!false)? 'checked'}>
+                                <span>上个自然月采购额大于等于</span>
+                            </label>
+                            <input type="text" class="input-small h22" name="preMonthMoney"
+                                   value="${nums.yuan(ac.conditionJson.preMonthMoney!)}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')">
+                            <span>元</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline ${(ac.conditionJson.chkPreMonthNum!false)? 'checked'}">
+                                <input name="chkPreMonthNum" value="true" type="checkbox"
+                                       ${(ac.conditionJson.chkPreMonthNum!false)? 'checked'}>
+                                <span>上个自然月采购订单数大于等于</span>
+                            </label>
+                            <input type="text" class="input-small h22" name="preMonthNum"
+                                   value="${nums.yuan(ac.conditionJson.preMonthNum!)}" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                            <span>笔</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline ${(ac.conditionJson.chkPreSeasonMoney!false) ? 'checked'}">
+                                <input name="chkPreSeasonMoney" value="true" type="checkbox"
+                                       ${(ac.conditionJson.chkPreSeasonMoney!false)? 'checked'}>
+                                <span>上个自然季采购额大于等于</span>
+                            </label>
+                            <input type="text" class="input-small h22" name="preSeasonMoney"
+                                   value="${nums.yuan(ac.conditionJson.preSeasonMoney!)}" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')">
+                            <span>元</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <label class="checkbox-pretty inline ${(ac.conditionJson.chkPreSeasonNum!false)? 'checked'}">
+                                <input name="chkPreSeasonNum" value="true" type="checkbox"
+                                       ${(ac.conditionJson.chkPreSeasonNum!false)? 'checked'}>
+                                <span>上个自然季采购订单数大于等于</span>
+                            </label>
+                            <input type="text" class="input-small h22" name="preSeasonNum"
+                                   value="${nums.yuan(ac.conditionJson.preSeasonNum!)}" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+                            <span>笔</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-on">多个参与条件</span>
+                        <span class="add-text">
+                            <label class="radio-pretty inline ${(ac.andOr!false)?'checked'}">
+                                <input type="radio" ${(ac.andOr!false)?'checked'} name="andOr"
+                                value="true"><span>满足所有条件</span>
+                            </label>
+                              <label class="radio-pretty inline ${!(ac.andOr!true)?'checked'}">
+                                  <input type="radio" name="andOr" ${!(ac.andOr!true)?'checked'} value="false"><span>满足其中一条</span>
+                              </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-group condition2">
+            <div class="control-group">
+                <div class="span2">
+                    <div class="input-prepend">
+                        <span class="add-text">
+                            <%for(level in levels!){%>
+                            <label class="checkbox-pretty inline ${(ac.memberLevelId!0) == level.id? 'checked'}">
+                                <input name="memberLevelId" type="radio" value="${level.id}" ${(ac.memberLevelId!0)==
+                                       level.id? 'checked'}>
+                                <span>${level.name}(${level.memberCount!})</span>
+                            </label>
+                            <%}%>
+                            <label class="checkbox-pretty inline ${(ac.memberLevelId!(-1)) == 0 && isEmpty(ac.memberRange)? 'checked'}">
+                                <input name="memberLevelId" class="allMembers" type="radio" value="0"
+                                       ${(ac.memberLevelId!(-1))== 0 && isEmpty(ac.memberRange)? 'checked'}>
+                                <input name="allMembers" type="checkbox" value="true" class="hide"/>
+                                <span>所有会员</span>
+                            </label>
+                            <label class="checkbox-pretty inline ${(ac.memberLevelId!(-1)) == 0 && isNotEmpty(ac.memberRange)? 'checked'}">
+                                <input name="memberLevelId" class="selfAdd" type="radio" value="0"
+                                       ${(ac.memberLevelId!(-1))== 0 && isNotEmpty(ac.memberRange)? 'checked'}>
+                                <input name="selfMembers" type="checkbox" value="true" class="hide"/>
+                                <span>自主添加进货商</span>
+                            </label>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: none;" class="selfAddDiv">
+                <div class="control-group">
+                    <div class="sui-msg msg-large msg-tips">
+                        <div class="msg-con">导入前，请按照模板编辑EXCEL文档，并将所有列设置成“客户编号”</div>
+                        <s class="msg-icon"></s>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <div class="span2">
+                        <div class="input-prepend">
+                            <span class="add-on">导入文件</span>
+                        <span class="add-text">
+                        <input type="file" name="members"/>
+                        </span>
+                            <a href="/static/file/customers.xls" class="add-text">下载EXCEL模板</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="noNums" value="false" />
+        <div class="control-group">
+            <input type="button" class="sui-btn btn-primary btn-save" value="保存"/>
+            <input type="button" class="sui-btn btn-primary btn-cancel" value="取消"/>
+        </div>
+    </form>
+</div>
+<%include("/admin/common/dialog.html"){};%>
+<%}%>

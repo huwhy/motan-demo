@@ -1,0 +1,136 @@
+<!--返回顶部 start -->
+<script type="text/javascript">
+    $(function() {
+        var e = $("#rocket-to-top"),
+                t = $(document).scrollTop(),
+                n,
+                r,
+                i = !0;
+        $(window).scroll(function() {
+            var t = $(document).scrollTop();
+            t == 0 ? e.css("background-position") == "0px 0px" ? e.fadeOut("slow") : i && (i = !1, $(".level-2").css("opacity", 1), e.delay(100).animate({
+                        marginTop: "-1000px"
+                    },
+                    "normal",
+                    function() {
+                        e.css({
+                            "margin-top": "-125px",
+                            display: "none"
+                        }),
+                                i = !0
+                    })) : e.fadeIn("slow")
+        }),
+                e.hover(function() {
+                            $(".level-2").stop(!0).animate({
+                                opacity: 1
+                            })
+                        },
+                        function() {
+                            $(".level-2").stop(!0).animate({
+                                opacity: 0
+                            })
+                        }),
+                $(".level-3").click(function() {
+                    function t() {
+                        var t = e.css("background-position");
+                        if (e.css("display") == "none" || i == 0) {
+                            clearInterval(n),
+                                    e.css("background-position", "0px 0px");
+                            return
+                        }
+                        switch (t){
+                           /* case "0px 0px":
+                                e.css("background-position", "-298px 0px");
+                                break;
+                            case "-298px 0px":
+                                e.css("background-position", "-447px 0px");
+                                break;
+                            case "-447px 0px":
+                                e.css("background-position", "-596px 0px");
+                                break;
+                            case "-596px 0px":
+                                e.css("background-position", "-745px 0px");
+                                break;
+                            case "-745px 0px":
+                                e.css("background-position", "-298px 0px");*/
+                            case "0px 0px":
+                                e.css("background-position", "-130px 0px");
+                                break;
+                            case "-130px 0px":
+                                e.css("background-position", "-195px 0px");
+                                break;
+                            case "-195px 0px":
+                                e.css("background-position", "-260px 0px");
+                                break;
+                            case "-260px 0px":
+                                e.css("background-position", "-325px 0px");
+                                break;
+                            case "-325px 0px":
+                                e.css("background-position", "-130px 0px");
+                        }
+                    }
+                    if (!i) return;
+                    n = setInterval(t, 50),
+                            $("html,body").animate({scrollTop: 0},"slow");
+                });
+    });
+</script>
+<div style="display:none;" id="rocket-to-top">
+    <div style="opacity:0;display:block;" class="level-2"></div>
+    <div class="level-3"></div>
+</div>
+<!--返回顶部 end -->
+<!-- 直通车 start -->
+<div class="tt_topCon">
+    <div class="tt_topConent">
+        <ul class="tttop_01">
+            <li class="tttop_indhome"><a href="/index.html" title="首页" class="tttop_left">首页</a><span>|</span></li>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li><a href="/register.html" title="免费注册">注册</a></li>
+            <%}%>
+            <%if(isEmpty(session.curCustomer)){%>
+            <li class="ty_rerelative" style="width: 55px;text-align:center;">
+                <span style="position: absolute;top:0;left: -5px;">|</span><a href="/login.html" title="请登录">请登录</a>
+            </li>
+            <%}%>
+        </ul>
+        <ul class="tttop_02">
+            <li class="tttop_indhome02"><div class="tttop_left02">0576-81300105</div></li>
+            <%if(!isEmpty(session.curCustomer)){%>
+            <li class="float_r"><a href="/member/follow.html" title="我的关注">我的关注</a><span>|</span></li>
+            <li class="float_r ty_rerelative">
+                <a href="${decode(session.curCustomer.type.val,0,'/member/index.html',1,'/member/buyOrder/list.html','/member/sellOrder/list.html')}" title="我的订单" class="ttTop_myDiDa">我的订单</a>
+                <span class="ttTop_dingdan"><img src="/static/images/web/tt_hot01.gif" /></span>
+                <span>|</span>
+            </li>
+            <li class="float_r">
+                <a href="/member/index.html" title="${session.curCustomer.name}的个人中心">
+                    <!-- 个人中心图标 start-->
+                    <span class="ncp_topHyuan"></span>
+                    <!-- 个人中心图标 end-->
+                    <span>${session.curCustomer.name}的个人中心</span>
+                </a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="/logout" title="注销">注销</a>
+                <span>|</span>
+            </li>
+            <%}%>
+        </ul>
+    </div>
+</div>
+<!-- 直通车 end -->
+<!-- menu start -->
+<div class="tt_menuCon">
+    <div class="tt_menuConter">
+        <a href="/index.html"><img src="/static/images/web/tt_logo.png" class="tt_menuCtImg" width="160" /></a>
+        <span class="nc_pageTitle">我的用户中心</span>
+        <ul class="float_r ty_rerelative">
+            <li><a href="/index.html" title="首页">首页</a></li>
+            <span class="ncmum_jg01">|</span>
+            <li class="${strutil.startWith(actionKey,'/goods')?'tt_indxZ':''}" ><a href="/goods/list.html" target="_blank" title="货源商城">货源商城</a></li>
+            <span class="ncmum_jg02">|</span>
+            <li class="${strutil.startWith(actionKey,'/brand')?'tt_indxZ':''}"><a href="/companyProfile.html" title="品牌专区">帮助中心</a></li>
+        </ul>
+    </div>
+</div>
+<!-- menu end -->

@@ -1,0 +1,213 @@
+<%layout("../layout/header_layout.html"){%>
+<title>在线商品管理</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $("input.btn-reset").click(function () {
+            Common.reset("form.query-form");
+        });
+
+        $(".btn-offline").unbind("click").bind("click", function () {
+            var $this = $(this);
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '确认下架？',
+                content: "<div class=\"input-prepend\"><span class=\"add-on\"><b style=\"color: #f00;\">*</b>原因</span>" +
+                "<input type='text' name='reason' class='input h22' /></div>",
+                callback: function (win) {
+                    var reason = $(win).find("input[name=reason]").val();
+                    if (reason == undefined || reason.length == 0 || reason.length > 10) {
+                        $(win).find("input[name=reason]").css("border", "solid 1px red");
+                        return false;
+                    } else {
+                        $(win).find("input[name=reason]").css("border", "");
+                    }
+                    Common.post("/admin/goods/online/offline",
+                            {id: $this.attr("data-id"), reason: reason}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${page.perSize!10}">
+
+        <div class="sui-row">
+            <div class="span4">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        查询条件
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select" style="margin-top: -4px;">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.fieldName!}" name="fieldName" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.fieldName, 'code', '商品编号', 'name', '商品名称',
+                                    'itemNo', '商品货号', 'sellerId', '卖家ID',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="code">商品编号</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="name">商品名称</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="itemNo">商品货号</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);"
+                                       value="sellerId">卖家ID</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                    <span class="add-on2">=</span>
+                    <input type="text" class="input h22" name="value" value="${parameter.value!}"/>
+                </div>
+            </div>
+            <div class="span3">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        商品类目
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select">
+                        <span class="dropdown-inner">
+                            <a role="button" href="javascript:void(0);" data-toggle="dropdown"
+                               class="dropdown-toggle h22">
+                                <input value="${parameter.type!}" name="type" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    ${decode(parameter.type, 'cushion', '汽车坐垫', 'floorMat', '汽车脚垫',
+                                    'wheelCover', '方向盘套', 'carTrim', '汽车内饰', 'other', '其他',
+                                    '请选择')}
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop4" class="sui-dropdown-menu">
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="">请选择</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="cushion">汽车坐垫</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="floorMat">汽车脚垫</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="wheelCover">方向盘套</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="carTrim">汽车内饰</a>
+                                </li>
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="javascript:void(0);" value="other">其他</a>
+                                </li>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        是否特殊商品
+                    </span>
+                    <span class="add-text">
+                        <label class="radio-pretty inline ${'true' == parameter.isSpecial ? 'checked'}">
+                            <input type="radio" ${'true' == parameter.isSpecial ? 'checked'} name="isSpecial"
+                            value="true"><span>是</span>
+                        </label>
+                        <label class="radio-pretty inline ${'false' == parameter.isSpecial ? 'checked'}">
+                            <input type="radio" ${'false' == parameter.isSpecial ? 'checked'} name="isSpecial"
+                            value="false"><span>否</span>
+                        </label>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+
+            <div class="sui-btn-group">
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>商品编号</th>
+        <th>商品名称</th>
+        <th>商品品牌</th>
+        <th>商品类目</th>
+        <th>商品货号</th>
+        <th>创建时间</th>
+        <th>最新上架时间</th>
+        <th>存货数</th>
+        <th>卖家ID</th>
+        <th>是否特殊商品</th>
+        <th>关注数</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>${item.code!}</td>
+        <td><a href="/goods/${item.code!}.html" target="_blank">${item.name!}</a></td>
+        <td>${item.brand!}</td>
+        <td>${item.type.name!}</td>
+        <td>${item.itemNo!}</td>
+        <td>${item.created!, 'yyyy-MM-dd HH:mm:ss'}</td>
+        <td>${item.onlineTime!, 'yyyy-MM-dd HH:mm:ss'}</td>
+        <td>${item.stock!}</td>
+        <td>${item.sellerId!}</td>
+        <td>${item.isSpecial? '是' : '否'}</td>
+        <td>${item.followCnt!}</td>
+        <td>
+            <a href="/admin/goods/online/detail?id=${item.id}">查看</a>
+            <a data-id="${item.id}" class="sui-btn btn-small btn-offline">下架</a>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../common/dialog.html"){};%>
+<%}%>

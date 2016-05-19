@@ -1,0 +1,208 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>上架商品</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript">
+        $(function () {
+            $(".subNav").click(function () {
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+
+            Pagination.init();
+
+            $(".btn-offShelf").unbind("click").bind("click", function () {
+                if (!confirm("确认要下架商品吗？")) {
+                    return;
+                }
+                var code = $(this).parent().siblings(".goodsCode").val();
+                Common.post("/member/online/offShelf", {code: code}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Msg.success(json.message);
+                        Common.refresh();
+                    } else {
+                        Msg.danger(json.message);
+                    }
+                });
+            });
+
+            $(".btn-add").click(function () {
+                var $this = $(this);
+                var code = $this.parent().siblings(".goodsCode").val();
+                $("#goodsCode").val(code);
+                Common.post2({
+                    url: "/member/online/getGoodsByCode",
+                    param: {code: code},
+                    success: function (json) {
+                        $("#clear").text("");
+                        var target = document.getElementById("clear");
+                        target.innerHTML = json.data;
+                        $this.siblings("a").click();
+                    }
+                })
+            });
+
+            $(".btn-editStock").unbind("click").bind("click", function () {
+                var params = $("form.append").serializeArray();
+                Common.post2({
+                    url: "/member/online/changeStock",
+                    param: params,
+                    success: function(json){
+                        if (json.code == Common.SUCC) {
+                            Common.refresh();
+                        } else {
+                            Msg.danger(json.message);
+                        }
+                    }
+                });
+            });
+        });
+        function resetForm() {
+            $("input.ttlog_input").val('');
+        }
+        ;
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+<p class="ncjhs_numberT">
+    <span class="ncs01">商品管理</span>
+    <span class="ncs01"> > </span>
+    <span class="ncs01">上架商品</span>
+</p>
+
+<form method="get">
+    <p class="ttlog_search">
+        <span>商品编号：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" value="${params.username!}"
+                       name="goodsCode"/>
+            </span>
+        <span>商品名称：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" value="${params.goodsName!}"
+                       name="goodsName"/>
+            </span>
+        <span>商品货号：</span>
+            <span>
+                <input type="text" class="ttlog_input" type="text" onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" value="${params.itemNo!}" name="itemNo"/>
+            </span>
+        <span>库存：</span>
+            <span>
+                <input type="text" class="ttlog_input" style="width: 48px" type="text"
+                       onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" value="${params.startStock}"
+                       name="startStock"/>
+            </span>
+        <span style="padding-right:3px;color: rgba(85,85,85,.6);">~</span>
+            <span>
+                <input type="text" class="ttlog_input" style="width: 48px" type="text"
+                       onblur="javascript:this.className='ttlog_input'"
+                       onfocus="javascript:this.className='ttlog_input02'" value="${params.endStock}" name="endStock"/>
+            </span>
+
+    <div class="ty_gyClear"></div>
+    <!--<span style="display: block;float:left; padding-left:42px;margin-bottom: 20px;padding-top:22px;">销量：</span>-->
+    <!--<span>-->
+    <!--<input type="text" class="ttlog_input" style="width: 55px" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="" name="" />-->
+    <!--</span>-->
+    <!--<span style="padding-right:3px;color: rgba(85,85,85,.6);">~</span>-->
+    <!--<span>-->
+    <!--<input type="text" class="ttlog_input" style="width: 55px" type="text" onblur="javascript:this.className='ttlog_input'" onfocus="javascript:this.className='ttlog_input02'" value="" name="" />-->
+    <!--</span>-->
+    <span style="margin-left:78px;"><input type="submit" value="查询" title="查询" class="ttLog_chaXun"/> </span>
+    <span><input type="button" class="ttLog_chongzhi" onclick="resetForm()" value="重置"/></span>
+    </p>
+</form>
+<p class="ttppzq_top">
+<table class="sui-table table-bordered" style="width:960px;margin:0 auto;">
+    <thead>
+    <tr>
+        <th width="50">商品编号</th>
+        <th>商品名称</th>
+        <th width="50">商品货号</th>
+        <th width="50">商品单价</th>
+        <th width="50">库存</th>
+        <!--<th>销量</th>-->
+        <th width="80">是否特殊商品</th>
+        <th width="50">关注数</th>
+        <th>最新上架时间</th>
+        <th width="173">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(goods in pager.data!){%>
+    <tr>
+        <td>${goods.code}</td>
+        <td>${goods.name}</td>
+        <td>${goods.itemNo}</td>
+        <td>${goods.wholesalePrice/100, "#0.00"}</td>
+        <td>${goods.stock}</td>
+        <td>${goods.isSpecial?'是':'否'}</td>
+        <td>${goods.followCnt}</td>
+        <td>${goods.onlineTime, "yyyy-MM-dd"}</td>
+        <td width="180">
+            <span class="chakan_Btn03" >
+                <a href="/goods/${goods.code}.html" target="_blank" class="sui-btn btn-small btn-link">查看</a>
+            </span>
+            <span class="chakan_Btn" >
+                <a href="javascript:void(0);" class="sui-btn btn-small btn-link btn-offShelf tiaoZheng_ys">下架</a>
+            </span>
+            <span class="details TiaoZheng_dingwei">
+                <a href="javascript:void(0);" class="hidden" data-toggle="modal" data-target="#city"
+                   data-keyboard="false" title="调整库存">调整库存</a>
+                <input type="button" class="details btn-add TiaoZheng_kuCun" value="调整库存">
+            </span>
+            <input type="hidden" class="goodsCode" value="${goods.code}"/>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="11">
+            <div class="guanzhuTabNo"><p>暂无数据</p></div>
+        </td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#webPage val='${pager.page}' size='large' params = '${params!}' showNum = 'hide' />
+</p>
+<%}%>
+<!--增加库存 start-->
+<div id="city" tabindex="-1" style="background: #fff;padding-bottom: 30px;max-height: 420px; overflow: scroll; " role="dialog" data-hasfoot="false" class="sui-modCity02 hide fade">
+    <div class="zdCity_Con03">
+        <button type="button" data-dismiss="modal" aria-hidden="true" class="sui-close">×</button>
+        <form class="append">
+            <p class="ncnum_tcTitle">调整库存</p>
+            <span id="clear"></span>
+            <p>
+                <span class="ncp_shuliang">&nbsp;</span>
+                <span>
+                    <input type="button" class="ncp_addkucun btn-editStock" value="确认提交" title="确认提交"/>
+                    <input type="hidden" name="goodsCode" id="goodsCode" value="">
+                </span>
+            </p>
+        </form>
+    </div>
+</div>
+<!--增加库存 end-->
+</html>

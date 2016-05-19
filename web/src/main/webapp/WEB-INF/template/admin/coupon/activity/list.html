@@ -1,0 +1,252 @@
+<%layout("../../layout/header_layout.html"){%>
+<title>优惠券活动列表</title>
+<script type="text/javascript">
+    $(function () {
+        Pagination.init();
+        $(".btn-reset").click(function(){
+            Common.go("/admin/coupon/activity");
+        });
+        $(".btn-finished").click(function () {
+            var id = $(this).attr("data-id");
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '结束活动？',
+                content: '结束活动？',
+                callback: function (win) {
+                    Common.post("/admin/coupon/activity/finished",
+                            {id: id}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+        $(".btn-deleted").click(function () {
+            var id = $(this).attr("data-id");
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '删除活动？',
+                content: '删除活动？',
+                callback: function (win) {
+                    Common.post("/admin/coupon/activity/deleted",
+                            {id: id}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+    });
+</script>
+<%}%>
+<%layout("../../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal query-form" id="query-form">
+        <input type="hidden" name="perSize" value="${parameter.perSize!10}">
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        活动名称
+                    </span>
+                    <input type="text" class="input h22" name="name" value="${parameter.name!}"/>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        使用的优惠券
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.useType!}" name="useType" type="hidden">
+                                <i class="caret"></i>
+                                <span>${useType.value!'所有'}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <%for(useType in useTypes!){%>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${useType}">${useType.value!}</a></li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        面值
+                    </span>
+                    <input type="text" class="input h22" name="money" value="${parameter.money!}"/>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        活动时间
+                    </span>
+                    <input type="text" class="input-date h22" name="from" data-toggle="datepicker"
+                           value="${parameter.from}">
+                    <span class="add-on2">-</span>
+                    <input type="text" class="input-date h22" name="end" data-toggle="datepicker"
+                           value="${parameter.end}">
+                </div>
+            </div>
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        参与活动对象
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.memberLevelId!}" name="memberLevelId" type="hidden">
+                                <i class="caret"></i>
+                                <span>
+                                    <%if(parameter.memberLevelId=='-1'){%>
+                                    所有会员
+                                    <%}else if(parameter.memberLevelId=='-2'){%>
+                                    自主添加进货商
+                                    <%}else{%>
+                                    ${level.name!'所有'}
+                                    <%}%>
+                                </span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="0">请选择</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="-1">所有会员</a></li>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="-2">自主添加进货商</a></li>
+                                <%for(level in levels!){%>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${level.id}">${level.name!}</a></li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <div class="span2">
+                <div class="input-prepend">
+                    <span class="add-on">
+                        状态
+                    </span>
+                    <span class="sui-dropdown dropdown-bordered select h22">
+                        <span class="dropdown-inner">
+                            <a role="button" data-toggle="dropdown" href="#" class="dropdown-toggle">
+                                <input value="${parameter.status!}" name="status" type="hidden">
+                                <i class="caret"></i>
+                                <span>${status.value!'所有'}</span>
+                            </a>
+                            <ul role="menu" aria-labelledby="drop12" class="sui-dropdown-menu">
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="0">请选择</a></li>
+                                <%for(s in statusList!){%>
+                                <li role="presentation"><a role="menuitem" tabindex="-1" href="javascript:void(0);" value="${s}">${s.value!}</a></li>
+                                <%}%>
+                            </ul>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="sui-row">
+            <button class="sui-btn btn-primary">查询</button>
+            <input type="button" class="sui-btn btn-primary btn-reset" value="重置"/>
+            <div class="sui-btn-group">
+                <a href="/admin/coupon/activity/add" class="sui-btn btn-primary">添加</a>
+            </div>
+        </div>
+    </form>
+</div>
+<table class="sui-table table-bordered">
+    <thead>
+    <tr>
+        <th>活动名称</th>
+        <th>优惠券</th>
+        <th>面值</th>
+        <th>活动时间</th>
+        <th>活动对象</th>
+        <th>活动对象数量</th>
+        <th>状态</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <%for(item in pager.data!){%>
+    <tr>
+        <td>
+            <a href="/admin/coupon/activity/detail?id=${item.id}">${item.name!}</a>
+        </td>
+        <td>${item.useType.value!}</td>
+        <td>${nums.yuan(item.money!)}</td>
+        <td>${item.startTime!, 'yyyy.MM.dd'}-${item.endTime!, 'yyyy.MM.dd'}</td>
+        <td>
+            <%if(item.memberLevelId > 0){%>
+            ${item.memberLevelName!}
+            <%}else if(isEmpty(item.memberRange)){%>
+            所有会员
+            <%}else{%>
+            自主添加进货商
+            <%}%>
+        </td>
+        <td>${item.memberNum!}</td>
+        <td>
+            <span style="color: ${item.status.value=='进行中'?'red'};" >${item.status.value!}</span>
+        </td>
+        <td>
+            <%if(item.status.value == '进行中'){%>
+            <a href="/admin/coupon/activity/edit?id=${item.id}" class="sui-btn btn-small">继续发放</a>
+            <%}%>
+            <%if(item.status.value != '结束'){%>
+            <a data-id="${item.id}" class="sui-btn btn-small btn-finished">结束</a>
+            <%}%>
+            <%if(item.status.value == '结束'){%>
+            <a data-id="${item.id}" class="sui-btn btn-small btn-deleted">删除</a>
+            <%}%>
+        </td>
+    </tr>
+    <%}elsefor{%>
+    <tr>
+        <td colspan="4">没有数据</td>
+    </tr>
+    <%}%>
+    </tbody>
+</table>
+<#page val="${pager.page!}" size="large" params="${parameter.map!}"/>
+<%include("../../common/dialog.html"){};%>
+<%}%>

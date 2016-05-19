@@ -1,0 +1,372 @@
+<%layout("../layout/header_layout.html"){%>
+<title>订单详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        $(".btn-resetPickCode").unbind("click").bind("click", function () {
+            $this = $(this);
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '修改取货区域编码',
+                content: "<div class=\"input-prepend\"><span class=\"add-on\"><b style=\"color: #f00;\">*</b>编号</span>" +
+                "<input type='text' name='code' class='input h22' /></div>",
+                callback: function (win) {
+                    var code = $(win).find("input[name=code]").val();
+                    if (code == undefined || code.length == 0 || code.length > 10) {
+                        $(win).find("input[name=code]").css("border", "solid 1px red");
+                        return false;
+                    } else {
+                        $(win).find("input[name=code]").css("border", "");
+                    }
+                    Common.post("/admin/customer/resetPickCode",
+                            {id: $this.attr("data-id"), code: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+    .buyInfo:after {
+        content: "物流信息";
+    }
+
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on">编号</span>
+                    <span class="add-text h18">${order.code!}</span>
+                </div>
+            </div>
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on">状态</span>
+                    <span class="add-text h18">${order.status.name!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">创建时间</span>
+                        <span class="add-text h18">
+                            ${order.created!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品单价</span>
+                        <span class="add-text h18">
+                            <#yuan value='${order.price}' />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品编号</span>
+                        <span class="add-text h18">
+                            ${order.goodsCode!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">购买数量</span>
+                        <span class="add-text h18">
+                            ${order.quantity!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品货号</span>
+                        <span class="add-text h18">
+                            ${order.goodsItemNo!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品总金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${order.money}' />
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流总金额</span>
+                        <span class="add-text h18">
+                            <#yuan value='${trade.postFee}' />
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品颜色</span>
+                        <span class="add-text h18">
+                            ${order.color!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">是否特殊商品</span>
+                        <span class="add-text h18">
+                            ${order.isSpecial? '是':'否'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品尺寸</span>
+                        <span class="add-text h18">
+                            ${order.size!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">适合车型</span>
+                        <span class="add-text h18">
+                            ${order.fitCar!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户备注</span>
+                        <div class="add-text" style="word-break:break-all;width:200px;white-space: normal;">
+                            ${order.buyerMessage!}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品总重量</span>
+                        <span class="add-text h18">
+                            ${order.weight / 1000, '#0.00'}KG
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品规格</span>
+                        <span class="add-text h18">
+                            ${order.specPropValue}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">优惠信息</span>
+                        <span class="add-text h18">
+                            <%if(trade.couponId > 0){%>
+                            ${trade.useType == 'PAYMENT'? '免货款' : '免运费'} ${trade.couponFee / 100, "#0.00"}元
+                            <%}else{%>
+                            无
+                            <%}%>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-group buyInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家ID</span>
+                        <span class="add-text h18">
+                            ${order.buyerId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">买家电话</span>
+                        <span class="add-text h18">
+                            ${order.buyerPhone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">卖家ID</span>
+                        <span class="add-text h18">
+                            ${order.sellerId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">卖家电话</span>
+                        <span class="add-text h18">
+                            ${order.sellerPhone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人姓名</span>
+                        <span class="add-text h18">
+                            ${trade.receiveName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人地址</span>
+                        <span class="add-text h18">
+                            ${province.name!} ${county.cityName!} ${county.name!} ${trade.receiveAddress!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人电话</span>
+                        <span class="add-text h18">
+                            ${trade.receivePhone!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">收货人邮编</span>
+                        <span class="add-text h18">
+                            ${trade.zip!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流公司</span>
+                        <span class="add-text h18">
+                            ${sendOrder.expressName!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">物流单号</span>
+                        <span class="add-text h18">
+                            ${sendOrder.expressCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货人ID</span>
+                        <span class="add-text h18">
+                            ${order.pickerId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">拣货完成时间</span>
+                        <span class="add-text h18">
+                            ${order.pickTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">发货人ID</span>
+                        <span class="add-text h18">
+                            ${sendOrder.sendUserId!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">发货完成时间</span>
+                        <span class="add-text h18">
+                            ${sendOrder.sendTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <%if(order.status.val == 85){%>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退货物流公司</span>
+                        <span class="add-text h18">
+                            ${order.refundExpressCompany!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">退货物流编号</span>
+                        <span class="add-text h18">
+                            ${order.refundExpressCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <%}%>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

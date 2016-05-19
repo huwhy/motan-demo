@@ -1,0 +1,418 @@
+<%layout("../layout/header_layout.html"){%>
+<title>客户详情</title>
+<script type="text/javascript">
+    $(function () {
+        $(".btn-close").unbind("click").bind("click", function () {
+            Common.backHistory();
+        });
+        $(".btn-resetPass").unbind("click").bind("click", function () {
+            Common.post("/admin/customer/resetPassword", {id: $(this).attr("data-id")});
+        });
+        $(".btn-resetPickCode").unbind("click").bind("click", function () {
+            $this = $(this);
+            Confirm.show({
+                id: '#dialog-tip',
+                mask: '1',
+                width: '20%',
+                title: '修改取货区域编码',
+                content: "<div class=\"input-prepend\"><span class=\"add-on\"><b style=\"color: #f00;\">*</b>编号</span>" +
+                "<input type='text' name='code' class='input h22' /></div>",
+                callback: function (win) {
+                    var code = $(win).find("input[name=code]").val();
+                    if (code == undefined || code.length == 0 || code.length > 10) {
+                        $(win).find("input[name=code]").css("border", "solid 1px red");
+                        return false;
+                    } else {
+                        $(win).find("input[name=code]").css("border", "");
+                    }
+                    Common.post("/admin/customer/resetPickCode",
+                            {id: $this.attr("data-id"), code: code}, function (json) {
+                                if (json.code == Common.SUCC) {
+                                    win.remove();
+                                    $('.dialog-mask').remove();
+                                    Common.refresh();
+                                    return true;
+                                } else {
+                                    Dialog.show({
+                                        id: '#dialog-tip',
+                                        mask: '0',
+                                        width: '20%',
+                                        title: 'fail!',
+                                        content: json.message,
+                                        callback: function () {
+                                        }
+                                    });
+                                    return false;
+                                }
+                            });
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .baseInfo:after {
+        content: "基本信息";
+    }
+
+    .buyInfo:after {
+        content: "进货商角色信息";
+    }
+
+    .sellInfo:after {
+        content: "供货商角色信息";
+    }
+</style>
+<%}%>
+<%layout("../layout/body_layout.html"){%>
+<div class="query-zone">
+    <form class="sui-form form-horizontal detail-form" novalidate="novalidate" method="POST">
+        <div class="control-group">
+            <div class="span2" style="margin-left: 0;">
+                <div class="input-prepend">
+                    <span class="add-on"><b style="color: #f00;">*</b>编号</span>
+                    <span class="add-text h18">${customer.code!}</span>
+                </div>
+            </div>
+        </div>
+        <div class="info-group baseInfo">
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户帐号</span>
+                        <span class="add-text h18">
+                            ${customer.username!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">手机号码</span>
+                        <span class="add-text h18">
+                            ${customer.phone!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">注册时间</span>
+                        <span class="add-text h18">
+                            ${customer.created!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户邮箱</span>
+                        <span class="add-text h18">
+                            ${customer.email!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户密码</span>
+                        <span class="add-text h18">
+                            *****
+                        </span>
+                        <input type="button" data-id="${customer.id!}" class="sui-btn btn-primary btn-resetPass"
+                               style="height: 28px;" value="重置密码"/>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户姓名</span>
+                        <span class="add-text h18">
+                            ${customer.name!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户状态</span>
+                        <span class="add-text h18">
+                            ${customer.state.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">所在区域</span>
+                        <span class="add-text h18">
+                            ${customer.province!} ${customer.city!} ${customer.area!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">详细地址</span>
+                        <span class="add-text">${customer.address!}</span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">邮政编码</span>
+                        <span class="add-text h18">
+                            ${customer.postCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">客户属性</span>
+                        <span class="add-text h18">
+                            ${customer.type.name!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="info-group buyInfo">
+            <%if(customer.type.val > 0){%>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">淘宝店网址</span>
+                        <span class="add-text h18">
+                            ${customer.shopUrl!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">旺旺(店铺)</span>
+                        <span class="add-text h18">
+                            ${customer.wangwang!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">申请进货商时间</span>
+                        <span class="add-text h18">
+                            ${customer.purchaseTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">进货商审核通过时间</span>
+                        <span class="add-text h18">
+                            ${customer.passPurchaseTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">进货商标签类型</span>
+                        <span class="add-text h18">${customer.sign!}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">QQ</span>
+                        <span class="add-text h18">
+                            ${customer.qq!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">商品类别</span>
+                        <span class="add-text h18">
+                            ${customer.inGoodsTypes2!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">支付宝帐户</span>
+                        <span class="add-text h18">
+                            ${customer.alipayCode!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">财付通帐户</span>
+                        <span class="add-text h18">
+                            ${customer.tenpayCode!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!--<div class="control-group">-->
+                <!--<div class="span3">-->
+                    <!--<div class="input-prepend">-->
+                        <!--<span class="add-on">所在地详细地址</span>-->
+                        <!--<span class="add-text h18">-->
+                            <!--${customer.address!}-->
+                        <!--</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+            <%}else{%>
+            无
+            <%}%>
+        </div>
+        <div class="info-group sellInfo">
+            <%if(customer.type.val > 1){%>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">公司名称</span>
+                        <span class="add-text h18">
+                            ${customer.supplierCompany!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商法人代表</span>
+                        <span class="add-text h18">
+                            ${customer.artificialPerson!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">申请供货商时间</span>
+                        <span class="add-text h18">
+                            ${customer.supplierTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商审核通过时间</span>
+                        <span class="add-text h18">
+                            ${customer.passSupplierTime!, 'yyyy-MM-dd HH:mm:ss'}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">产品品牌</span>
+                        <span class="add-text h18">
+                            ${customer.brand!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商备注</span>
+                        <span class="add-text h18">
+                            ${customer.remarks!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供应商营业执照</span>
+                        <div class="pic_l">
+                            <span id="preview01">
+                                <img width="460" src="${img_url.fullPath(customer.businessLicence!)}"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">支付宝帐号</span>
+                        <span class="add-text h18">
+                            ${customer.alipayCode!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">财付通帐户</span>
+                        <span class="add-text h18">
+                            ${customer.tenpayCode!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">紧急联系人姓名</span>
+                        <span class="add-text h18">
+                            ${customer.emergencyContact!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">紧急联系人电话</span>
+                        <span class="add-text h18">
+                            ${customer.emergencyPhone!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">供货商品类别</span>
+                        <span class="add-text h18">
+                            ${customer.outGoodsTypes!}
+                        </span>
+                    </div>
+                </div>
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">是否是生产厂商</span>
+                        <span class="add-text h18">
+                            ${(customer.isProducer!false)?'是':'否'}
+                        </span>
+                    </div>
+                </div>
+                <!--<div class="span3">-->
+                    <!--<div class="input-prepend">-->
+                        <!--<span class="add-on">取货区域编码</span>-->
+                        <!--<span class="add-text h18">-->
+                            <!--${customer.pickAreaCode!}-->
+                        <!--</span>-->
+                        <!--<input type="button" data-id="${customer.id!}" class="sui-btn btn-primary btn-resetPickCode"-->
+                               <!--style="height: 28px;" value="修改"/>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="span3">
+                    <div class="input-prepend">
+                        <span class="add-on">取货地址</span>
+                        <span class="add-text h18">
+                            ${customer.pickAddress!}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <%}else{%>
+            无
+            <%}%>
+        </div>
+        <input type="button" class="sui-btn btn-primary btn-close" value="关闭"/>
+    </form>
+</div>
+<%include("../common/dialog.html"){}%>
+<%}%>

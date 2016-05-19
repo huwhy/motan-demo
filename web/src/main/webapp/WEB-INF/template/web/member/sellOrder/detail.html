@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8" />
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>订单详情页</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/lib/jquery/dist/jquery.min.js?v=${v}"></script>
+    <script type="text/javascript" src="http://g.alicdn.com/sj/dpl/1.5.1/js/sui.min.js?v=${v}"></script>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui.min.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/sui-append.css?v=${v}">
+    <script type="text/javascript">
+        $(function(){
+            $(".subNav").click(function(){
+                $(this).toggleClass("currentDd").siblings(".subNav").removeClass("currentDd")
+                $(this).toggleClass("currentDt").siblings(".subNav").removeClass("currentDt")
+                $(this).next(".navContent").slideToggle(500).siblings(".navContent").slideUp(500);
+            });
+
+        });
+    </script>
+</head>
+<%layout("../../layout/body_layout.html"){%>
+    <p class="ncjhs_numberT">
+        <span class="ncs01"> 订单管理</span>
+        <span class="ncs01"> > </span>
+        <span class="ncs01"> 订单详情</span>
+    </p>
+    <div class="jiangeDiv"></div>
+    <!-- 订单状态 待付款 start -->
+    <%if(order.status.val <= 20 ){%>
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztLeft">订单状态</div>
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_2.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+
+        </div>
+    </div>
+    <%}%>
+    <!-- 订单状态 待付款 end -->
+    <!-- 订单状态 待拣货 start -->
+    <%if(order.status.val >= 30 && order.status.val < 35 ){%>
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztLeft">订单状态</div>
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_3.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_02">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_03">${order.payTime!, "yyyy-MM-dd"}</span>
+        </div>
+    </div>
+    <%}%>
+    <!-- 订单状态 待拣货 end -->
+    <!-- 订单状态 拣货中 start -->
+    <%if(order.status.val == 35 ){%>
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztLeft">订单状态</div>
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_4.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_02">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_03">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_04">${order.startPickTime, "yyyy-MM-dd"}</span>
+        </div>
+    </div>
+    <%}%>
+    <!-- 订单状态 拣货中 end -->
+    <!-- 订单状态 拣货完成 start -->
+    <%if(order.status.val == 38 ){%>
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztLeft">订单状态</div>
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_5.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_02">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_03">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_04">${order.startPickTime, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_05">${order.pickTime!, "yyyy-MM-dd"}</span>
+        </div>
+    </div>
+    <%}%>
+    <!-- 订单状态 拣货完成 end -->
+    <!-- 订单状态 待发货 start -->
+    <%if(order.status.val == 40 ){%>
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztLeft">订单状态</div>
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_6.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_02">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_03">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_04">${order.startPickTime, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_05">${order.pickTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_06">${order.waitDeliverTime, "yyyy-MM-dd"}</span>
+        </div>
+    </div>
+    <%}%>
+    <!-- 订单状态 待发货 end -->
+    <!-- 订单状态 已发货待收 start -->
+    <%if(order.status.val >= 50 && order.status.val < 200 ){%>
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztLeft">订单状态</div>
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_7.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_02">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_03">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_04">${order.startPickTime, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_05">${order.pickTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_06">${order.waitDeliverTime, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_07">${trade.consignTime!, "yyyy-MM-dd"}</span>
+        </div>
+    </div>
+    <%}%>
+    <!-- 订单状态 已发货待收 end -->
+    <!-- 订单状态 交易完成 start -->
+    <%if(order.status.val == 200 ){%>
+    <div class="ncp_ddzt_zt01">
+        <div class="ncp_ddztLeft">订单状态</div>
+        <div class="ncp_ddztRight">
+            <img src="/static/images/web/ttu_8.png" alt="订单状态">
+            <span class="xiadanTime01">${order.created!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_02">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_03">${order.payTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_04">${order.startPickTime, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_05">${order.pickTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_06">${order.waitDeliverTime, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_07">${trade.consignTime!, "yyyy-MM-dd"}</span>
+            <span class="xiadanU_08">${order.endTime!, "yyyy-MM-dd"}</span>
+        </div>
+    </div>
+    <%}%>
+    <!-- 订单状态 交易完成 end -->
+
+    <!--取消订单 start -->
+    <%if(order.status.val == 20 || (order.status.val >= 31 && order.status.val <= 33) || (order.status.val >= 70 && order.status.val < 200) ){%>
+    <div class="ncp_ddzt_zt01">
+        <%if(order.status.val == 20 || (order.status.val >= 31 && order.status.val <= 33)){%>
+        <div class="quxiaozhtai">取消订单</div>
+        <%}else if(order.status.val >= 105 && order.status.val <= 116){%>
+        <div class="quxiaozhtai">仅退款</div>
+        <%}else{%>
+        <div class="quxiaozhtai">退货退款</div>
+        <%}%>
+        <div class="ty_gyClear quxiaozhtai02">当前状态为：${order.status.name}</div>
+    </div>
+    <%}%>
+    <!--取消订单 end -->
+
+    <div class="ncp_grzxdingxinxi">
+        <p class="ncp_grzxdingTitle">订单信息</p>
+        <p class="ncp_grzxP">
+            <span>订单编号：${order.code}</span>
+            <span>|</span>
+            <span>创建时间：${order.created, "yyyy-MM-dd"}</span>
+        </p>
+        <p class="ncp_grzxshouhuo">拣货人</p>
+        <p class="ncp_grzxjtxinxi">
+            <span>姓名：${pickerName!}</span>
+            <span>联系电话：${pickerPhone!}</span>
+        </p>
+        <p class="ncp_grzxshouhuo">商品信息</p>
+        <p class="ncp_grzxjtxinxi">
+            <span>商品名称：${order.goodsName!}</span>
+            <span>商品规格：${order.specPropValue!}</span>
+            <span>商品编号：${order.goodsCode}</span>
+            <span>商品货号：${order.goodsItemNo}</span>
+            <span>商品颜色：${order.color}</span>
+            <span>商品尺寸：${order.size}</span>
+            <span>购买数量：${order.quantity}</span>
+            <span>商品单价 ( 元 )：${order.price/100,"#0.00"}</span>
+            <span>购买总重量 ( kg )：${order.weight/1000}</span>
+            <span>是否特殊商品：${order.isSpecial?'是':'否'}</span>
+            <span>商品总金额 ( 元 )：${order.money/100,"#0.00"}</span>
+            <span>物流总金额 ( 元 )：${sendOrder.freight/100,"#0.00"}</span>
+            <span>买家留言：${order.buyerMessage}</span>
+        </p>
+
+        <%if(isNotEmpty(order.refundReason)){%>
+        <p class="ncp_grzxshouhuo" style="margin-top:15px;border-top:1px solid #ddd;">取消订单/退款/退货</p>
+
+        <p class="ncp_grzxjtxinxi">
+            <span>理由：${order.refundReason!}</span>
+            <span>处理意见：${order.refundDeal!}</span>
+            <%if(!isEmpty(order.disagreeRefundReason)){%>
+            <span>拒绝理由：${order.disagreeRefundReason!}</span>
+            <%}%>
+            <%if(!isEmpty(order.refundExpressCompany)){%>
+            <span>退货快递公司：${order.refundExpressCompany!}</span>
+            <span>退货快递单号：${order.refundExpressCode!}</span>
+            <%}%>
+            <%if(!isEmpty(order.negotiationResult)){%>
+            <span>退货协商结果：${order.negotiationResult!}</span>
+            <span>协商退款金额：${order.refundFee/100, '#0.00'}</span>
+            <%}%>
+            <%if(order.status.val == 90){%>
+            <span>全额退款：${order.refundFee/100,"#0.00"}</span>
+            <%}%>
+        </p>
+        <%}%>
+        <p><span class="ncp_closePage"><a href="/member/sellOrder/list.html" title="关闭页面">关闭页面</a></span></p>
+    </div>
+<%}%>
+</html>

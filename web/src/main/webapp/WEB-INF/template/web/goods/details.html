@@ -1,0 +1,442 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999 /xhtml">
+<head>
+    <meta http-equiv="carlist_content-Type" carlist_content="text/html; charset=utf-8"/>
+    <meta name="viewport" carlist_content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <title>纳车品供销服务平台--首页</title>
+    <link href="/static/images/web/ncp_logo.ico" rel="icon" type="image/x-icon"/>
+    <link href="/static/images/web/ncp_logo.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/web/common.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/web/style.css?v=${v}">
+    <link rel="stylesheet" type="text/css" href="/static/css/msg_box.css?v=${v}">
+    <script type="text/javascript" src="/static/js/web/jquery-1.9.1.min.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/zixie.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/baidu.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/mzp-packed.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/common.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/jquery.form.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/order.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/MsgBox.js?v=${v}"></script>
+    <!--加入购物车飞入特效 start-->
+    <script type="text/javascript" src="/static/js/web/ieBetter.js?v=${v}"></script>
+    <script type="text/javascript" src="/static/js/web/parabola.js?v=${v}"></script>
+    <!--加入购物车飞入特效 end-->
+    <script type="text/javascript">
+        function getSku(skus) {
+            var skuProps = new Array();
+            $(".sku .sku_item.selected").each(function (i, item) {
+                skuProps.push($(this).attr("data-value"));
+            });
+            var sku = skus[skuProps.join(";") + ";"];
+            return sku;
+        }
+        function selectSkuProp(obj) {
+            if ($(obj).hasClass("disable")) {
+                return;
+            }
+            $(obj).siblings("span").removeClass("selected");
+            $(obj).addClass("selected");
+            if ($(obj).hasClass("spec")) {
+                var specV = $(obj).attr("data-value");
+                var colorV;
+                $(".sku .color.sku_item").each(function () {
+                    var colorObj = $(this);
+                    colorV = $(this).attr("data-value");
+                    var display = false;
+                    $(".sku .size.sku_item").each(function () {
+                        var skuP = specV + ";" + colorV + ";" + $(this).attr("data-value") + ";";
+                        var sku = skus[skuP];
+                        if (sku.availableStock > 0) {
+                            display = true;
+                            return;
+                        }
+                    });
+                    if (!display) {
+                        $(this).addClass("disable").removeClass("selected");
+                    } else {
+                        $(this).removeClass("disable");
+                    }
+                });
+
+            } else if ($(obj).hasClass("color")) {
+                var specV = $(".sku .spec.selected").attr("data-value");
+                var colorV = $(obj).attr("data-value");
+                $(".sku .size.sku_item").each(function () {
+                    var skuP = specV + ";" + colorV + ";" + $(this).attr("data-value") + ";";
+                    var sku = skus[skuP];
+                    if (sku.availableStock == 0) {
+                        $(this).addClass("disable").removeClass("selected");
+                    } else {
+                        $(this).removeClass("disable");
+                    }
+                });
+            }
+        }
+
+        $(function () {
+            $("#addGZ").unbind("click").bind("click", function () {
+                _this = $(this);
+                var FlagL = ($("#addGZ").attr("src") == "/static/images/web/ttDT_guanZ01.png");
+                if (FlagL) {
+                    var goodsCode = $("#goodsCode").val();
+                    Common.post("/buy/follow", {goodsCode: goodsCode}, function (json) {
+                        if (json.code == Common.SUCC) {
+                            $("#addGZ").attr("src", "/static/images/web/ttDT_guanZ02.png");
+                            $("#fcnt").html(json.data);
+                        } else {
+                            MsgBox.danger(_this, json.message);
+                        }
+                    });
+                } else {
+                    var goodsCode = $("#goodsCode").val();
+                    Common.post("/buy/delFollow", {goodsCode: goodsCode}, function (json) {
+                        if (json.code == Common.SUCC) {
+                            $("#addGZ").attr("src", "/static/images/web/ttDT_guanZ01.png");
+                            $("#fcnt").html(json.data);
+                        } else {
+                            MsgBox.danger(_this, json.message);
+                        }
+                    });
+                }
+            });
+
+            $(".sku").click(function () {
+                var sku = getSku(skus);
+                if (sku) {
+                    $(".price").text("￥" + (sku.price / 100).toFixed(2));
+                    $(".retailPrice").text("￥" + (sku.retailPrice / 100).toFixed(2));
+                    $("#num").text(sku.availableStock);
+                    $(".weight").text((sku.weight / 1000).toFixed(2) + "kg");
+                    if(sku.imgUrl != null && sku.imgUrl.length > 0){
+                        $("#zoom1").attr("href", getL(sku.imgUrl));
+                        $(".main_img").attr("src", getM(sku.imgUrl));
+                        $(".MagicZoomBigImageCont").find("img").attr("src", getM(sku.imgUrl));
+                        $(".MagicThumb-image").attr("src", getL(sku.imgUrl));
+                    }
+                }
+            });
+
+            function getM(imgUrl){
+                if(imgUrl == null || imgUrl == ""){
+                    return "";
+                }
+                return "http://storage.nachepin.com" + imgUrl + "!400";
+            }
+            function getL(imgUrl){
+                if(imgUrl == null || imgUrl == ""){
+                    return "";
+                }
+                return "http://storage.nachepin.com" + imgUrl + "!600";
+            }
+
+            $(".btnCart").unbind("click").bind("click", function () {
+                var img = $(this);
+                var code = $(this).attr("data-code");
+
+                var color = "";
+                var size = "";
+                var specJson = $(".sku .spec.selected").attr("data-json");
+                if (!specJson) {
+                    MsgBox.warning(img, "请选择规格");
+                    return;
+                }
+
+                var colorJson = $(".sku .color.selected").attr("data-json");
+                if ($(".sku .color").length > 0 && !colorJson) {
+                    MsgBox.danger(img, "请选择颜色");
+                    return;
+                } else if(colorJson) {
+                    color = $.parseJSON(colorJson).value;
+                }
+                var sizeJson = $(".sku .size.selected").attr("data-json");
+                if ($(".sku .size").length > 0 && !sizeJson) {
+                    MsgBox.danger(img, "请选择尺寸");
+                    return;
+                } else if(sizeJson){
+                    size = $.parseJSON(sizeJson).value;
+                }
+                var quantity = $("input[name=quantity]").val();
+                if (!Common.Rules.digits.test(quantity)) {
+                    MsgBox.danger(img, "请选择购买数量");
+                    return;
+                }
+                var spec = $.parseJSON(specJson);
+                var sku = getSku(skus);
+                var stock = parseInt($("#num").text());
+                if (parseInt(quantity) > stock) {
+                    MsgBox.danger(img, "库存不足");
+                    return;
+                }
+                Common.post2({
+                    obj: img,
+                    url: "/cart/add",
+                    param: {
+                        goodsCode: code,
+                        color: color,
+                        size: size,
+                        skuId: sku.id,
+                        specPropValueId: spec.id,
+                        specPropValue: spec.value,
+                        quantity: quantity
+                    },
+                    success: function (json) {
+                        $(".ncp_gwcShuLiang").text(json.data);
+                        MsgBox.success(img, "加入购物车成功");
+                    },
+                    error: function(json){
+                        MsgBox.warning(img, json.message);
+                    }
+                });
+            });
+
+            $(".btn-order").unbind("click").bind("click", function () {
+                var btn = $(this);
+                var img = btn.find("img");
+                var color = "";
+                var size = "";
+                var specJson = $(".sku .spec.selected").attr("data-json");
+                if (!specJson) {
+                    MsgBox.warning(img, "请选择规格");
+                    return;
+                }
+
+                var colorJson = $(".sku .color.selected").attr("data-json");
+                if ($(".sku .color").length > 0 && !colorJson) {
+                    MsgBox.danger(img, "请选择颜色");
+                    return;
+                } else if(colorJson) {
+                    color = $.parseJSON(colorJson).value;
+                }
+                var sizeJson = $(".sku .size.selected").attr("data-json");
+                if ($(".sku .size").length > 0 && !sizeJson) {
+                    MsgBox.danger(img, "请选择尺寸");
+                    return;
+                } else if(sizeJson){
+                    size = $.parseJSON(sizeJson).value;
+                }
+                var quantity = $("input[name=quantity]").val();
+                if (!Common.Rules.digits.test(quantity)) {
+                    MsgBox.danger(img, "请选择购买数量");
+                    return;
+                }
+                var spec = $.parseJSON(specJson);
+                var sku = getSku(skus);
+                var stock = parseInt($("#num").text());
+                if (parseInt(quantity) > stock) {
+                    MsgBox.warning(img, "库存不足");
+                    return;
+                }
+                var goodsCode = $(this).attr("data-code");
+                var order = new Order(goodsCode, sku.id, spec.skuPropId, spec.id, spec.value, quantity, color, size);
+                var orders = new Array();
+                orders[0] = order;
+                Common.post("/trade/sendItems", {data: JSON.stringify(orders)}, function (json) {
+                    if (json.code == Common.SUCC) {
+                        Common.go("/trade/confirmOrder.html");
+                    } else {
+                        if (json.subCode == 5001) {
+                            MsgBox.danger(img, json.message + "&nbsp;&nbsp;<a style=\"color: white;text-decoration:underline;\" href='/member/purchase.html'>马上申请</a>");
+                        } else {
+                            MsgBox.danger(img, json.message);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<%include("/web/common/top.html"){}%>
+<div class="ttDt_bigBox">
+    <div>
+        <div id="flyItem" class="fly_item"></div>
+    </div>
+    <div class="ttDT_proL">
+        <!--已下架 start -->
+        <div class="ncp_yixiajiaCon" style="display: ${goods.status.val == 20?'block':'none'}">
+            <p>已下架</p>
+        </div>
+        <!--已下架 end -->
+        <div class="t1">
+            <img src="/static/images/web/gotop.gif" id="gotop"/>
+
+            <div id="showArea">
+                <%for(img in goods.headImgUrls){%>
+                <a href="${img_url.getL(img)}" rel="zoom1" rev="${img_url.getM(img)}"><img src="${img_url.getS(img)}"/></a>
+                <%}%>
+            </div>
+            <img src="/static/images/web/gobottom.gif" id="gobottom"/>
+        </div>
+        <div class="t2">
+            <a href="${img_url.getL(goods.headImgUrls[0])}" id="zoom1" class="MagicZoom MagicThumb"><img
+                    src="${img_url.getM(goods.headImgUrls[0])}" id="main_img" class="main_img"
+                    style="width:400px; height:400px;"/></a>
+        </div>
+        <div class="ttDT_sjbUpload">
+            <%if(isEmpty(goods.dataPackageUrl1)){%>
+            <span class="alitaobaoNoY">阿里数据包一键下载</span>
+            <%}else{%>
+            <a href="${img_url.fullPath(goods.dataPackageUrl1)}" title="阿里数据下载">阿里数据包一键下载</a>
+            <%}%>
+        </div>
+        <div class="ttDT_sjbUpload02">
+            <%if(isEmpty(goods.imgPackageUrl1)){%>
+            <span class="alitaobaoNoY02">阿里图片包一键下载</span>
+            <%}else{%>
+            <a href="${img_url.fullPath(goods.imgPackageUrl1)}" title="阿里图片包下载">阿里图片包一键下载</a>
+            <%}%>
+        </div>
+        <div class="ttDT_sjbUpload03">
+            <%if(isEmpty(goods.dataPackageUrl2)){%>
+            <span class="alitaobaoNoY03">淘宝数据包一键下载</span>
+            <%}else{%>
+            <a href="${img_url.fullPath(goods.dataPackageUrl2)}" title="淘宝数据包下载">淘宝数据包一键下载</a>
+            <%}%>
+        </div>
+        <div class="ttDT_sjbUpload04">
+            <%if(isEmpty(goods.imgPackageUrl2)){%>
+            <span class="alitaobaoNoY04">淘宝图片包一键下载</span>
+            <%}else{%>
+            <a href="${img_url.fullPath(goods.imgPackageUrl2)}" title="淘宝图片包下载">淘宝图片包一键下载</a>
+            <%}%>
+        </div>
+    </div>
+    <div class="ttDT_proR">
+        <form action="">
+            <input type="hidden" id="goodsCode" value="${goods.code}"/>
+
+            <p class="ttDT_sTitle">${goods.brand}&nbsp;${goods.name}</p>
+            <%if(isEmpty(session.curCustomer)){%>
+            <p class="ttDT_sprice02">
+                <span class="ttDT_pifaBtn" style="width:150px;"><a href="/login.html" title="登陆后即可享受批发价">登陆后即可享受批发价</a></span>
+            </p>
+            <%}else{%>
+            <p class="ttDT_sprice">
+                <span class="ttDt_jianyi">批发价：</span><span
+                    class="ttDt_Price price">￥${goods.wholesalePrice/100, "#0.00"}</span>
+                <span class="ttDt_jianyi02">建议零售价：</span><span
+                    class="ttDt_Price02 retailPrice">￥${goods.retailPrice/100, "#0.00"}</span>
+            </p>
+            <%}%>
+            <p class="ttDT_ppBh">
+                <span class="float_l">商品编号：${goods.code}</span>
+                <span class="float_l">货号：${goods.itemNo}</span>
+                <span class="float_l">重量：<span class="weight">${goods.weight/1000, "#0.00"}kg</span></span>
+                <span class="float_l">销量：${goods.saleNum}</span>
+                <span class="ncp_shipeiBtn"><a href="shipeichexing.html" title="查看适配车型列表">查看适配车型</a></span>
+            </p>
+            <!--已下架右侧样式 start-->
+            <div class="ncp_yixiaJiaCo" style="display: ${goods.status.val == 20?'block':'none'}">
+                <p>
+                    <span class="ncp_yxjYuan">此宝贝已下架</span>
+                </p>
+            </div>
+            <!--已下架右侧样式 start-->
+            <!--未下架右侧样式 start-->
+            <div style="display: ${goods.status.val == 20?'none':'block'}">
+                <!--商品规格 start-->
+                <%if(isNotEmpty(spec.propValues)){%>
+                <div class="ty_gyClear"></div>
+                <p class="ttDT_coloGroup">
+                    <span class="ttDT_yanse">商品规格：</span>
+                    <div class="sku ttDT_divCG" id="shangpinguige">
+                        <%for(pv in spec.propValues!){%>
+                        <span class="spec div_1 sku_item" data-value="${pv.skuPropId}:${pv.id}" data-json="${json(pv)}"
+                              onclick="selectSkuProp(this)">${pv.value!}</span>
+                        <%}%>
+                    </div>
+                </p>
+                <%}%>
+                <!--商品规格 end-->
+                <!--商品颜色 start-->
+                <%if(isNotEmpty(color.propValues)){%>
+                <div class="ty_gyClear"></div>
+                <p class="ttDT_coloGroup">
+                    <span class="ttDT_yanse">商品颜色：</span>
+
+                    <div class="sku ttDT_divCG">
+                        <%for(pv in color.propValues!){%>
+                        <span class="color div_1 sku_item" data-value="${pv.skuPropId}:${pv.id}" data-json="${json(pv)}"
+                              onclick="selectSkuProp(this)">${pv.value!}</span>
+                        <%}%>
+                    </div>
+                </p>
+                <%}%>
+                <!--商品颜色 end-->
+                <!--商品尺寸 start-->
+                <%if(isNotEmpty(size.propValues)){%>
+                <div class="ty_gyClear"></div>
+                <p class="ttDT_coloGroup">
+                    <span class="ttDT_yanse">商品尺寸：</span>
+
+                    <div class="sku ttDT_divCG">
+                        <%for(pv in size.propValues!){%>
+                        <span class="size div_1 sku_item" data-value="${pv.skuPropId}:${pv.id}" data-json="${json(pv)}"
+                              onclick="selectSkuProp(this)">${pv.value!}</span>
+                        <%}%>
+                    </div>
+                </p>
+                <%}%>
+                <!--商品尺寸 end-->
+
+                <p class="ty_gyClear ttDT_coloGroup" style="margin: 20px 0;">
+                    <span class="ttDT_yanse">购买数量：</span>
+
+                    <div class="ttDT_divCG">
+                        <input class="min" name="" type="button" value="-"/>
+                        <input class="text_box" name="quantity" type="text" value="1" style="width: 42px;"/>
+                        <input class="add" name="" type="button" value="+"/>
+
+                        <div class="ttDT_kuCun" id="add_GWC2">库存：<label id="num">${goods.stock}</label>件</div>
+                    </div>
+                </p>
+                <p class="ty_gyClear ttDT_coloGroup">
+
+                <div class="ttDT_xiaDan">
+                <span><a data-code="${goods.code!}" class="btn-order" title="下单"><img
+                        src="/static/images/web/xiadan_Btn.jpg"/></a></span>
+
+                    <div class="image_limit">
+                        <a href="javascript:" data-code="${goods.code!}" class="add_cart_small btnCart" title="加入购物车">
+                            <img width="142" src="/static/images/web/add_gouwucar02.png"/>
+                        </a>
+
+                        <div id="cg_GWC" class="ncp_yichenggongtianJia">
+                            <p>已成功加入购物车!</p>
+                        </div>
+                    </div>
+                <span style="margin-left:154px;"><img width="110" id="addGZ"
+                                                      src="/static/images/web/ttDT_guanZ${followed?'02':'01'}.png"/></span>
+                    <span class="ttDT_yigNmu">已有<label id="fcnt">${goods.followCnt}</label>人关注</span>
+                </div>
+                </p>
+                <p class="ty_gyClear ttDT_coloGroup">
+
+                <div class="ttDT_xiaDan02">
+                    <span><img src="/static/images/web/ddDT_liucheng.jpg"/></span>
+                </div>
+                </p>
+                <%if(goods.isSpecial){%>
+                <p style="color: #fc7025;font-size: 15px;padding-left:80px;padding-top:18px; display: ${goods.isSpecial?'block':'none'}">
+                    该商品为特殊商品，不享受8天无理由退货条款</p>
+                <%}%>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="ty_gyClear"></div>
+<div class="ty_gyClear"></div>
+<div class="ttDT_jiangeD"></div>
+<div class="ty_gyClear ttDT_spMiaoShu02">
+    <p class="ttDT_spMs">商品描述</p>
+    ${goods.comment}
+    <div class="ty_gyClear ttDT_jiangeD"></div>
+</div>
+<div class="ty_gyClear ttDT_jiangeD"></div>
+<%include("/web/common/foot.html"){}%>
+<script type="text/javascript">
+    var skus = ${json(skus, '\"')};
+</script>
+</body>
+</html>
