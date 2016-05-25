@@ -1,5 +1,10 @@
 package com.nachepin;
 
+import com.google.common.collect.ImmutableMap;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -34,5 +39,14 @@ public class AppTest
     public void testApp()
     {
         assertTrue( true );
+    }
+
+
+    public void testXml( ) {
+        //解决XStream对出现双下划线的bug
+        XStream xStreamForRequestPostData = new XStream(new DomDriver("UTF-8", new XmlFriendlyNameCoder("-_", "_")));
+        //将要提交给API的数据对象转换成XML格式数据Post给API
+        String postDataXML = xStreamForRequestPostData.toXML(ImmutableMap.<String, String>of("1", "1", "2", "2"));
+        System.out.println(postDataXML);
     }
 }
